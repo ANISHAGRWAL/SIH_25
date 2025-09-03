@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import SplitPane from "@/components/auth/split-pane"
-import { GradientButton } from "@/components/gradient-button"
+import { useState } from "react";
+import SplitPane from "@/components/auth/split-pane";
+import { GradientButton } from "@/components/gradient-button";
 
 export default function SignupPage() {
-  const [role, setRole] = useState<"student" | "admin">("student")
-  const [step, setStep] = useState<1 | 2>(1)
+  const [role, setRole] = useState<"student" | "admin">("student");
+  const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,10 +16,13 @@ export default function SignupPage() {
     organization: "",
     contact: "",
     idFile: undefined as File | undefined,
-  })
+  });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
-    setForm((f) => ({ ...f, [key]: value }))
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K]
+  ) {
+    setForm((f) => ({ ...f, [key]: value }));
   }
 
   return (
@@ -27,7 +30,9 @@ export default function SignupPage() {
       activeRole={role}
       onRoleChange={setRole}
       rightTitle="WELCOME!"
-      leftImage={step === 1 ? "/images/signup-step1.jpg" : "/images/signup-step2.jpg"}
+      leftImage={
+        step === 1 ? "/images/signup-step1.jpg" : "/images/signup-step2.jpg"
+      }
     >
       {step === 1 ? (
         <div className="space-y-4">
@@ -59,9 +64,9 @@ export default function SignupPage() {
         <form
           className="space-y-4"
           onSubmit={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             // TODO: connect to your Node.js/Express API
-            alert(`Signed up as ${role}.`)
+            alert(`Signed up as ${role}.`);
           }}
         >
           <LabeledInput
@@ -77,7 +82,9 @@ export default function SignupPage() {
             onChange={(e) => update("contact", e.target.value)}
           />
           <div className="space-y-2">
-            <label className="text-slate-700 text-sm font-medium">ID Proof</label>
+            <label className="text-slate-700 text-sm font-medium">
+              ID Proof
+            </label>
             <input
               className="w-full rounded-full border border-slate-300 px-4 py-3"
               type="file"
@@ -85,7 +92,11 @@ export default function SignupPage() {
             />
           </div>
           <div className="flex gap-3">
-            <GradientButton type="button" className="min-w-28" onClick={() => setStep(1)}>
+            <GradientButton
+              type="button"
+              className="min-w-28"
+              onClick={() => setStep(1)}
+            >
               Back
             </GradientButton>
             <GradientButton asFull type="submit">
@@ -95,10 +106,13 @@ export default function SignupPage() {
         </form>
       )}
     </SplitPane>
-  )
+  );
 }
 
-function LabeledInput({ label, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+function LabeledInput({
+  label,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
     <div className="space-y-2">
       <label className="text-slate-700 text-sm font-medium">{label}</label>
@@ -107,5 +121,5 @@ function LabeledInput({ label, ...props }: React.InputHTMLAttributes<HTMLInputEl
         className="w-full rounded-full border border-slate-300 px-4 py-3 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-400"
       />
     </div>
-  )
+  );
 }
