@@ -40,3 +40,7 @@ A support system where people volunteer to help you recover from stress.(user id
 Achievement
 A page where people can add their achievements which will help them to encourage self esteem. 
 
+
+
+For facial recognition have to  install:- npm install @vladmandic/face-api
+
