@@ -1,0 +1,18 @@
+import { type Request, Response } from "express";
+import { IRole } from "../db/schema/user";
+
+export interface IApiResponse {
+  success: boolean;
+  data?: object;
+  error?: {
+    message: string;
+  };
+}
+
+export interface IAuthUser {
+  email: string;
+  role?: IRole;
+}
+export interface IApiRequest extends Request {
+  user?: IAuthUser;
+}
