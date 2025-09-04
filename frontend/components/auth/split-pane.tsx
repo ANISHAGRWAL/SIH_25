@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import Image from "next/image"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
+import Image from "next/image";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function SplitPane({
   children,
@@ -21,12 +21,12 @@ export default function SplitPane({
   ),
   leftImage = "/images/signup-step1.jpg",
 }: {
-  children: React.ReactNode
-  activeRole?: "student" | "admin"
-  onRoleChange?: (role: "student" | "admin") => void
-  rightTitle?: string
-  rightSubtitle?: React.ReactNode
-  leftImage?: string
+  children: React.ReactNode;
+  activeRole?: "student" | "admin";
+  onRoleChange?: (role: "student" | "admin") => void;
+  rightTitle?: string;
+  rightSubtitle?: React.ReactNode;
+  leftImage?: string;
 }) {
   return (
     <div className="min-h-[100dvh] grid md:grid-cols-2 bg-[#EFF9FA]">
@@ -44,7 +44,9 @@ export default function SplitPane({
 
       <div className="bg-white p-6 md:p-12 flex flex-col gap-6 justify-center">
         <header className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-wide text-slate-800">{rightTitle}</h1>
+          <h1 className="text-3xl font-semibold tracking-wide text-slate-800">
+            {rightTitle}
+          </h1>
           {rightSubtitle}
         </header>
 
@@ -55,7 +57,7 @@ export default function SplitPane({
               "rounded-full px-6 py-2 ring-1 ring-slate-300 shadow-sm",
               activeRole === "student"
                 ? "bg-gradient-to-r from-teal-400 to-sky-700 text-white"
-                : "bg-white text-slate-700",
+                : "bg-white text-slate-700"
             )}
           >
             Student
@@ -66,7 +68,7 @@ export default function SplitPane({
               "rounded-full px-6 py-2 ring-1 ring-slate-300 shadow-sm",
               activeRole === "admin"
                 ? "bg-gradient-to-r from-teal-400 to-sky-700 text-white"
-                : "bg-white text-slate-700",
+                : "bg-white text-slate-700"
             )}
           >
             Admin
@@ -76,5 +78,5 @@ export default function SplitPane({
         <div className="max-w-md">{children}</div>
       </div>
     </div>
-  )
+  );
 }
