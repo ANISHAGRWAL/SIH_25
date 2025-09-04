@@ -210,9 +210,9 @@ export default function ExpertSupportPage() {
           <button onClick={handleCloseResult} className={`flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded-lg transition-colors ${isMobile ? 'py-2 px-3 text-sm' : 'py-3 px-4'}`}>
             Close
           </button>
-          <button onClick={handleRetake} className={`flex-1 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-semibold rounded-lg transition-all duration-200 ${isMobile ? 'py-2 px-3 text-sm' : 'py-3 px-4'}`}>
+          {/* <button onClick={handleRetake} className={`flex-1 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-semibold rounded-lg transition-all duration-200 ${isMobile ? 'py-2 px-3 text-sm' : 'py-3 px-4'}`}>
             Try Again
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
