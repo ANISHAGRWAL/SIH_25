@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import { Poppins } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
+import type React from "react"
+
+const poppins = Poppins({ weight: ['400', '700'], subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'v0 App',
@@ -13,14 +15,14 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans ${poppins.className}`}>
         {children}
         <Analytics />
       </body>
     </html>
-  )
+  );
 }
