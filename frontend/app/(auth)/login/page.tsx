@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import SplitPane from "@/components/auth/split-pane"
-import Link from "next/link"
-import { GradientButton } from "@/components/gradient-button"
+import SplitPane from "@/components/auth/split-pane";
+import Link from "next/link";
+import { GradientButton } from "@/components/gradient-button";
 
 export default function LoginPage() {
   return (
@@ -20,9 +20,9 @@ export default function LoginPage() {
       <form
         className="space-y-4"
         onSubmit={(e) => {
-          e.preventDefault()
+          e.preventDefault();
           // TODO: authenticate against your backend
-          location.href = "/dashboard"
+          location.href = "/dashboard";
         }}
       >
         <div className="space-y-2">
@@ -46,5 +46,5 @@ export default function LoginPage() {
         </GradientButton>
       </form>
     </SplitPane>
-  )
+  );
 }
