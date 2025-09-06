@@ -4,10 +4,10 @@
   "description": "",
   "main": "dist",
   "scripts": {
-    "start": "node dist",
+    "start": "node dist/src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 NODE_ENV=development concurrently \"tsc --watch\" \"nodemon dist/src\"",
-    "build": "NODE_OPTIONS=--max-old-space-size=4096 tsc -p tsconfig.json",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 tsc -p tsconfig.json",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts"
   },
