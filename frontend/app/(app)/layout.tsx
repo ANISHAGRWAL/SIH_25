@@ -211,14 +211,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   Services
                 </Link>
                 <Link 
-                  href="#" 
+                  href="/contacts" 
                   className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Contact
                 </Link>
                 <Link 
-                  href="#" 
+                  href="/blogs" 
                   className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
