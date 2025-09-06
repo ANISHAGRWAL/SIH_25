@@ -12,15 +12,52 @@ export default function ChatbotPage() {
     { id: "4", role: "bot", text: "Are you feeling good", time: "9:03 am" },
   ])
   const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  function send() {
+  async function send() {
     if (!input.trim()) return
-    setMessages((m) => [
-      ...m,
-      { id: crypto.randomUUID(), role: "user", text: input, time: new Date().toLocaleTimeString() },
-    ])
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: "user",
+      text: input,
+      time: new Date().toLocaleTimeString(),
+    }
+
+    setMessages((m) => [...m, userMessage])
     setInput("")
-    // TODO: connect to AI SDK backed by your Node/Express API
+    setLoading(true)
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ session_id: "frontend-user", query: input }),
+})
+
+const data = await res.json()
+
+const botMessage: Message = {
+  id: crypto.randomUUID(),
+  role: "bot",
+  text: data.response,  // matches FastAPI
+  time: new Date().toLocaleTimeString(),
+}
+
+
+      setMessages((m) => [...m, botMessage])
+    } catch (error) {
+      console.error("Backend error:", error)
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        role: "bot",
+        text: "Sorry, I could not connect to the server.",
+        time: new Date().toLocaleTimeString(),
+      }
+      setMessages((m) => [...m, errorMessage])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -42,6 +79,7 @@ export default function ChatbotPage() {
               </div>
             </div>
           ))}
+          {loading && <p className="text-slate-500 text-sm">Bot is typing...</p>}
         </div>
         <div className="p-3 border-t flex items-center gap-2">
           <input
@@ -53,8 +91,9 @@ export default function ChatbotPage() {
           <button
             className="rounded-full px-4 py-2 bg-gradient-to-r from-teal-400 to-sky-700 text-white"
             onClick={send}
+            disabled={loading}
           >
-            Send
+            {loading ? "..." : "Send"}
           </button>
         </div>
       </div>

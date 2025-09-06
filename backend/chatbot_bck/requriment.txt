@@ -1,0 +1,20 @@
+# core libraries
+langchain
+llama-index
+haystack
+
+
+# for bckend server
+fastapi
+uvicorn
+
+# Addtional tools
+requests
+python-dotenv
+
+# Google Gemini + embeddings
+langchain-google-genai
+llama-index-llms-gemini
+llama-index-embeddings-huggingface
+transformers
+sentence-transformers
