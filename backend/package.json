@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist",
   "scripts": {
-    "start": "node dist",
+    "start": "node dist/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 NODE_ENV=development concurrently \"tsc --watch\" \"nodemon dist/src\"",
     "build": "NODE_OPTIONS=--max-old-space-size=4096 tsc -p tsconfig.json",
