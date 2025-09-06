@@ -1,12 +1,17 @@
 "use client";
 
 import type React from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import SplitPane from "@/components/auth/split-pane";
 import { GradientButton } from "@/components/gradient-button";
+import { register } from "@/actions/auth";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { isAuthenticated, token, loading, getTokens } = useAuth();
+
   const [role, setRole] = useState<"student" | "admin">("student");
   const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState({
@@ -18,6 +23,13 @@ export default function SignupPage() {
     idFile: undefined as File | undefined,
   });
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated && token) {
+      router.replace("/dashboard");
+    }
+  }, [loading, isAuthenticated, token, router]);
+
   function update<K extends keyof typeof form>(
     key: K,
     value: (typeof form)[K]
@@ -25,8 +37,42 @@ export default function SignupPage() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
+  async function handleSignup(e: React.FormEvent) {
+    e.preventDefault();
+
+    try {
+      const body = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role,
+        organization: form.organization,
+        contact: form.contact,
+        idFile: form.idFile,
+      };
+
+      const res = await register(body);
+      const data = res?.data;
+      if (data.success && data.data) {
+        localStorage.setItem("token", data.data.token);
+        getTokens(); // Sync AuthContext
+        router.push("/dashboard");
+      } else {
+        alert("Signup failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    }
+  }
+
+  if (loading || (isAuthenticated && token)) {
+    return null; // Or loading spinner
+  }
+
   return (
     <SplitPane
+      isLoginPage={false}
       activeRole={role}
       onRoleChange={setRole}
       rightTitle="WELCOME!"
@@ -61,14 +107,7 @@ export default function SignupPage() {
           </GradientButton>
         </div>
       ) : (
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            // TODO: connect to your Node.js/Express API
-            alert(`Signed up as ${role}.`);
-          }}
-        >
+        <form className="space-y-4" onSubmit={handleSignup}>
           <LabeledInput
             label="Organization"
             placeholder="Techno Main Salt Lake"

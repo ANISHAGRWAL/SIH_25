@@ -7,6 +7,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function SplitPane({
+  isLoginPage = false,
   children,
   activeRole = "student",
   onRoleChange,
@@ -21,6 +22,7 @@ export default function SplitPane({
   ),
   leftImage = "/images/signup-step1.jpg",
 }: {
+  isLoginPage?: boolean;
   children: React.ReactNode;
   activeRole?: "student" | "admin";
   onRoleChange?: (role: "student" | "admin") => void;
@@ -50,30 +52,32 @@ export default function SplitPane({
           {rightSubtitle}
         </header>
 
-        <div className="flex gap-4">
-          <button
-            onClick={() => onRoleChange?.("student")}
-            className={cn(
-              "rounded-full px-6 py-2 ring-1 ring-slate-300 shadow-sm",
-              activeRole === "student"
-                ? "bg-gradient-to-r from-teal-400 to-sky-700 text-white"
-                : "bg-white text-slate-700"
-            )}
-          >
-            Student
-          </button>
-          <button
-            onClick={() => onRoleChange?.("admin")}
-            className={cn(
-              "rounded-full px-6 py-2 ring-1 ring-slate-300 shadow-sm",
-              activeRole === "admin"
-                ? "bg-gradient-to-r from-teal-400 to-sky-700 text-white"
-                : "bg-white text-slate-700"
-            )}
-          >
-            Admin
-          </button>
-        </div>
+        {isLoginPage ? null : (
+          <div className="flex gap-4">
+            <button
+              onClick={() => onRoleChange?.("student")}
+              className={cn(
+                "rounded-full px-6 py-2 ring-1 ring-slate-300 shadow-sm",
+                activeRole === "student"
+                  ? "bg-gradient-to-r from-teal-400 to-sky-700 text-white"
+                  : "bg-white text-slate-700"
+              )}
+            >
+              Student
+            </button>
+            <button
+              onClick={() => onRoleChange?.("admin")}
+              className={cn(
+                "rounded-full px-6 py-2 ring-1 ring-slate-300 shadow-sm",
+                activeRole === "admin"
+                  ? "bg-gradient-to-r from-teal-400 to-sky-700 text-white"
+                  : "bg-white text-slate-700"
+              )}
+            >
+              Admin
+            </button>
+          </div>
+        )}
 
         <div className="max-w-md">{children}</div>
       </div>

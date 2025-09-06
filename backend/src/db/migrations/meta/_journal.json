@@ -15,6 +15,20 @@
       "when": 1756933895955,
       "tag": "0001_cloudy_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757142529618,
+      "tag": "0002_flawless_rictor",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1757149623363,
+      "tag": "0003_fat_dracula",
+      "breakpoints": true
     }
   ]
 }

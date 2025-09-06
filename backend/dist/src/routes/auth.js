@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const auth_1 = require("../controllers/auth");
 const router = express_1.default.Router();
-router.post("/register", (req, res) => {
+router.post('/register', (req, res) => {
     (0, auth_1.registerUser)(req.body)
         .then((data) => {
-        res.status(200).json({ data });
+        res.status(200).json({ success: true, data });
     })
         .catch((error) => {
         res
@@ -17,7 +17,7 @@ router.post("/register", (req, res) => {
             .json({ success: false, error: { message: error.message } });
     });
 });
-router.post("/login", (req, res) => {
+router.post('/login', (req, res) => {
     (0, auth_1.loginUser)(req.body)
         .then((data) => {
         res.status(200).json({ success: true, data });

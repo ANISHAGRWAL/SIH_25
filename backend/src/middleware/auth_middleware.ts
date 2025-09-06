@@ -1,7 +1,7 @@
-import { NextFunction, Response } from "express";
-import { db } from "../db";
-import { IApiRequest } from "../types";
-import jwt from "jsonwebtoken";
+import { NextFunction, Response } from 'express';
+import { db } from '../db';
+import { IApiRequest } from '../types';
+import jwt from 'jsonwebtoken';
 
 const verifyToken = async (token: string) => {
   try {
@@ -13,7 +13,7 @@ const verifyToken = async (token: string) => {
       where: (user, { eq }) => eq(user.email, (decodedToken as any).email),
     });
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
     return user;
   } catch (error) {
@@ -27,26 +27,26 @@ const authMiddleware = (
   next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader && authHeader.split(' ')[1];
   if (!token) {
     return res
       .status(401)
-      .json({ success: false, error: { message: "No token provided" } });
+      .json({ success: false, error: { message: 'No token provided' } });
   }
   verifyToken(token)
     .then((user) => {
       if (!user) {
         return res
           .status(401)
-          .json({ success: false, error: { message: "Invalid token" } });
+          .json({ success: false, error: { message: 'Invalid token' } });
       }
-      req.user = { email: user.email, role: user.role };
+      req.user = { id: user.id, email: user.email, role: user.role };
       next();
     })
     .catch((error) => {
       res
         .status(401)
-        .json({ success: false, error: { message: "Invalid token" } });
+        .json({ success: false, error: { message: 'Invalid token' } });
     });
 };
 
