@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { StatusDot } from "@/components/status-dot";
 import ExpertSupportPage from "../expert-support/page";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -99,8 +100,9 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <h2 className="text-xl md:text-2xl font-semibold">Welcome Amar,</h2>
 
-      <section className="grid md:grid-cols-3 gap-4">
-        <div className="col-span-3 rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+      <section className="space-y-4">
+        {/* Mood Selection Card - Full Width */}
+        <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
           {!selectedMood ? (
             <>
               <p className="text-center font-medium text-slate-700 mb-6 text-lg">
@@ -167,12 +169,6 @@ export default function DashboardPage() {
                   
                   <div className="flex gap-2 justify-center">
                     <button
-                      onClick={getAnotherMessage}
-                      className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm rounded-lg transition-colors font-medium"
-                    >
-                      Another Message
-                    </button>
-                    <button
                       onClick={resetMoodSelection}
                       className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition-colors font-medium"
                     >
@@ -185,27 +181,126 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-          <div className="flex items-center justify-between">
-            <p className="font-medium">Start Face Check-In</p>
-            <StatusDot status="success" />
+        {/* Three Feature Cards - Mobile: Stack Vertically, Desktop: Side by Side */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Face Check-In Card - Updated to use facial-mood-detection route */}
+          <div
+            onClick={() => (location.href = "/facial-mood-detection")}
+            className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                location.href = "/facial-mood-detection";
+              }
+            }}
+          >
+            {/* Mobile Layout */}
+            <div className="md:hidden flex flex-col items-center text-center">
+              <div className="flex items-center justify-between w-full mb-4">
+                <h3 className="font-semibold text-gray-800">Start Face Check-In</h3>
+                <StatusDot status="success" />
+              </div>
+              <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
+                <img src="/faceicon.png" alt="Face scan" />
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Quick facial emotion analysis to understand your current mood
+              </p>
+            </div>
+
+            {/* Desktop Layout */}
+            <div className="hidden md:block">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800">Start Face Check-In</h3>
+                <StatusDot status="success" />
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <img src="/faceicon.png" alt="Face scan" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Quick facial emotion analysis to understand your current mood
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mt-3 h-28 rounded-xl bg-slate-50 flex items-center justify-center">
-            <span className="text-slate-400">Face scan placeholder</span>
+
+          {/* Voice Mood Check Card */}
+          <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-lg transition-shadow duration-300">
+            {/* Mobile Layout */}
+            <div className="md:hidden flex flex-col items-center text-center">
+              <div className="flex items-center justify-between w-full mb-4">
+                <h3 className="font-semibold text-gray-800">Start Voice Mood Check</h3>
+                <StatusDot status="pending" />
+              </div>
+              <div className="w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center mb-4">
+                <img src="/mic.png" alt="Voice analysis" className="" />
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Voice tone analysis to detect emotional patterns - Coming Soon
+              </p>
+            </div>
+            
+            {/* Desktop Layout */}
+            <div className="hidden md:block">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800">Start Voice Mood Check</h3>
+                <StatusDot status="pending" />
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <img src="/mic.png" alt="Voice analysis" className="" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Voice tone analysis to detect emotional patterns - Coming Soon
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mental Detox Card */}
+          <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-lg transition-shadow duration-300">
+            {/* Mobile Layout */}
+            <div className="md:hidden flex flex-col items-center text-center">
+              <div className="flex items-center justify-between w-full mb-4">
+                <h3 className="font-semibold text-gray-800">5-Minute Mental Detox</h3>
+                <StatusDot status="pending" />
+              </div>
+              <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center mb-4">
+                <img src="/yoga.png" alt="Mental wellness" className="" />
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Guided stretches and breathing exercises to refresh focus and ease stress
+              </p>
+            </div>
+            
+            {/* Desktop Layout */}
+            <div className="hidden md:block">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800">5-Minute Mental Detox</h3>
+                <StatusDot status="pending" />
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <img src="/yoga.png" alt="Mental wellness" className="" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Guided stretches and breathing exercises to refresh focus and ease stress
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Media Player Controls */}
         <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-          <div className="flex items-center justify-between">
-            <p className="font-medium">Start Voice Mood Check</p>
-            <StatusDot status="pending" />
-          </div>
-          <div className="mt-3 h-28 rounded-xl bg-slate-50 flex items-center justify-center">
-            <span className="text-slate-400">Microphone placeholder</span>
-          </div>
-        </div>
-
-        <div className="col-span-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
           <div className="h-24 rounded-xl flex items-center justify-center gap-4 px-6">
             <button
               className="size-10 rounded-full bg-white shadow-md hover:shadow-lg transition-shadow"
@@ -227,24 +322,6 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
-
-        <div className="col-span-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/woman-in-nature-yoga.png" alt="" className="h-12 w-12" />
-            <div>
-              <p className="font-semibold">Your 5-minute mental detox</p>
-              <p className="text-sm text-slate-600">
-                Guided stretches to refresh focus and ease stress.
-              </p>
-            </div>
-          </div>
-          <button className="rounded-full px-4 py-2 bg-slate-800 text-white">
-            Start Now
-          </button>
-        </div>
-        <h1 onClick={() => (location.href = "/facial-mood-detection")}>
-          facial-mood-detection
-        </h1>
       </section>
     </div>
   );

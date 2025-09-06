@@ -24,6 +24,7 @@ export default function ExpertSupportPage() {
   const [autoStart, setAutoStart] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [detectionStatus, setDetectionStatus] = useState<'idle' | 'complete' | 'incomplete'>('idle');
 
   useEffect(() => {
     const loadModels = async () => {
@@ -67,11 +68,13 @@ export default function ExpertSupportPage() {
     setMood(null);
     setErrorMsg(null);
     setIsDetecting(true);
+    setDetectionStatus('idle');
 
     const input = await getCameraInput();
     if (!input) {
       setErrorMsg("Unable to access camera.");
       setIsDetecting(false);
+      setDetectionStatus('incomplete');
       return;
     }
 
@@ -80,6 +83,7 @@ export default function ExpertSupportPage() {
     if (!canvas || !ctx) {
       setErrorMsg("Canvas not available.");
       setIsDetecting(false);
+      setDetectionStatus('incomplete');
       return;
     }
 
@@ -90,9 +94,11 @@ export default function ExpertSupportPage() {
 
       if (!detection) {
         setErrorMsg("No face detected. Please try again.");
+        setDetectionStatus('incomplete');
       } else {
         const topMood = Object.entries(detection.expressions!).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
         setMood(topMood);
+        setDetectionStatus('complete');
       }
       setIsDetecting(false);
     };
@@ -129,6 +135,7 @@ export default function ExpertSupportPage() {
   const handleRetake = () => {
     setMood(null);
     setErrorMsg(null);
+    setDetectionStatus('idle');
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
@@ -142,6 +149,7 @@ export default function ExpertSupportPage() {
   const handleCloseResult = () => {
     setMood(null);
     setErrorMsg(null);
+    setDetectionStatus('idle');
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
@@ -200,8 +208,17 @@ export default function ExpertSupportPage() {
           <div className="flex items-center justify-between">
             <span className="font-medium text-slate-600">Status</span>
             <div className="flex items-center gap-1">
-              <div className="bg-green-500 rounded-full w-2 h-2 animate-pulse"></div>
-              <span className="font-bold text-green-600">Complete</span>
+              {detectionStatus === 'complete' ? (
+                <>
+                  <div className="bg-green-500 rounded-full w-2 h-2 animate-pulse"></div>
+                  <span className="font-bold text-green-600">Complete</span>
+                </>
+              ) : (
+                <>
+                  <div className="bg-red-500 rounded-full w-2 h-2"></div>
+                  <span className="font-bold text-red-600">Incomplete</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -210,9 +227,6 @@ export default function ExpertSupportPage() {
           <button onClick={handleCloseResult} className={`flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded-lg transition-colors ${isMobile ? 'py-2 px-3 text-sm' : 'py-3 px-4'}`}>
             Close
           </button>
-          {/* <button onClick={handleRetake} className={`flex-1 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-semibold rounded-lg transition-all duration-200 ${isMobile ? 'py-2 px-3 text-sm' : 'py-3 px-4'}`}>
-            Try Again
-          </button> */}
         </div>
       </div>
     </div>
@@ -321,9 +335,6 @@ export default function ExpertSupportPage() {
                   className="w-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   <div className="flex items-center justify-center gap-3">
-                    {/* <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg> */}
                     Start Mood Detection
                   </div>
                 </button>
