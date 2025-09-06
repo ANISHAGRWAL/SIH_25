@@ -21,7 +21,7 @@ const verifyToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
             where: (user, { eq }) => eq(user.email, decodedToken.email),
         });
         if (!user) {
-            throw new Error("User not found");
+            throw new Error('User not found');
         }
         return user;
     }
@@ -31,26 +31,26 @@ const verifyToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = authHeader && authHeader.split(' ')[1];
     if (!token) {
         return res
             .status(401)
-            .json({ success: false, error: { message: "No token provided" } });
+            .json({ success: false, error: { message: 'No token provided' } });
     }
     verifyToken(token)
         .then((user) => {
         if (!user) {
             return res
                 .status(401)
-                .json({ success: false, error: { message: "Invalid token" } });
+                .json({ success: false, error: { message: 'Invalid token' } });
         }
-        req.user = { email: user.email, role: user.role };
+        req.user = { id: user.id, email: user.email, role: user.role };
         next();
     })
         .catch((error) => {
         res
             .status(401)
-            .json({ success: false, error: { message: "Invalid token" } });
+            .json({ success: false, error: { message: 'Invalid token' } });
     });
 };
 exports.default = authMiddleware;

@@ -4,12 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const auth_1 = require("../controllers/auth");
+const student_1 = require("../controllers/student");
 const router = express_1.default.Router();
-router.post('/register', (req, res) => {
-    (0, auth_1.registerUser)(req.body)
+router.post('/facial-detection', (req, res) => {
+    if (!req.user) {
+        return res
+            .status(401)
+            .json({ success: false, error: { message: 'Unauthorized' } });
+    }
+    (0, student_1.facialDetection)(req.user, req.body)
         .then((data) => {
-        res.status(200).json({ success: true, data });
+        res.status(200).json({ data });
     })
         .catch((error) => {
         res
@@ -17,15 +22,7 @@ router.post('/register', (req, res) => {
             .json({ success: false, error: { message: error.message } });
     });
 });
-router.post('/login', (req, res) => {
-    (0, auth_1.loginUser)(req.body)
-        .then((data) => {
-        res.status(200).json({ success: true, data });
-    })
-        .catch((error) => {
-        res
-            .status(400)
-            .json({ success: false, error: { message: error.message } });
-    });
+router.get('/me', (req, res) => {
+    res.status(200).json({ success: true, data: req.user });
 });
 exports.default = router;

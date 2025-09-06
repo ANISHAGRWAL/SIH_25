@@ -1,16 +1,26 @@
-import { pgEnum, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import { studentMoods } from './studentMoods';
 
-export const RoleEnum = pgEnum("role", ["student", "admin"]);
+export const RoleEnum = pgEnum('role', ['student', 'admin']);
 
-export const user = pgTable("users", {
-  id: uuid("id")
+export const user = pgTable('users', {
+  id: uuid('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  role: RoleEnum("role").default("student").notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(),
+  role: RoleEnum('role').default('student').notNull(),
+  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
+
+export const userRelations = relations(user, ({ many }) => ({
+  moods: many(studentMoods, { relationName: 'student_moods' }),
+}));
 
 export type IRole = (typeof RoleEnum.enumValues)[number];
 export type IUser = typeof user.$inferSelect;

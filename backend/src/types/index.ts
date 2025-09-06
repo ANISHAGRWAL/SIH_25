@@ -1,5 +1,5 @@
-import { type Request, Response } from "express";
-import { IRole } from "../db/schema/user";
+import { type Request, Response } from 'express';
+import { IRole } from '../db/schema/user';
 
 export interface IApiResponse {
   success: boolean;
@@ -10,6 +10,7 @@ export interface IApiResponse {
 }
 
 export interface IAuthUser {
+  id: string;
   email: string;
   role?: IRole;
 }
