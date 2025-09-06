@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { StatusDot } from "@/components/status-dot";
 import ExpertSupportPage from "../expert-support/page";
 import Link from "next/link";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -54,16 +55,47 @@ export default function DashboardPage() {
   };
 
   const moods = [
-    { key: "happy", emoji: "😊", label: "Happy", color: "bg-yellow-100 hover:bg-yellow-200" },
-    { key: "neutral", emoji: "😐", label: "Neutral", color: "bg-gray-100 hover:bg-gray-200" },
-    { key: "sad", emoji: "😢", label: "Sad", color: "bg-blue-100 hover:bg-blue-200" },
-    { key: "angry", emoji: "😠", label: "Angry", color: "bg-red-100 hover:bg-red-200" },
-    { key: "fearful", emoji: "😰", label: "Fearful", color: "bg-purple-100 hover:bg-purple-200" },
-    { key: "disgusted", emoji: "🤢", label: "Disgusted", color: "bg-green-100 hover:bg-green-200" },
+    {
+      key: "happy",
+      emoji: "😊",
+      label: "Happy",
+      color: "bg-yellow-100 hover:bg-yellow-200",
+    },
+    {
+      key: "neutral",
+      emoji: "😐",
+      label: "Neutral",
+      color: "bg-gray-100 hover:bg-gray-200",
+    },
+    {
+      key: "sad",
+      emoji: "😢",
+      label: "Sad",
+      color: "bg-blue-100 hover:bg-blue-200",
+    },
+    {
+      key: "angry",
+      emoji: "😠",
+      label: "Angry",
+      color: "bg-red-100 hover:bg-red-200",
+    },
+    {
+      key: "fearful",
+      emoji: "😰",
+      label: "Fearful",
+      color: "bg-purple-100 hover:bg-purple-200",
+    },
+    {
+      key: "disgusted",
+      emoji: "🤢",
+      label: "Disgusted",
+      color: "bg-green-100 hover:bg-green-200",
+    },
   ];
 
   const handleMoodClick = (moodKey: string) => {
-    const messages = motivationalMessages[moodKey as keyof typeof motivationalMessages];
+    const messages =
+      motivationalMessages[moodKey as keyof typeof motivationalMessages];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     setSelectedMood(moodKey);
     setCurrentMessage(randomMessage);
@@ -71,8 +103,10 @@ export default function DashboardPage() {
 
   const getAnotherMessage = () => {
     if (selectedMood) {
-      const messages = motivationalMessages[selectedMood as keyof typeof motivationalMessages];
-      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+      const messages =
+        motivationalMessages[selectedMood as keyof typeof motivationalMessages];
+      const randomMessage =
+        messages[Math.floor(Math.random() * messages.length)];
       setCurrentMessage(randomMessage);
     }
   };
@@ -83,20 +117,21 @@ export default function DashboardPage() {
   };
 
   const renderMoodButton = (mood: any, isLarge = false) => {
-    const sizeClasses = isLarge 
-      ? "text-8xl" 
-      : "text-5xl md:text-6xl";
-    
+    const sizeClasses = isLarge ? "text-8xl" : "text-5xl md:text-6xl";
+
     return (
-      <div className={`flex items-center justify-center ${!isLarge ? 'cursor-pointer hover:scale-110 active:scale-95' : ''} transition-all duration-200`}>
-        <span className={`select-none ${sizeClasses}`}>
-          {mood.emoji}
-        </span>
+      <div
+        className={`flex items-center justify-center ${
+          !isLarge ? "cursor-pointer hover:scale-110 active:scale-95" : ""
+        } transition-all duration-200`}
+      >
+        <span className={`select-none ${sizeClasses}`}>{mood.emoji}</span>
       </div>
     );
   };
 
   return (
+    // <ProtectedRoute>
     <div className="space-y-6">
       <h2 className="text-xl md:text-2xl font-semibold">Welcome Amar,</h2>
 
@@ -117,7 +152,9 @@ export default function DashboardPage() {
                     className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-50/80 transition-all duration-300"
                   >
                     {renderMoodButton(mood)}
-                    <span className="text-sm font-medium text-slate-600">{mood.label}</span>
+                    <span className="text-sm font-medium text-slate-600">
+                      {mood.label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -126,9 +163,12 @@ export default function DashboardPage() {
             <div className="pl-4">
               <div className="hidden md:flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  {renderMoodButton(moods.find((m) => m.key === selectedMood)!, true)}
+                  {renderMoodButton(
+                    moods.find((m) => m.key === selectedMood)!,
+                    true
+                  )}
                 </div>
-                
+
                 <div className="flex-1">
                   <div className="text-base text-gray-600 mb-3">
                     You said you were feeling{" "}
@@ -139,7 +179,7 @@ export default function DashboardPage() {
                   <p className="text-base text-gray-700 leading-relaxed mb-4">
                     {currentMessage}
                   </p>
-                  
+
                   <div className="flex gap-3">
                     <button
                       onClick={resetMoodSelection}
@@ -153,9 +193,12 @@ export default function DashboardPage() {
 
               <div className="md:hidden flex flex-col items-center text-center">
                 <div className="mb-4">
-                  {renderMoodButton(moods.find((m) => m.key === selectedMood)!, true)}
+                  {renderMoodButton(
+                    moods.find((m) => m.key === selectedMood)!,
+                    true
+                  )}
                 </div>
-                
+
                 <div className="w-full">
                   <div className="text-base text-gray-600 mb-3">
                     You said you were feeling{" "}
@@ -166,7 +209,7 @@ export default function DashboardPage() {
                   <p className="text-base text-gray-700 leading-relaxed mb-4">
                     {currentMessage}
                   </p>
-                  
+
                   <div className="flex gap-2 justify-center">
                     <button
                       onClick={resetMoodSelection}
@@ -198,7 +241,9 @@ export default function DashboardPage() {
             {/* Mobile Layout */}
             <div className="md:hidden flex flex-col items-center text-center">
               <div className="flex items-center justify-between w-full mb-4">
-                <h3 className="font-semibold text-gray-800">Start Face Check-In</h3>
+                <h3 className="font-semibold text-gray-800">
+                  Start Face Check-In
+                </h3>
                 <StatusDot status="success" />
               </div>
               <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
@@ -212,7 +257,9 @@ export default function DashboardPage() {
             {/* Desktop Layout */}
             <div className="hidden md:block">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800">Start Face Check-In</h3>
+                <h3 className="font-semibold text-gray-800">
+                  Start Face Check-In
+                </h3>
                 <StatusDot status="success" />
               </div>
               <div className="flex items-center gap-4">
@@ -221,7 +268,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Quick facial emotion analysis to understand your current mood
+                    Quick facial emotion analysis to understand your current
+                    mood
                   </p>
                 </div>
               </div>
@@ -233,7 +281,9 @@ export default function DashboardPage() {
             {/* Mobile Layout */}
             <div className="md:hidden flex flex-col items-center text-center">
               <div className="flex items-center justify-between w-full mb-4">
-                <h3 className="font-semibold text-gray-800">Start Voice Mood Check</h3>
+                <h3 className="font-semibold text-gray-800">
+                  Start Voice Mood Check
+                </h3>
                 <StatusDot status="pending" />
               </div>
               <div className="w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center mb-4">
@@ -243,11 +293,13 @@ export default function DashboardPage() {
                 Voice tone analysis to detect emotional patterns - Coming Soon
               </p>
             </div>
-            
+
             {/* Desktop Layout */}
             <div className="hidden md:block">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800">Start Voice Mood Check</h3>
+                <h3 className="font-semibold text-gray-800">
+                  Start Voice Mood Check
+                </h3>
                 <StatusDot status="pending" />
               </div>
               <div className="flex items-center gap-4">
@@ -256,7 +308,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Voice tone analysis to detect emotional patterns - Coming Soon
+                    Voice tone analysis to detect emotional patterns - Coming
+                    Soon
                   </p>
                 </div>
               </div>
@@ -268,21 +321,26 @@ export default function DashboardPage() {
             {/* Mobile Layout */}
             <div className="md:hidden flex flex-col items-center text-center">
               <div className="flex items-center justify-between w-full mb-4">
-                <h3 className="font-semibold text-gray-800">5-Minute Mental Detox</h3>
+                <h3 className="font-semibold text-gray-800">
+                  5-Minute Mental Detox
+                </h3>
                 <StatusDot status="pending" />
               </div>
               <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center mb-4">
                 <img src="/yoga.png" alt="Mental wellness" className="" />
               </div>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Guided stretches and breathing exercises to refresh focus and ease stress
+                Guided stretches and breathing exercises to refresh focus and
+                ease stress
               </p>
             </div>
-            
+
             {/* Desktop Layout */}
             <div className="hidden md:block">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800">5-Minute Mental Detox</h3>
+                <h3 className="font-semibold text-gray-800">
+                  5-Minute Mental Detox
+                </h3>
                 <StatusDot status="pending" />
               </div>
               <div className="flex items-center gap-4">
@@ -291,7 +349,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Guided stretches and breathing exercises to refresh focus and ease stress
+                    Guided stretches and breathing exercises to refresh focus
+                    and ease stress
                   </p>
                 </div>
               </div>
@@ -324,5 +383,6 @@ export default function DashboardPage() {
         </div>
       </section>
     </div>
+    // </ProtectedRoute>
   );
 }
