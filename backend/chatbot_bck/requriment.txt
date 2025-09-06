@@ -12,7 +12,7 @@ uvicorn
 requests
 python-dotenv
 
-# Google Gemini + embeddings
+
 langchain-google-genai
 llama-index-llms-gemini
 llama-index-embeddings-huggingface
