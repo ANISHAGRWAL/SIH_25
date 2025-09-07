@@ -4,8 +4,7 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import SplitPane from "@/components/auth/split-pane";
-import { GradientButton } from "@/components/gradient-button";
+import Link from "next/link";
 import { register } from "@/actions/auth";
 
 export default function SignupPage() {
@@ -22,6 +21,11 @@ export default function SignupPage() {
     contact: "",
     idFile: undefined as File | undefined,
   });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // You can change this image URL to any image you want for the center
+  const centerImage = step === 1 ? "/login.png" : "/login.png";
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -29,6 +33,13 @@ export default function SignupPage() {
       router.replace("/dashboard");
     }
   }, [loading, isAuthenticated, token, router]);
+
+  // Clear error when user starts typing
+  useEffect(() => {
+    if (error) {
+      setError("");
+    }
+  }, [form.name, form.email, form.password, form.organization, form.contact]);
 
   function update<K extends keyof typeof form>(
     key: K,
@@ -39,6 +50,8 @@ export default function SignupPage() {
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
     try {
       const body = {
@@ -52,99 +65,280 @@ export default function SignupPage() {
       };
 
       const res = await register(body);
+      console.log("response", res);
       const data = res?.data;
       if (data.success && data.data) {
         localStorage.setItem("token", data.data.token);
         getTokens(); // Sync AuthContext
         router.push("/dashboard");
       } else {
-        alert("Signup failed.");
+        // Set specific error message based on response
+        if (data?.message) {
+          setError(data.message);
+        } else {
+          setError("Signup failed. Please try again.");
+        }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Something went wrong.");
+      // Handle different types of errors
+      if (err?.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err?.message) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
+  function handleNext(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+    setStep(2);
+  }
+
   if (loading || (isAuthenticated && token)) {
-    return null; // Or loading spinner
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
-    <SplitPane
-      isLoginPage={false}
-      activeRole={role}
-      onRoleChange={setRole}
-      rightTitle="WELCOME!"
-      leftImage={
-        step === 1 ? "/images/signup-step1.jpg" : "/images/signup-step2.jpg"
-      }
-    >
-      {step === 1 ? (
-        <div className="space-y-4">
-          <LabeledInput
-            label="Full Name"
-            placeholder="Ashika Jain"
-            value={form.name}
-            onChange={(e) => update("name", e.target.value)}
-          />
-          <LabeledInput
-            label="Email"
-            type="email"
-            placeholder="name@email.com"
-            value={form.email}
-            onChange={(e) => update("email", e.target.value)}
-          />
-          <LabeledInput
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            value={form.password}
-            onChange={(e) => update("password", e.target.value)}
-          />
-          <GradientButton asFull onClick={() => setStep(2)}>
-            Next
-          </GradientButton>
-        </div>
-      ) : (
-        <form className="space-y-4" onSubmit={handleSignup}>
-          <LabeledInput
-            label="Organization"
-            placeholder="Techno Main Salt Lake"
-            value={form.organization}
-            onChange={(e) => update("organization", e.target.value)}
-          />
-          <LabeledInput
-            label="Contact"
-            placeholder="+91 78233 18393"
-            value={form.contact}
-            onChange={(e) => update("contact", e.target.value)}
-          />
-          <div className="space-y-2">
-            <label className="text-slate-700 text-sm font-medium">
-              ID Proof
-            </label>
-            <input
-              className="w-full rounded-full border border-slate-300 px-4 py-3"
-              type="file"
-              onChange={(e) => update("idFile", e.target.files?.[0])}
+    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Left Side - Centered Image and Text */}
+      <div className="hidden lg:flex lg:flex-1 items-center justify-center p-12">
+        <div className="text-center max-w-md">
+          {/* Centered Image */}
+          <div className="mb-8">
+            <img
+              src={centerImage}
+              alt={step === 1 ? "Join our community" : "Complete your profile"}
+              className="w-92 h-92 object-cover"
             />
           </div>
-          <div className="flex gap-3">
-            <GradientButton
-              type="button"
-              className="min-w-28"
-              onClick={() => setStep(1)}
-            >
-              Back
-            </GradientButton>
-            <GradientButton asFull type="submit">
-              Sign Up
-            </GradientButton>
+          
+          {/* Text Content */}
+          <div className="space-y-4">
+            <h2 className="text-4xl font-bold text-[#7586FF]">
+              {step === 1 ? "Join Our Community" : "Complete Your Profile"}
+            </h2>
+            <p className="text-xm text-[#3780FF] leading-relaxed">
+              {step === 1 
+                ? "Create your account and start your mental wellness journey with expert support and personalized tools." 
+                : "Add your organization details and verification to complete your registration."}
+            </p>
           </div>
-        </form>
-      )}
-    </SplitPane>
+        </div>
+      </div>
+
+      {/* Right Side - Signup Form */}
+      <div className="flex-1 flex items-center justify-center px-8 py-8">
+        <div className="w-full max-w-sm">
+          {/* Glass-like card effect */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 space-y-5">
+            {/* Logo/Brand */}
+            <div className="text-center">
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center shadow-lg">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                {step === 1 ? "Create Account" : "Additional Details"}
+              </h1>
+              <p className="text-sm text-gray-600">
+                {step === 1 ? "Sign up for your MindMates account" : "Complete your profile setup"}
+              </p>
+            </div>
+
+            {/* Role Selection */}
+            <div className="flex justify-center">
+              <div className="bg-gray-100/80 backdrop-blur-sm rounded-lg flex">
+                <button
+                  type="button"
+                  onClick={() => setRole("student")}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    role === "student"
+                      ? "bg-white shadow-sm text-blue-600"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Student
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("admin")}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    role === "admin"
+                      ? "bg-white shadow-sm text-blue-600"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Admin
+                </button>
+              </div>
+            </div>
+
+            {/* Progress indicator */}
+            
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-lg p-3">
+                <div className="flex items-center">
+                  <svg
+                    className="w-4 h-4 text-red-400 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                  <p className="text-xs text-red-700 font-medium">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Forms */}
+            {step === 1 ? (
+              <form className="space-y-4" onSubmit={handleNext}>
+                <LabeledInput
+                  label="Full Name"
+                  placeholder="Enter your full name"
+                  value={form.name}
+                  onChange={(e) => update("name", e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+                <LabeledInput
+                  label="Email Address"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={form.email}
+                  onChange={(e) => update("email", e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+                <LabeledInput
+                  label="Password"
+                  type="password"
+                  placeholder="Create a password"
+                  value={form.password}
+                  onChange={(e) => update("password", e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-400 text-white py-2.5 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg text-sm"
+                >
+                  Next Step
+                </button>
+              </form>
+            ) : (
+              <form className="space-y-4" onSubmit={handleSignup}>
+                <LabeledInput
+                  label="Organization"
+                  placeholder="Enter your organization"
+                  value={form.organization}
+                  onChange={(e) => update("organization", e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+                <LabeledInput
+                  label="Contact Number"
+                  placeholder="Enter your contact number"
+                  value={form.contact}
+                  onChange={(e) => update("contact", e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+                
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-gray-700">
+                    ID Proof
+                  </label>
+                  <input
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 text-xs"
+                    type="file"
+                    onChange={(e) => update("idFile", e.target.files?.[0])}
+                    disabled={isSubmitting}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-2 bg-gradient-to-r from-blue-500 to-indigo-400 text-white py-2.5 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg text-sm"
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating Account...
+                      </div>
+                    ) : (
+                      'Create Account'
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Sign In Link */}
+            <div className="text-center">
+              <p className="text-xs text-gray-600">
+                Already have an account?{" "}
+                <Link 
+                  href="/login" 
+                  className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                >
+                  Sign in here
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -153,11 +347,13 @@ function LabeledInput({
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
-    <div className="space-y-2">
-      <label className="text-slate-700 text-sm font-medium">{label}</label>
+    <div className="space-y-1.5">
+      <label className="block text-xs font-medium text-gray-700">
+        {label}
+      </label>
       <input
         {...props}
-        className="w-full rounded-full border border-slate-300 px-4 py-3 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-400"
+        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm placeholder:text-gray-400 text-sm"
       />
     </div>
   );
