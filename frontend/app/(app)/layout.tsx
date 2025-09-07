@@ -62,7 +62,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 Contact
               </Link>
               <Link
-                href="#blogs"
+                href="/blogs"
                 className="font-medium hover:text-slate-900 transition-colors"
               >
                 Blogs
