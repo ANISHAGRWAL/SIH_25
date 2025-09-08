@@ -44,19 +44,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex-1 flex justify-center">
             <nav className="flex items-center gap-6 text-slate-600">
               <Link
-                href="#"
+                href="/#home"
                 className="font-medium hover:text-slate-900 transition-colors"
               >
                 Home
               </Link>
               <Link
-                href="#"
+                href="/#services"
                 className="font-medium hover:text-slate-900 transition-colors"
               >
                 Services
               </Link>
               <Link
-                href="#"
+                href="/#contact"
                 className="font-medium hover:text-slate-900 transition-colors"
               >
                 Contact
