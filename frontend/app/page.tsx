@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+// Import the Formspree hook and component
+import { useForm, ValidationError } from '@formspree/react';
 
 // Blog data - same as in your blogs page
 const blogs = [
@@ -20,13 +22,13 @@ const blogs = [
     category: "Mental Health",
   },
   {
-    id: "digital-detox",
-    title: "Digital Detox: How to Reset Your Mind",
+    id: "journaling-for-clarity",
+    title: "Journaling for Clarity: Turning Thoughts Into Healing Words",
     excerpt:
-      "Discover proven methods to manage academic stress and maintain emotional well-being during challenging times.",
-    date: "March 10, 2024",
-    image: "/Detox.png",
-    category: "Wellness",
+      "Journaling helps untangle your thoughts and create space for healing, growth, and emotional awareness.",
+    date: "March 23, 2024",
+    image: "/chatjournal.jpeg",
+    category: "Expression",
   },
   {
     id: "simple-habit-to-boost-your-mind",
@@ -92,6 +94,62 @@ const blogs = [
   },
 ];
 
+// New ContactForm component using Formspree hook
+function ContactForm() {
+  // Use the formspree hook with your unique form ID
+  const [state, handleSubmit] = useForm("mqadwjzw");
+
+  // If the form submission is successful, show a success message
+  if (state.succeeded) {
+    return <div className="text-center p-8 text-xl text-green-700 font-semibold rounded-3xl bg-green-50 shadow-inner">
+      Thanks! Your message has been sent successfully. We'll be in touch!
+    </div>;
+  }
+
+  return (
+    <Card className="p-6 rounded-3xl shadow-2xl border border-gray-200 hover:shadow-3xl transition-all duration-500 bg-white/90 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle>Send us a message</CardTitle>
+        <CardDescription>We'll get back to you within 24 hours</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Wrap your inputs in a form and attach the onSubmit handler */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Add 'name' attribute to each input field */}
+            <Input placeholder="First Name" name="first-name" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
+            <Input placeholder="Last Name" name="last-name" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
+          </div>
+          <Input placeholder="Email Address" type="email" name="email" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
+          {/* Add validation error messages for specific fields */}
+          <ValidationError 
+            prefix="Email" 
+            field="email"
+            errors={state.errors}
+            className="text-red-500 text-sm"
+          />
+          <Input placeholder="Institution Name" name="institution" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
+          <Textarea placeholder="Your Message" name="message" rows={4} className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
+          <ValidationError 
+            prefix="Message" 
+            field="message"
+            errors={state.errors}
+            className="text-red-500 text-sm"
+          />
+          <Button 
+            type="submit" 
+            disabled={state.submitting} 
+            className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform"
+          >
+            {state.submitting ? "Sending..." : "Send Message"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Update the main HomePage component to use the new ContactForm component
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("")
@@ -103,10 +161,10 @@ export default function HomePage() {
 
   useEffect(() => {
     setIsLoaded(true)
-    
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
-      
+
       // Active section detection
       const sections = ["about", "services", "contact", "blogs"]
       const current = sections.find(section => {
@@ -126,7 +184,7 @@ export default function HomePage() {
 
     window.addEventListener("scroll", handleScroll)
     window.addEventListener("mousemove", handleMouseMove)
-    
+
     return () => {
       window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("mousemove", handleMouseMove)
@@ -144,7 +202,7 @@ export default function HomePage() {
     <div className="min-h-screen scroll-smooth bg-blue-50 font-sans text-slate-800 overflow-x-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
-        <div 
+        <div
           className="absolute w-96 h-96 bg-gradient-to-r from-blue-500/10 to-indigo-400/10 rounded-full blur-3xl transition-all duration-1000 ease-out"
           style={{
             transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
@@ -152,7 +210,7 @@ export default function HomePage() {
             top: '20%'
           }}
         />
-        <div 
+        <div
           className="absolute w-80 h-80 bg-gradient-to-r from-indigo-400/10 to-purple-500/10 rounded-full blur-3xl transition-all duration-1000 ease-out"
           style={{
             transform: `translate(${mousePosition.x * -0.015}px, ${mousePosition.y * -0.015}px)`,
@@ -163,11 +221,10 @@ export default function HomePage() {
       </div>
 
       {/* Enhanced Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-lg shadow-xl border-b border-gray-200/50' 
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
+          ? 'bg-white/95 backdrop-blur-lg shadow-xl border-b border-gray-200/50'
           : 'bg-white/80 backdrop-blur-sm border-b border-gray-200'
-      }`}>
+        }`}>
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className={`flex items-center gap-2 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
@@ -193,21 +250,18 @@ export default function HomePage() {
                 <button
                   key={section}
                   onClick={() => scrollToSection(section)}
-                  className={`font-medium transition-all duration-300 hover:text-slate-900 relative group capitalize ${
-                    activeSection === section ? 'text-blue-600' : 'text-slate-600'
-                  } ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+                  className={`font-medium transition-all duration-300 hover:text-slate-900 relative group capitalize ${activeSection === section ? 'text-blue-600' : 'text-slate-600'
+                    } ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
                   style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   {section}
-                  <span className={`absolute -bottom-2 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-400 transition-all duration-300 group-hover:w-full ${
-                    activeSection === section ? 'w-full' : ''
-                  }`} />
+                  <span className={`absolute -bottom-2 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-400 transition-all duration-300 group-hover:w-full ${activeSection === section ? 'w-full' : ''
+                    }`} />
                 </button>
               ))}
               <Link href="/signup">
-                <Button className={`rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform ${
-                  isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-                }`} style={{ transitionDelay: '400ms' }}>
+                <Button className={`rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+                    }`} style={{ transitionDelay: '400ms' }}>
                   Get Started
                 </Button>
               </Link>
@@ -255,12 +309,6 @@ export default function HomePage() {
                     </svg>
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="rounded-full bg-transparent border-slate-300 hover:bg-white hover:border-blue-300 transition-all duration-300 hover:scale-105 hover:shadow-lg transform group">
-                  Learn More
-                  <svg className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </Button>
               </div>
             </div>
             <div className={`relative transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
@@ -380,29 +428,13 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-            <Card className="p-6 rounded-3xl shadow-2xl border border-gray-200 hover:shadow-3xl transition-all duration-500 bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Send us a message</CardTitle>
-                <CardDescription>We'll get back to you within 24 hours</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Input placeholder="First Name" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
-                  <Input placeholder="Last Name" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
-                </div>
-                <Input placeholder="Email Address" type="email" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
-                <Input placeholder="Institution Name" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
-                <Textarea placeholder="Your Message" rows={4} className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
-                <Button className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform">
-                  Send Message
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Replace the Card with the new ContactForm component */}
+            <ContactForm />
           </div>
         </div>
       </section>
 
-      {/* Enhanced Blogs Section with Real Data */}
+      {/* Enhanced Blogs Section with No Background Cards */}
       <section id="blogs" className="py-16 bg-blue-50 relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -413,11 +445,15 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             {featuredBlogs.map((blog, index) => (
-              <Card key={blog.id} className="rounded-3xl hover:shadow-2xl transition-all duration-500 border border-gray-200 group hover:-translate-y-3 cursor-pointer bg-white/80 backdrop-blur-sm">
+              <div
+                key={blog.id}
+                className="group cursor-pointer rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3"
+              >
                 <Link href={`/blogs/${blog.id}`}>
-                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-indigo-100 rounded-t-3xl relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                    <Image 
-                      src={blog.image} 
+                  {/* Image wrapper */}
+                  <div className="aspect-video relative overflow-hidden">
+                    <Image
+                      src={blog.image}
                       alt={blog.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -429,17 +465,20 @@ export default function HomePage() {
                       </div>
                     )}
                   </div>
-                  <CardHeader>
+
+                  {/* Title + text wrapper - same width as image */}
+                  <div className="p-4 bg-white">
                     <div className="text-sm text-slate-500 mb-2">{blog.date}</div>
-                    <CardTitle className="text-lg group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
+                    <h3 className="text-lg font-semibold group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 mb-2">
                       {blog.title}
-                    </CardTitle>
-                    <CardDescription className="group-hover:text-slate-700 transition-colors duration-300 line-clamp-3">
+                    </h3>
+                    <p className="text-slate-600 group-hover:text-slate-700 transition-colors duration-300 line-clamp-3">
                       {blog.excerpt}
-                    </CardDescription>
-                  </CardHeader>
+                    </p>
+                  </div>
                 </Link>
-              </Card>
+              </div>
+
             ))}
           </div>
           <div className="text-center">
@@ -484,23 +523,29 @@ export default function HomePage() {
               </p>
             </div>
             {[
-              { title: "Platform", links: [
-                { name: "About", action: () => scrollToSection("about") },
-                { name: "Services", action: () => scrollToSection("services") },
-                { name: "Get Started", href: "/signup" },
-                { name: "Login", href: "/login" }
-              ]},
-              { title: "Resources", links: [
-                { name: "Blog", href: "/blogs" },
-                { name: "Help Center", href: "#" },
-                { name: "Privacy Policy", href: "#" },
-                { name: "Terms of Service", href: "#" }
-              ]},
-              { title: "Emergency Support", links: [
-                { name: "Crisis Helpline: 988", href: "#" },
-                { name: "Campus Security: 911", href: "#" },
-                { name: "24/7 Chat Support", href: "#" }
-              ]}
+              {
+                title: "Platform", links: [
+                  { name: "About", action: () => scrollToSection("about") },
+                  { name: "Services", action: () => scrollToSection("services") },
+                  { name: "Get Started", href: "/signup" },
+                  { name: "Login", href: "/login" }
+                ]
+              },
+              {
+                title: "Resources", links: [
+                  { name: "Blog", href: "/blogs" },
+                  { name: "Help Center", href: "#" },
+                  { name: "Privacy Policy", href: "#" },
+                  { name: "Terms of Service", href: "#" }
+                ]
+              },
+              {
+                title: "Emergency Support", links: [
+                  { name: "Crisis Helpline: 988", href: "#" },
+                  { name: "Campus Security: 911", href: "#" },
+                  { name: "24/7 Chat Support", href: "#" }
+                ]
+              }
             ].map((section, index) => (
               <div key={index}>
                 <h4 className="font-semibold mb-4">{section.title}</h4>
