@@ -427,12 +427,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 icon="support"
               />
               <div className="border-t border-gray-200 my-4"></div>
-              <SideLink
-                href="/admin/analytics"
-                label="Admin Analytics"
-                isActive={pathname === "/admin/analytics"}
-                icon="analytics"
-              />
             </nav>
           </aside>
 
