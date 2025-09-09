@@ -28,18 +28,25 @@ export async function register(registerData: {
   email: string;
   password: string;
   role: "student" | "admin";
-  organization?: string;
-  contact?: string;
-  idFile?: File;
+  organization: string;
+  contact: string;
+  idFile: File;
 }) {
   try {
+    const formData = new FormData();
+    formData.append("email", registerData.email);
+    formData.append("password", registerData.password);
+    formData.append("role", registerData.role);
+    formData.append("organization", registerData.organization);
+    formData.append("name", registerData.name);
+    formData.append("contact", registerData.contact);
+    formData.append("file", registerData.idFile);
     const response = await fetch(`${API_ENDPOINTS.AUTH}/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(registerData),
+      body: formData,
     });
+    console.log("registering with data", formData);
+
     const data = await response.json();
     console.log("register response data:", data);
     return {

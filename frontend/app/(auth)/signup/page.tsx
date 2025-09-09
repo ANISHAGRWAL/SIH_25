@@ -54,6 +54,11 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
+      if (!form.idFile) {
+        setError("Must have to upload the id proof");
+        setIsSubmitting(false);
+        return;
+      }
       const body = {
         name: form.name,
         email: form.email,
@@ -63,7 +68,6 @@ export default function SignupPage() {
         contact: form.contact,
         idFile: form.idFile,
       };
-
       const res = await register(body);
       console.log("response", res);
       const data = res?.data;
@@ -124,15 +128,15 @@ export default function SignupPage() {
               className="w-92 h-92 object-cover"
             />
           </div>
-          
+
           {/* Text Content */}
           <div className="space-y-4">
             <h2 className="text-4xl font-bold text-[#7586FF]">
               {step === 1 ? "Join Our Community" : "Complete Your Profile"}
             </h2>
             <p className="text-xm text-[#3780FF] leading-relaxed">
-              {step === 1 
-                ? "Create your account and start your mental wellness journey with expert support and personalized tools." 
+              {step === 1
+                ? "Create your account and start your mental wellness journey with expert support and personalized tools."
                 : "Add your organization details and verification to complete your registration."}
             </p>
           </div>
@@ -167,7 +171,9 @@ export default function SignupPage() {
                 {step === 1 ? "Create Account" : "Additional Details"}
               </h1>
               <p className="text-sm text-gray-600">
-                {step === 1 ? "Sign up for your MindMates account" : "Complete your profile setup"}
+                {step === 1
+                  ? "Sign up for your MindMates account"
+                  : "Complete your profile setup"}
               </p>
             </div>
 
@@ -200,7 +206,6 @@ export default function SignupPage() {
             </div>
 
             {/* Progress indicator */}
-            
 
             {/* Error Message */}
             {error && (
@@ -219,9 +224,7 @@ export default function SignupPage() {
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
                     />
                   </svg>
-                  <p className="text-xs text-red-700 font-medium">
-                    {error}
-                  </p>
+                  <p className="text-xs text-red-700 font-medium">{error}</p>
                 </div>
               </div>
             )}
@@ -282,7 +285,7 @@ export default function SignupPage() {
                   disabled={isSubmitting}
                   required
                 />
-                
+
                 <div className="space-y-1.5">
                   <label className="block text-xs font-medium text-gray-700">
                     ID Proof
@@ -316,7 +319,7 @@ export default function SignupPage() {
                         Creating Account...
                       </div>
                     ) : (
-                      'Create Account'
+                      "Create Account"
                     )}
                   </button>
                 </div>
@@ -327,8 +330,8 @@ export default function SignupPage() {
             <div className="text-center">
               <p className="text-xs text-gray-600">
                 Already have an account?{" "}
-                <Link 
-                  href="/login" 
+                <Link
+                  href="/login"
                   className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
                 >
                   Sign in here
@@ -348,9 +351,7 @@ function LabeledInput({
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-gray-700">
-        {label}
-      </label>
+      <label className="block text-xs font-medium text-gray-700">{label}</label>
       <input
         {...props}
         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm placeholder:text-gray-400 text-sm"
