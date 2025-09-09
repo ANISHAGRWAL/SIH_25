@@ -1,10 +1,16 @@
 import express, { Request, Response } from 'express';
 import { loginUser, registerUser } from '../controllers/auth';
+import uploadFile from '../middleware/multer_middleware';
 
 const router = express.Router();
 
-router.post('/register', (req: Request, res: Response) => {
-  registerUser(req.body)
+router.post('/register', uploadFile, (req: Request, res: Response) => {
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ success: false, error: { message: 'ID proof is required' } });
+  }
+  registerUser(req.body, req.file)
     .then((data) => {
       res.status(200).json({ success: true, data });
     })

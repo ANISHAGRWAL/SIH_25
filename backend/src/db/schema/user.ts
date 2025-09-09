@@ -11,6 +11,10 @@ export const user = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 255 }).notNull(),
   role: RoleEnum('role').default('student').notNull(),
+  organization: varchar('organization', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  contact: varchar('contact', { length: 20 }).notNull(),
+  idProofUrl: varchar('id_proof_url', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp('updated_at')
     .defaultNow()
