@@ -49,6 +49,7 @@ export default function ExpertSupportPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [mood, setMood] = useState<string | null>(null);
+  const [moodScore, setMoodScore] = useState<number | null>(null);
   const [isDetecting, setIsDetecting] = useState(false);
   const [autoStart, setAutoStart] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -61,7 +62,7 @@ export default function ExpertSupportPage() {
   useEffect(() => {
     const facialData = {
       mood: mood || "",
-      moodScore: 1,
+      moodScore: moodScore || 0,
     };
     async function faceDetection() {
       const result = await facialDetection(token, facialData);
@@ -147,7 +148,11 @@ export default function ExpertSupportPage() {
       } else {
         const topMood = Object.entries(detection.expressions!).reduce((a, b) =>
           a[1] > b[1] ? a : b
-        )[0];
+        )[0] as keyof faceapi.FaceExpressions;
+        const rawScore = detection.expressions[topMood];
+        const score =
+          typeof rawScore === "function" ? rawScore()[0].probability : rawScore;
+        setMoodScore(score);
         setMood(topMood);
         setDetectionStatus("complete");
       }

@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRole="student">
       <div className="min-h-screen bg-blue-50 font-sans text-slate-800">
         {/* Desktop header */}
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm relative z-50">

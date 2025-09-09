@@ -14,6 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   token: string | null;
+  isStudent: boolean;
   loading: boolean; // added loading here
   getTokens: () => void;
   logout: () => void;
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isStudent, setIsStudent] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true); // loading state
 
@@ -39,17 +41,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userDetails = await getMe(storedToken);
         if (userDetails?.data?.role === "admin") {
           setIsAdmin(true);
+          setIsStudent(false);
+        } else {
+          setIsAdmin(false);
+          setIsStudent(true);
         }
       } else {
         setIsAuthenticated(false);
         setToken(null);
         setIsAdmin(false);
+        setIsStudent(false);
       }
     } catch (error) {
       console.error("Error getting token from localStorage", error);
       setIsAuthenticated(false);
       setToken(null);
       setIsAdmin(false);
+      setIsStudent(false);
     } finally {
       setLoading(false); // mark loading done
     }
@@ -60,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
     setToken(null);
     setIsAdmin(false);
+    setIsStudent(false);
     router.push("/login"); // Optional: push to login after logout
   }, [router]);
 
@@ -76,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         getTokens,
         logout,
+        isStudent,
       }}
     >
       {/* Only render children once loading is finished */}
