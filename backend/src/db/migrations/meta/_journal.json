@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1756928872247,
-      "tag": "0000_slow_raider",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1756933895955,
-      "tag": "0001_cloudy_namorita",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1757142529618,
-      "tag": "0002_flawless_rictor",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1757149623363,
-      "tag": "0003_fat_dracula",
+      "when": 1757441193527,
+      "tag": "0000_melted_tombstone",
       "breakpoints": true
     }
   ]
