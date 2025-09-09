@@ -9,7 +9,7 @@ import { register } from "@/actions/auth";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { isAuthenticated, token, loading, getTokens } = useAuth();
+  const { isAuthenticated, token, loading, getTokens, isAdmin } = useAuth();
 
   const [role, setRole] = useState<"student" | "admin">("student");
   const [step, setStep] = useState<1 | 2>(1);
@@ -30,9 +30,13 @@ export default function SignupPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && isAuthenticated && token) {
-      router.replace("/dashboard");
+      if (isAdmin) {
+        router.push("/admin-dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     }
-  }, [loading, isAuthenticated, token, router]);
+  }, [loading, isAuthenticated, token, isAdmin, router]);
 
   // Clear error when user starts typing
   useEffect(() => {
@@ -73,8 +77,7 @@ export default function SignupPage() {
       const data = res?.data;
       if (data.success && data.data) {
         localStorage.setItem("token", data.data.token);
-        getTokens(); // Sync AuthContext
-        router.push("/dashboard");
+        getTokens(); // Sync AuthContext with new token
       } else {
         // Set specific error message based on response
         if (data?.message) {

@@ -8,7 +8,7 @@ import { login } from "@/actions/auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, token, loading, getTokens } = useAuth();
+  const { isAuthenticated, token, loading, getTokens, isAdmin } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,12 +19,15 @@ export default function LoginPage() {
   // You can change this image URL to any image you want for the center
   const centerImage = "/login.png";
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!loading && isAuthenticated && token) {
-      router.replace("/dashboard");
+      if (isAdmin) {
+        router.push("/admin-dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     }
-  }, [loading, isAuthenticated, token, router]);
+  }, [loading, isAuthenticated, token, isAdmin, router]);
 
   // Clear error when user starts typing
   useEffect(() => {
@@ -46,7 +49,6 @@ export default function LoginPage() {
       if (data.success && data.data) {
         localStorage.setItem("token", data.data.token);
         getTokens(); // Sync AuthContext with new token
-        router.push("/dashboard");
       } else {
         // Set specific error message based on response
         if (data?.message) {
@@ -91,14 +93,15 @@ export default function LoginPage() {
               className="w-96 h-96 object-cover"
             />
           </div>
-          
+
           {/* Text Content */}
           <div className="space-y-4">
             <h2 className="text-4xl font-bold text-[#7586FF]">
               Your Mental Wellness Journey
             </h2>
             <p className="text-xl text-[#3780FF] leading-relaxed">
-              Connect with expert support, track your progress, and discover tools for better mental health.
+              Connect with expert support, track your progress, and discover
+              tools for better mental health.
             </p>
           </div>
         </div>
@@ -131,9 +134,7 @@ export default function LoginPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Welcome Back
               </h1>
-              <p className="text-gray-600">
-                Sign in to your MindMates account
-              </p>
+              <p className="text-gray-600">Sign in to your MindMates account</p>
             </div>
 
             {/* Login Form */}
@@ -155,9 +156,7 @@ export default function LoginPage() {
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
                       />
                     </svg>
-                    <p className="text-sm text-red-700 font-medium">
-                      {error}
-                    </p>
+                    <p className="text-sm text-red-700 font-medium">{error}</p>
                   </div>
                 </div>
               )}
@@ -170,7 +169,7 @@ export default function LoginPage() {
                   type="email"
                   required
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
-                    error ? 'border-red-300' : 'border-gray-300'
+                    error ? "border-red-300" : "border-gray-300"
                   }`}
                   placeholder="Enter your email"
                   value={email}
@@ -187,7 +186,7 @@ export default function LoginPage() {
                   type="password"
                   required
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
-                    error ? 'border-red-300' : 'border-gray-300'
+                    error ? "border-red-300" : "border-gray-300"
                   }`}
                   placeholder="Enter your password"
                   value={password}
@@ -211,8 +210,8 @@ export default function LoginPage() {
                 </div>
 
                 <div className="text-sm">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="font-medium text-blue-600 hover:text-blue-500 disabled:opacity-50 transition-colors"
                     disabled={isSubmitting}
                   >
@@ -232,7 +231,7 @@ export default function LoginPage() {
                     Signing In...
                   </div>
                 ) : (
-                  'Sign In'
+                  "Sign In"
                 )}
               </button>
             </form>
@@ -241,8 +240,8 @@ export default function LoginPage() {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <Link 
-                  href="/signup" 
+                <Link
+                  href="/signup"
                   className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
                 >
                   Sign up here
