@@ -18,3 +18,4 @@ llama-index-llms-gemini
 llama-index-embeddings-huggingface
 transformers
 sentence-transformers
+pillow==10.2.0
