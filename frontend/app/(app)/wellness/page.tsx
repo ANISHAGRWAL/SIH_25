@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Play, Clock, Heart, Brain } from "lucide-react"
+import { Play, Clock, Heart, Brain } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const techniques = [
   {
@@ -24,18 +25,11 @@ const techniques = [
   },
   {
     id: 2,
-    name: "Child's Pose",
-    duration: "5 minutes",
+    name: "Yoga",
+    duration: "5-15 minutes",
     emoji: "🧘",
-    benefits: "Relieves stress and calms the mind",
-    instructions: [
-      "Kneel on the floor with big toes touching",
-      "Sit back on your heels",
-      "Separate knees hip-width apart",
-      "Fold forward, extending arms in front",
-      "Rest forehead on the ground",
-      "Breathe deeply and hold",
-    ],
+    benefits: "Improves flexibility, strength, and mental clarity",
+    isYogaCategory: true,
     color: "from-green-100 to-emerald-100",
   },
   {
@@ -105,18 +99,14 @@ const techniques = [
 ]
 
 export default function WellnessPage() {
-  const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedTechnique, setSelectedTechnique] = useState<(typeof techniques)[0] | null>(null)
-
-  const nextTechnique = () => {
-    setCurrentIndex((prev) => (prev + 1) % techniques.length)
-  }
-
-  const prevTechnique = () => {
-    setCurrentIndex((prev) => (prev - 1 + techniques.length) % techniques.length)
-  }
+  const router = useRouter()
 
   const startTechnique = (technique: (typeof techniques)[0]) => {
+    if (technique.isYogaCategory) {
+      router.push("/wellness/yoga")
+      return
+    }
     setSelectedTechnique(technique)
   }
 
@@ -155,7 +145,7 @@ export default function WellnessPage() {
                 Step-by-Step Instructions
               </h3>
               <ol className="space-y-3">
-                {selectedTechnique.instructions.map((instruction, index) => (
+                {selectedTechnique.instructions?.map((instruction, index) => (
                   <li key={index} className="flex gap-3">
                     <span className="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-teal-400 to-sky-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}
@@ -192,22 +182,11 @@ export default function WellnessPage() {
           </p>
         </div>
 
-        {/* Techniques Carousel */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-slate-800">Quick Wellness Techniques</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={prevTechnique} className="rounded-full bg-transparent">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={nextTechnique} className="rounded-full bg-transparent">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <h2 className="text-2xl font-semibold text-slate-800 mb-6">Quick Wellness Techniques</h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {techniques.slice(currentIndex, currentIndex + 3).map((technique) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {techniques.map((technique) => (
               <Card
                 key={technique.id}
                 className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-br ${technique.color} border-0`}
