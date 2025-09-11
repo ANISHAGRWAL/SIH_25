@@ -1,6 +1,9 @@
 import { pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { studentMoods } from './studentMoods';
+import { phq } from './phq';
+import { gad } from './gad';
+import { pss } from './pss';
 
 export const RoleEnum = pgEnum('role', ['student', 'admin']);
 export const GenderEnum = pgEnum('gender', ['male', 'female']);
@@ -34,6 +37,9 @@ export const user = pgTable('users', {
 
 export const userRelations = relations(user, ({ many }) => ({
   moods: many(studentMoods, { relationName: 'student_moods' }),
+  phqs: many(phq, { relationName: 'phq_student' }),
+  gads: many(gad, { relationName: 'gad_student' }),
+  pss: many(pss, { relationName: 'pss_student' }),
 }));
 
 export type IRole = (typeof RoleEnum.enumValues)[number];

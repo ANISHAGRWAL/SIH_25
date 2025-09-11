@@ -3,6 +3,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import authRoutes from './routes/auth';
 import studentRoutes from './routes/student';
+import testRoutes from './routes/test';
 import authMiddleware from './middleware/auth_middleware';
 import adminMiddleware from './middleware/admin_middleware';
 import chatRouter from './routes/chat';
@@ -40,6 +41,7 @@ app.use('/api/doc-chat', docChatRouter);
 // student router
 app.use(authMiddleware);
 app.use(`${BASE_PATH}/student`, studentRoutes);
+app.use(`${BASE_PATH}/test`, testRoutes);
 
 // admin router
 app.use(adminMiddleware);
