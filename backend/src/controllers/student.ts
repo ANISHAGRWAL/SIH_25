@@ -76,6 +76,14 @@ export const updateUserDetails = async (
   updateData: Partial<IUser>,
 ): Promise<IUser> => {
   try {
+    delete updateData.email;
+    delete updateData.role;
+    delete updateData.organization;
+    delete updateData.contact;
+    delete updateData.idProofUrl;
+    delete updateData.name;
+    delete updateData.password;
+
     const userDetails = await db
       .update(userSchema)
       .set(updateData)
