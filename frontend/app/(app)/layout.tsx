@@ -1,5 +1,6 @@
 "use client";
 
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,13 +8,16 @@ import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] =
     React.useState(false);
 
+
   const auth = useAuth();
+
 
   return (
     <ProtectedRoute requiredRole="student">
@@ -39,6 +43,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <span className="text-xl font-bold text-slate-900">MindMates</span>
           </div>
+
 
           {/* Center: Navigation Links */}
           <div className="flex-1 flex justify-center">
@@ -70,6 +75,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </nav>
           </div>
 
+
           {/* Right side: Profile dropdown */}
           <div className="relative">
             <button
@@ -90,6 +96,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 />
               </svg>
             </button>
+
 
             {isProfileDropdownOpen && (
               <>
@@ -174,6 +181,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
+
         {/* Mobile header */}
         <header className="md:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm sticky top-0 z-40">
           <div className="flex items-center justify-between px-4 py-3">
@@ -199,6 +207,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </span>
             </div>
 
+
             {/* Right side: Profile and Menu button */}
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -222,6 +231,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     />
                   </svg>
                 </button>
+
 
                 {isProfileDropdownOpen && (
                   <>
@@ -334,6 +344,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
+
           {/* Mobile menu dropdown */}
           {isMobileMenuOpen && (
             <>
@@ -344,28 +355,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-40">
                 <nav className="px-4 py-3 space-y-1">
                   <Link
-                    href="#"
+                    href="/#home"
                     className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Home
                   </Link>
                   <Link
-                    href="#"
+                    href="/#services"
                     className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Services
                   </Link>
                   <Link
-                    href="#"
+                    href="/#contact"
                     className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Contact
                   </Link>
                   <Link
-                    href="#"
+                    href="/blogs"
                     className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -376,6 +387,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </>
           )}
         </header>
+
 
         <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] gap-6 p-4 md:p-8">
           {/* Sidebar */}
@@ -430,11 +442,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </nav>
           </aside>
 
+
           {/* Main content */}
           <main className="min-h-[80vh] bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-gray-200 shadow-xl mb-20 md:mb-0">
             {children}
           </main>
         </div>
+
 
         {/* Mobile nav bar */}
         <footer className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/90 backdrop-blur-md border-t border-gray-200">
@@ -471,9 +485,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+
 function getIcon(iconType: string, isActive: boolean) {
   const iconColor = isActive ? "text-blue-600" : "text-slate-500";
   const iconClass = `w-5 h-5 ${iconColor}`;
+
 
   switch (iconType) {
     case "dashboard":
@@ -629,6 +645,7 @@ function getIcon(iconType: string, isActive: boolean) {
   }
 }
 
+
 function SideLink({
   href,
   label,
@@ -645,6 +662,7 @@ function SideLink({
   const inactiveClasses =
     "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900";
 
+
   return (
     <Link
       href={href}
@@ -657,6 +675,7 @@ function SideLink({
     </Link>
   );
 }
+
 
 function MobileLink({
   href,
@@ -671,6 +690,7 @@ function MobileLink({
 }) {
   const activeClasses = "text-blue-600";
   const inactiveClasses = "text-slate-500";
+
 
   return (
     <Link
@@ -687,16 +707,19 @@ function MobileLink({
   );
 }
 
+
 function MobileMoreMenu({ pathname }: { pathname: string }) {
   const [isOpen, setIsOpen] = React.useState(false);
+
 
   const moreItems = [
     { href: "/psych-tests", label: "Psych Test", icon: "test" },
     { href: "/book-session", label: "Book Session", icon: "calendar" },
-    { href: "/admin/analytics", label: "Admin Analytics", icon: "analytics" },
   ];
 
+
   const isAnyMoreItemActive = moreItems.some((item) => pathname === item.href);
+
 
   return (
     <div className="relative">
@@ -711,6 +734,7 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
         </div>
         <span className="font-medium">More</span>
       </button>
+
 
       {isOpen && (
         <>
@@ -740,3 +764,6 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
     </div>
   );
 }
+
+
+
