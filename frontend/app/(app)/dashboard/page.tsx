@@ -1,14 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StatusDot } from "@/components/status-dot";
-import ExpertSupportPage from "../expert-support/page";
-import Link from "next/link";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const { user } = useAuth();
 
   const motivationalMessages = {
     happy: [
@@ -111,7 +110,7 @@ export default function DashboardPage() {
     const messages =
       motivationalMessages[moodKey as keyof typeof motivationalMessages];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-    
+
     // Delay to show transition effect
     setTimeout(() => {
       setSelectedMood(moodKey);
@@ -148,7 +147,11 @@ export default function DashboardPage() {
           !isLarge ? "cursor-pointer hover:scale-110 active:scale-95" : ""
         } transition-all duration-300 ease-out`}
       >
-        <span className={`select-none ${sizeClasses} transition-all duration-300`}>{mood.emoji}</span>
+        <span
+          className={`select-none ${sizeClasses} transition-all duration-300`}
+        >
+          {mood.emoji}
+        </span>
       </div>
     );
   };
@@ -157,14 +160,18 @@ export default function DashboardPage() {
     // <ProtectedRoute>
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-xl md:text-2xl font-semibold text-slate-800 animate-slideInDown">
-        Welcome Amar,
+        Welcome {user?.name}! How are you feeling today?,
       </h2>
 
       <section className="space-y-4">
         {/* Mood Selection Card - Full Width */}
         <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 shadow-sm hover:shadow-lg transition-all duration-500 ease-out backdrop-blur-sm">
           {!selectedMood ? (
-            <div className={`transition-all duration-500 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+            <div
+              className={`transition-all duration-500 ${
+                isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+              }`}
+            >
               <p className="text-center font-medium text-slate-700 mb-6 text-lg animate-fadeIn">
                 How are you feeling right now?
               </p>
@@ -188,7 +195,11 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : (
-            <div className={`pl-4 transition-all duration-500 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+            <div
+              className={`pl-4 transition-all duration-500 ${
+                isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+              }`}
+            >
               <div className="hidden md:flex items-start gap-6">
                 <div className="flex-shrink-0 animate-bounceIn">
                   {renderMoodButton(
@@ -277,7 +288,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-all duration-300 group-hover:shadow-lg">
-                <img src="/faceicon.png" alt="Face scan" className="group-hover:scale-110 transition-transform duration-300" />
+                <img
+                  src="/faceicon.png"
+                  alt="Face scan"
+                  className="group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
                 Quick facial emotion analysis to understand your current mood
@@ -296,11 +311,16 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-all duration-300 group-hover:shadow-lg">
-                  <img src="/faceicon.png" alt="Face scan" className="group-hover:scale-110 transition-transform duration-300" />
+                  <img
+                    src="/faceicon.png"
+                    alt="Face scan"
+                    className="group-hover:scale-110 transition-transform duration-300"
+                  />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                    Quick facial emotion analysis to understand your current mood
+                    Quick facial emotion analysis to understand your current
+                    mood
                   </p>
                 </div>
               </div>
@@ -308,7 +328,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Voice Mood Check Card */}
-          <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-purple-100/50 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group animate-slideInUp bg-gradient-to-br from-white to-purple-50/30" style={{ animationDelay: '100ms' }}>
+          <div
+            className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-purple-100/50 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group animate-slideInUp bg-gradient-to-br from-white to-purple-50/30"
+            style={{ animationDelay: "100ms" }}
+          >
             {/* Mobile Layout */}
             <div className="md:hidden flex flex-col items-center text-center">
               <div className="flex items-center justify-between w-full mb-4">
@@ -320,7 +343,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-purple-100 transition-all duration-300 group-hover:shadow-lg">
-                <img src="/mic.png" alt="Voice analysis" className="group-hover:scale-110 transition-transform duration-300" />
+                <img
+                  src="/mic.png"
+                  alt="Voice analysis"
+                  className="group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
                 Voice tone analysis to detect emotional patterns - Coming Soon
@@ -339,11 +366,16 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-all duration-300 group-hover:shadow-lg">
-                  <img src="/mic.png" alt="Voice analysis" className="group-hover:scale-110 transition-transform duration-300" />
+                  <img
+                    src="/mic.png"
+                    alt="Voice analysis"
+                    className="group-hover:scale-110 transition-transform duration-300"
+                  />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                    Voice tone analysis to detect emotional patterns - Coming Soon
+                    Voice tone analysis to detect emotional patterns - Coming
+                    Soon
                   </p>
                 </div>
               </div>
@@ -351,16 +383,18 @@ export default function DashboardPage() {
           </div>
 
           {/* Mental Detox Card */}
-          <div  onClick={() => (location.href = "/wellness")}
+          <div
+            onClick={() => (location.href = "/wellness")}
             className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-green-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 hover:scale-105 group animate-slideInUp bg-gradient-to-br from-white to-green-50/30"
-            style={{ animationDelay: '200ms' }}
+            style={{ animationDelay: "200ms" }}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 location.href = "/wellness";
               }
-            }}>
+            }}
+          >
             {/* Mobile Layout */}
             <div className="md:hidden flex flex-col items-center text-center">
               <div className="flex items-center justify-between w-full mb-4">
@@ -372,10 +406,15 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-green-100 transition-all duration-300 group-hover:shadow-lg">
-                <img src="/yoga.png" alt="Mental wellness" className="group-hover:scale-110 transition-transform duration-300" />
+                <img
+                  src="/yoga.png"
+                  alt="Mental wellness"
+                  className="group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                Guided stretches and breathing exercises to refresh focus and ease stress
+                Guided stretches and breathing exercises to refresh focus and
+                ease stress
               </p>
             </div>
 
@@ -391,11 +430,16 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-all duration-300 group-hover:shadow-lg">
-                  <img src="/yoga.png" alt="Mental wellness" className="group-hover:scale-110 transition-transform duration-300" />
+                  <img
+                    src="/yoga.png"
+                    alt="Mental wellness"
+                    className="group-hover:scale-110 transition-transform duration-300"
+                  />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                    Guided stretches and breathing exercises to refresh focus and ease stress
+                    Guided stretches and breathing exercises to refresh focus
+                    and ease stress
                   </p>
                 </div>
               </div>
@@ -404,7 +448,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Media Player Controls */}
-        <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200 hover:shadow-lg transition-all duration-300 animate-slideInUp bg-gradient-to-r from-white to-slate-50/50" style={{ animationDelay: '300ms' }}>
+        <div
+          className="rounded-2xl bg-white p-4 ring-1 ring-slate-200 hover:shadow-lg transition-all duration-300 animate-slideInUp bg-gradient-to-r from-white to-slate-50/50"
+          style={{ animationDelay: "300ms" }}
+        >
           <div className="h-24 rounded-xl flex items-center justify-center gap-6 px-6">
             <button
               className="size-12 rounded-full bg-white shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-slate-600 hover:text-slate-800 hover:scale-110 active:scale-95 hover:-translate-y-1"
@@ -430,10 +477,14 @@ export default function DashboardPage() {
 
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
-        
+
         @keyframes slideInDown {
           from {
             opacity: 0;
@@ -444,7 +495,7 @@ export default function DashboardPage() {
             transform: translateY(0);
           }
         }
-        
+
         @keyframes slideInUp {
           from {
             opacity: 0;
@@ -455,7 +506,7 @@ export default function DashboardPage() {
             transform: translateY(0);
           }
         }
-        
+
         @keyframes slideInRight {
           from {
             opacity: 0;
@@ -466,7 +517,7 @@ export default function DashboardPage() {
             transform: translateX(0);
           }
         }
-        
+
         @keyframes bounceIn {
           0% {
             opacity: 0;
@@ -476,30 +527,32 @@ export default function DashboardPage() {
             opacity: 1;
             transform: scale(1.05);
           }
-          70% { transform: scale(0.9); }
+          70% {
+            transform: scale(0.9);
+          }
           100% {
             opacity: 1;
             transform: scale(1);
           }
         }
-        
+
         .animate-fadeIn {
           animation: fadeIn 0.6s ease-out;
         }
-        
+
         .animate-slideInDown {
           animation: slideInDown 0.8s ease-out;
         }
-        
+
         .animate-slideInUp {
           animation: slideInUp 0.8s ease-out;
           animation-fill-mode: both;
         }
-        
+
         .animate-slideInRight {
           animation: slideInRight 0.8s ease-out;
         }
-        
+
         .animate-bounceIn {
           animation: bounceIn 1s ease-out;
         }
