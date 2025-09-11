@@ -5,6 +5,8 @@ import authRoutes from './routes/auth';
 import studentRoutes from './routes/student';
 import authMiddleware from './middleware/auth_middleware';
 import adminMiddleware from './middleware/admin_middleware';
+import chatRouter from './routes/chat';
+import docChatRouter from './routes/doc_chat';
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -31,6 +33,9 @@ app.use(`${BASE_PATH}/health`, (req, res) => {
 });
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+
+app.use('/api/chat', chatRouter);
+app.use('/api/doc-chat', docChatRouter);
 
 // student router
 app.use(authMiddleware);
