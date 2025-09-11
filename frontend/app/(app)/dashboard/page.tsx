@@ -351,7 +351,16 @@ export default function DashboardPage() {
           </div>
 
           {/* Mental Detox Card */}
-          <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-green-100/50 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group animate-slideInUp bg-gradient-to-br from-white to-green-50/30" style={{ animationDelay: '200ms' }}>
+          <div  onClick={() => (location.href = "/wellness")}
+            className="rounded-2xl bg-white p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-green-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 hover:scale-105 group animate-slideInUp bg-gradient-to-br from-white to-green-50/30"
+            style={{ animationDelay: '200ms' }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                location.href = "/wellness";
+              }
+            }}>
             {/* Mobile Layout */}
             <div className="md:hidden flex flex-col items-center text-center">
               <div className="flex items-center justify-between w-full mb-4">
