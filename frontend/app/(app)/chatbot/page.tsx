@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
+import { chat } from "@/actions/chat";
+import { useState, useRef, useEffect } from "react";
 
 type Message = {
   id: string;
@@ -8,7 +9,7 @@ type Message = {
   text: string;
   time: string;
   isTyping?: boolean;
-}
+};
 
 function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -18,16 +19,36 @@ function generateId() {
 }
 
 const botAvatar = (
-  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+  <svg
+    className="w-5 h-5 text-white"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+    />
   </svg>
-)
+);
 
 const userAvatar = (
-  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  <svg
+    className="w-5 h-5 text-white"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+    />
   </svg>
-)
+);
 
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -35,41 +56,41 @@ export default function ChatbotPage() {
       id: "1",
       role: "bot",
       text: "Hello! I'm your mental health companion. How are you feeling today?",
-      time: "9:00 AM"
+      time: "9:00 AM",
     },
     {
       id: "2",
       role: "bot",
       text: "I'm here to listen and support you. Feel free to share what's on your mind - whether it's something that's bothering you, a win you'd like to celebrate, or just how your day is going.",
-      time: "9:01 AM"
-    }
-  ])
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
-  const [showClearConfirm, setShowClearConfirm] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+      time: "9:01 AM",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   // Close settings when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (showSettings && !target.closest('.settings-container')) {
-        setShowSettings(false)
+      const target = event.target as HTMLElement;
+      if (showSettings && !target.closest(".settings-container")) {
+        setShowSettings(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showSettings])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSettings]);
 
   const clearChat = () => {
     setMessages([
@@ -77,108 +98,109 @@ export default function ChatbotPage() {
         id: generateId(),
         role: "bot",
         text: "Hello! I'm your mental health companion. How are you feeling today?",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }
-    ])
-    setShowClearConfirm(false)
-    setShowSettings(false)
-  }
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
+    setShowClearConfirm(false);
+    setShowSettings(false);
+  };
 
   async function send() {
-    if (!input.trim() || loading) return
+    if (!input.trim() || loading) return;
 
     const userMessage: Message = {
       id: generateId(),
       role: "user",
       text: input.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    }
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    const currentInput = input.trim()
-    setInput("")
-    setLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input.trim();
+    setInput("");
+    setLoading(true);
 
     const typingMessage: Message = {
       id: "typing",
       role: "bot",
       text: "",
       time: "",
-      isTyping: true
-    }
-    setMessages(prev => [...prev, typingMessage])
+      isTyping: true,
+    };
+    setMessages((prev) => [...prev, typingMessage]);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: "frontend-user", query: currentInput }),
-      })
+      const data = await chat("frontend-user", currentInput);
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`)
-      }
-
-      const data = await res.json()
-
-      setMessages(prev => {
-        const filtered = prev.filter(msg => msg.id !== "typing")
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "typing");
         const botMessage: Message = {
           id: generateId(),
           role: "bot",
           text: data.response || "I'm here to help. Could you tell me more?",
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }
-        return [...filtered, botMessage]
-      })
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        return [...filtered, botMessage];
+      });
     } catch (error) {
-      console.error("Backend error:", error)
-      setMessages(prev => {
-        const filtered = prev.filter(msg => msg.id !== "typing")
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "typing");
         const errorMessage: Message = {
           id: generateId(),
           role: "bot",
           text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }
-        return [...filtered, errorMessage]
-      })
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        return [...filtered, errorMessage];
+      });
     } finally {
-      setLoading(false)
-      inputRef.current?.focus()
+      setLoading(false);
+      inputRef.current?.focus();
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      send()
+      e.preventDefault();
+      send();
     }
-  }
+  };
 
   const quickActions = [
     "I need someone to talk to",
     "I'm feeling anxious",
     "I had a good day",
     "Help me relax",
-    "I'm stressed about work"
-  ]
+    "I'm stressed about work",
+  ];
 
   const handleQuickAction = (action: string) => {
-    setInput(action)
-    inputRef.current?.focus()
-  }
+    setInput(action);
+    inputRef.current?.focus();
+  };
 
   const adjustTextareaHeight = (textarea: HTMLTextAreaElement) => {
-    textarea.style.height = 'auto'
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px'
-  }
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
+  };
 
   useEffect(() => {
     if (inputRef.current) {
-      adjustTextareaHeight(inputRef.current)
+      adjustTextareaHeight(inputRef.current);
     }
-  }, [input])
+  }, [input]);
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -192,8 +214,18 @@ export default function ChatbotPage() {
       <div className="flex items-center justify-between p-1 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
             </svg>
           </div>
           <div>
@@ -210,8 +242,18 @@ export default function ChatbotPage() {
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+              />
             </svg>
           </button>
 
@@ -238,7 +280,6 @@ export default function ChatbotPage() {
               </button>
             </div>
           )}
-
         </div>
       </div>
 
@@ -248,12 +289,27 @@ export default function ChatbotPage() {
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
             <div className="text-center">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Clear Chat History</h3>
-              <p className="text-sm text-gray-600 mb-6">This will permanently delete all your messages. This action cannot be undone.</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Clear Chat History
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                This will permanently delete all your messages. This action
+                cannot be undone.
+              </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
@@ -279,22 +335,35 @@ export default function ChatbotPage() {
           {/* Messages Area */}
           <div className="flex-1 p-4 overflow-y-auto space-y-4">
             {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.role === "user"
-                      ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                      : "bg-gradient-to-br from-emerald-500 to-teal-600"
-                  }`}>
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] flex gap-3 ${
+                    message.role === "user" ? "flex-row-reverse" : "flex-row"
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      message.role === "user"
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                        : "bg-gradient-to-br from-emerald-500 to-teal-600"
+                    }`}
+                  >
                     {message.role === "user" ? userAvatar : botAvatar}
                   </div>
 
                   <div className="flex flex-col">
-                    <div className={`px-4 py-3 rounded-2xl ${
-                      message.role === "user"
-                        ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
-                        : "bg-gray-100 text-gray-800 rounded-tl-md"
-                    }`}>
+                    <div
+                      className={`px-4 py-3 rounded-2xl ${
+                        message.role === "user"
+                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
+                          : "bg-gray-100 text-gray-800 rounded-tl-md"
+                      }`}
+                    >
                       {message.isTyping ? (
                         <div className="flex items-center gap-1">
                           <div className="flex gap-1">
@@ -304,11 +373,17 @@ export default function ChatbotPage() {
                           </div>
                         </div>
                       ) : (
-                        <p className="text-sm leading-relaxed">{message.text}</p>
+                        <p className="text-sm leading-relaxed">
+                          {message.text}
+                        </p>
                       )}
                     </div>
                     {message.time && !message.isTyping && (
-                      <p className={`text-xs mt-1 ${message.role === "user" ? "text-right" : "text-left"} text-gray-500`}>
+                      <p
+                        className={`text-xs mt-1 ${
+                          message.role === "user" ? "text-right" : "text-left"
+                        } text-gray-500`}
+                      >
                         {message.time}
                       </p>
                     )}
@@ -322,7 +397,9 @@ export default function ChatbotPage() {
           {/* Quick Actions */}
           {messages.length <= 2 && (
             <div className="p-4 border-t border-gray-200/60 bg-gray-50/50">
-              <p className="text-sm text-gray-700 mb-3 font-medium">Quick responses:</p>
+              <p className="text-sm text-gray-700 mb-3 font-medium">
+                Quick responses:
+              </p>
               <div className="flex flex-wrap gap-2">
                 {quickActions.map((action, index) => (
                   <button
@@ -350,15 +427,25 @@ export default function ChatbotPage() {
                   disabled={loading}
                   rows={1}
                   className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200 placeholder-gray-500 text-sm resize-none bg-white"
-                  style={{ minHeight: '48px', maxHeight: '120px' }}
+                  style={{ minHeight: "48px", maxHeight: "120px" }}
                 />
                 {input && (
                   <button
                     onClick={() => setInput("")}
                     className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 )}
@@ -374,13 +461,38 @@ export default function ChatbotPage() {
                 }`}
               >
                 {loading ? (
-                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="w-5 h-5 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    />
                   </svg>
                 )}
               </button>
@@ -389,5 +501,5 @@ export default function ChatbotPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

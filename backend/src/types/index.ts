@@ -17,3 +17,8 @@ export interface IAuthUser {
 export interface IApiRequest extends Request {
   user?: IAuthUser;
 }
+
+export interface ChatRequest {
+  session_id: string;
+  query: string;
+}
