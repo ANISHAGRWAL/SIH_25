@@ -3,6 +3,7 @@ import { relations, sql } from 'drizzle-orm';
 import { studentMoods } from './studentMoods';
 
 export const RoleEnum = pgEnum('role', ['student', 'admin']);
+export const GenderEnum = pgEnum('gender', ['male', 'female']);
 
 export const user = pgTable('users', {
   id: uuid('id')
@@ -15,6 +16,15 @@ export const user = pgTable('users', {
   name: varchar('name', { length: 255 }).notNull(),
   contact: varchar('contact', { length: 20 }).notNull(),
   idProofUrl: varchar('id_proof_url', { length: 255 }).notNull(),
+  city: varchar('city', { length: 100 }),
+  age: varchar('age', { length: 3 }),
+  gender: GenderEnum('gender'),
+  yearOfStudy: varchar('year_of_study', { length: 10 }),
+  department: varchar('department', { length: 100 }),
+  emergencyContact: varchar('emergency_contact', { length: 20 }),
+  emergencyContactPerson: varchar('emergency_contact_person', { length: 100 }),
+  bio: varchar('bio', { length: 500 }),
+  degree: varchar('degree', { length: 100 }),
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp('updated_at')
     .defaultNow()
