@@ -17,7 +17,7 @@ router.post('/facial-detection', (req: IApiRequest, res: Response) => {
   }
   facialDetection(req.user, req.body)
     .then((data) => {
-      res.status(200).json({ data });
+      res.status(200).json({ success: true, data });
     })
     .catch((error) => {
       res
@@ -34,7 +34,7 @@ router.get('/me', (req: IApiRequest, res: Response) => {
   }
   getMe(req.user)
     .then((data) => {
-      res.status(200).json({ data });
+      res.status(200).json({ success: true, data });
     })
     .catch((error) => {
       res
@@ -51,7 +51,7 @@ router.get('/details', (req: IApiRequest, res: Response) => {
   }
   userDetails(req.user)
     .then((data) => {
-      res.status(200).json({ data });
+      res.status(200).json({ success: true, data });
     })
     .catch((error) => {
       res
@@ -68,7 +68,7 @@ router.post('/details', (req: IApiRequest, res: Response) => {
   }
   updateUserDetails(req.user, req.body)
     .then((data) => {
-      res.status(200).json({ data });
+      res.status(200).json({ success: true, data });
     })
     .catch((error) => {
       res

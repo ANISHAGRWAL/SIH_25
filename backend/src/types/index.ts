@@ -12,6 +12,7 @@ export interface IApiResponse {
 export interface IAuthUser {
   id: string;
   email: string;
+  organizationId: string;
   role?: IRole;
 }
 export interface IApiRequest extends Request {

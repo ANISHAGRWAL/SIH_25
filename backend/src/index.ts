@@ -4,6 +4,7 @@ import 'dotenv/config';
 import authRoutes from './routes/auth';
 import studentRoutes from './routes/student';
 import testRoutes from './routes/test';
+import organizationRoutes from './routes/organization';
 import authMiddleware from './middleware/auth_middleware';
 import adminMiddleware from './middleware/admin_middleware';
 import chatRouter from './routes/chat';
@@ -34,6 +35,7 @@ app.use(`${BASE_PATH}/health`, (req, res) => {
 });
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/organizations`, organizationRoutes);
 
 app.use('/api/chat', chatRouter);
 app.use('/api/doc-chat', docChatRouter);

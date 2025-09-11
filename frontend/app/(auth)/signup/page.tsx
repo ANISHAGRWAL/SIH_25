@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { register } from "@/actions/auth";
+import { organizations, register } from "@/actions/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -17,12 +17,15 @@ export default function SignupPage() {
     name: "",
     email: "",
     password: "",
-    organization: "",
+    organizationId: "",
     contact: "",
     idFile: undefined as File | undefined,
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [organizationList, setOrganizationList] = useState<
+    { id: string; name: string }[]
+  >([]);
 
   // You can change this image URL to any image you want for the center
   const centerImage = step === 1 ? "/login.png" : "/login.png";
@@ -43,7 +46,20 @@ export default function SignupPage() {
     if (error) {
       setError("");
     }
-  }, [form.name, form.email, form.password, form.organization, form.contact]);
+  }, [form.name, form.email, form.password, form.organizationId, form.contact]);
+
+  useEffect(() => {
+    if (step === 2) {
+      (async () => {
+        const res = await organizations();
+        if (res.ok && res.data) {
+          setOrganizationList(res.data);
+        } else {
+          setError("Failed to load organizations. Try again.");
+        }
+      })();
+    }
+  }, [step]);
 
   function update<K extends keyof typeof form>(
     key: K,
@@ -68,7 +84,7 @@ export default function SignupPage() {
         email: form.email,
         password: form.password,
         role,
-        organization: form.organization,
+        organizationId: form.organizationId,
         contact: form.contact,
         idFile: form.idFile,
       };
@@ -272,14 +288,30 @@ export default function SignupPage() {
               </form>
             ) : (
               <form className="space-y-4" onSubmit={handleSignup}>
-                <LabeledInput
-                  label="Organization"
-                  placeholder="Enter your organization"
-                  value={form.organization}
-                  onChange={(e) => update("organization", e.target.value)}
-                  disabled={isSubmitting}
-                  required
-                />
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-gray-700">
+                    Organization
+                  </label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm text-sm"
+                    value={form.organizationId}
+                    onChange={(e) => update("organizationId", e.target.value)}
+                    disabled={isSubmitting || organizationList.length === 0}
+                    required
+                  >
+                    <option value="" disabled>
+                      {organizationList.length === 0
+                        ? "Loading organizations..."
+                        : "Select your organization"}
+                    </option>
+                    {organizationList.map((org) => (
+                      <option key={org.id} value={org.id}>
+                        {org.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <LabeledInput
                   label="Contact Number"
                   placeholder="Enter your contact number"

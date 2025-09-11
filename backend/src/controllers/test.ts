@@ -29,6 +29,7 @@ export const phqTest = async (
     const phqPayload = {
       studentId: user.id,
       score: score,
+      organizationId: user.organizationId,
     };
     const phqTest = await db.insert(phqSchema).values(phqPayload).returning();
     if (!phqTest) {
@@ -59,6 +60,7 @@ export const gadTest = async (user: IAuthUser, score: number) => {
     const gadPayload = {
       studentId: user.id,
       score: score,
+      organizationId: user.organizationId,
     };
     const gadTest = await db.insert(gadSchema).values(gadPayload).returning();
     if (!gadTest) {
@@ -89,6 +91,7 @@ export const pssTest = async (user: IAuthUser, score: number) => {
     const pssPayload: INewPhq = {
       studentId: user.id,
       score: score,
+      organizationId: user.organizationId,
     };
     const pssTest = await db.insert(pssSchema).values(pssPayload).returning();
     if (!pssTest) {

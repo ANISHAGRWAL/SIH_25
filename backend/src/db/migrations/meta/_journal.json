@@ -29,6 +29,20 @@
       "when": 1757606483917,
       "tag": "0003_nosy_aaron_stack",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1757609454108,
+      "tag": "0004_wealthy_morlun",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1757609516562,
+      "tag": "0005_volatile_mad_thinker",
+      "breakpoints": true
     }
   ]
 }
