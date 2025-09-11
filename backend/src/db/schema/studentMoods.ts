@@ -11,6 +11,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { user } from './user';
+import { organization } from './organization';
 
 // Enum definition
 export const MoodEnum = pgEnum('mood', [
@@ -33,6 +34,7 @@ export const studentMoods = pgTable(
     date: timestamp('date', { withTimezone: false }).defaultNow(),
     mood: MoodEnum('mood').notNull(),
     moodScore: doublePrecision('mood_score').default(0),
+    organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
     updatedAt: timestamp('updated_at')
       .defaultNow()
@@ -44,6 +46,13 @@ export const studentMoods = pgTable(
       columns: [table.studentId],
       foreignColumns: [user.id],
       name: 'fk_student_moods_user',
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organization.id],
+      name: 'fk_gad_organization',
     })
       .onDelete('cascade')
       .onUpdate('cascade'),

@@ -40,7 +40,12 @@ const authMiddleware = (
           .status(401)
           .json({ success: false, error: { message: 'Invalid token' } });
       }
-      req.user = { id: user.id, email: user.email, role: user.role };
+      req.user = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        organizationId: user.organizationId,
+      };
       next();
     })
     .catch((error) => {

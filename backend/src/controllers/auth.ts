@@ -36,10 +36,10 @@ export const registerUser = async (
         email: userData.email,
         password: hashedPassword,
         role: userData.role,
-        organization: userData.organization,
         name: userData.name,
         contact: userData.contact,
         idProofUrl: idProofUrl,
+        organizationId: userData.organizationId,
       })
       .returning();
     if (!user) {

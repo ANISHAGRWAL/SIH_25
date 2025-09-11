@@ -28,7 +28,7 @@ export async function register(registerData: {
   email: string;
   password: string;
   role: "student" | "admin";
-  organization: string;
+  organizationId: string;
   contact: string;
   idFile: File;
 }) {
@@ -37,7 +37,7 @@ export async function register(registerData: {
     formData.append("email", registerData.email);
     formData.append("password", registerData.password);
     formData.append("role", registerData.role);
-    formData.append("organization", registerData.organization);
+    formData.append("organizationId", registerData.organizationId);
     formData.append("name", registerData.name);
     formData.append("contact", registerData.contact);
     formData.append("file", registerData.idFile);
@@ -62,3 +62,27 @@ export async function register(registerData: {
     };
   }
 }
+
+export const organizations = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/organizations`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log("organizations response data:", data);
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: data.data,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 500,
+      error: "Failed to fetch organizations. Please try again.",
+    };
+  }
+};

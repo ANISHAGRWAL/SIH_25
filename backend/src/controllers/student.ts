@@ -14,7 +14,7 @@ export const facialDetection = async (
   facialData: INewStudentMood,
 ): Promise<IStudentMood> => {
   try {
-    console.log('Registering user:', facialData);
+    console.log('Storing FacialData:', facialData);
 
     const facialMood = await db
       .insert(studentMoods)
@@ -23,6 +23,7 @@ export const facialDetection = async (
         mood: facialData.mood,
         date: new Date(),
         moodScore: facialData.moodScore,
+        organizationId: user.organizationId,
       })
       .returning();
     if (!facialMood) {
@@ -78,7 +79,7 @@ export const updateUserDetails = async (
   try {
     delete updateData.email;
     delete updateData.role;
-    delete updateData.organization;
+    delete updateData.organizationId;
     delete updateData.contact;
     delete updateData.idProofUrl;
     delete updateData.name;
