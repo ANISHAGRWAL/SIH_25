@@ -38,7 +38,7 @@ export default function ChatbotPage() {
       time: "9:00 AM"
     },
     {
-      id: "2", 
+      id: "2",
       role: "bot",
       text: "I'm here to listen and support you. Feel free to share what's on your mind - whether it's something that's bothering you, a win you'd like to celebrate, or just how your day is going.",
       time: "9:01 AM"
@@ -89,7 +89,7 @@ export default function ChatbotPage() {
 
     const userMessage: Message = {
       id: generateId(),
-      role: "user", 
+      role: "user",
       text: input.trim(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
@@ -158,7 +158,7 @@ export default function ChatbotPage() {
 
   const quickActions = [
     "I need someone to talk to",
-    "I'm feeling anxious", 
+    "I'm feeling anxious",
     "I had a good day",
     "Help me relax",
     "I'm stressed about work"
@@ -181,7 +181,7 @@ export default function ChatbotPage() {
   }, [input])
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Subtle animated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
@@ -189,7 +189,7 @@ export default function ChatbotPage() {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between p-2 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
+      <div className="flex items-center justify-between p-1 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,28 +216,28 @@ export default function ChatbotPage() {
           </button>
 
           {showSettings && (
-  <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-[50]">
-    <button
-      onClick={() => setShowClearConfirm(true)}
-      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-    >
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-        />
-      </svg>
-      Clear Chat
-    </button>
-  </div>
-)}
+            <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-[50]">
+              <button
+                onClick={() => setShowClearConfirm(true)}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Clear Chat
+              </button>
+            </div>
+          )}
 
         </div>
       </div>
@@ -276,20 +276,19 @@ export default function ChatbotPage() {
       {/* Chat Container */}
       <div className="flex-1 flex flex-col min-h-0 p-4 relative z-10">
         <div className="flex-1 flex flex-col min-h-0 rounded-2xl bg-white/80 backdrop-blur-lg border border-gray-200/60 shadow-xl overflow-hidden">
-          
           {/* Messages Area */}
           <div className="flex-1 p-4 overflow-y-auto space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[80%] flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.role === "user" 
-                      ? "bg-gradient-to-br from-blue-500 to-indigo-600" 
+                    message.role === "user"
+                      ? "bg-gradient-to-br from-blue-500 to-indigo-600"
                       : "bg-gradient-to-br from-emerald-500 to-teal-600"
                   }`}>
                     {message.role === "user" ? userAvatar : botAvatar}
                   </div>
-                  
+
                   <div className="flex flex-col">
                     <div className={`px-4 py-3 rounded-2xl ${
                       message.role === "user"
