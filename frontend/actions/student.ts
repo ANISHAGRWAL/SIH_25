@@ -94,3 +94,68 @@ export const getMe = async (token: string) => {
     };
   }
 };
+
+export const getUserDetails = async (token: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/student/details`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to fetch user details");
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data,
+    };
+  } catch (error: any) {
+    return {
+      ok: false,
+      status: 500,
+      error: error.message || "Failed to fetch user details. Please try again.",
+    };
+  }
+};
+
+export const updateUserDetails = async (
+  token: string,
+  updateData: Partial<ICompleteUser>
+) => {
+  try {
+    const response = await fetch(`${BASE_URL}/student/details`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to update user details");
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data,
+    };
+  } catch (error: any) {
+    return {
+      ok: false,
+      status: 500,
+      error:
+        error.message || "Failed to update user details. Please try again.",
+    };
+  }
+};
