@@ -1,5 +1,10 @@
 import { db } from '../db';
-import { INewStudentMood, IStudentMood, studentMoods } from '../db/schema';
+import {
+  INewStudentMood,
+  IStudentMood,
+  IUser,
+  studentMoods,
+} from '../db/schema';
 import { IAuthUser } from '../types';
 
 export const facialDetection = async (
@@ -22,6 +27,21 @@ export const facialDetection = async (
       throw new Error('Facial data not stored');
     }
     return facialMood[0];
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const userDetails = async (authUser: IAuthUser): Promise<IUser> => {
+  try {
+    const userDetails = await db.query.user.findFirst({
+      where: (user, { eq }) => eq(user.email, authUser.email),
+    });
+    if (!userDetails) {
+      throw new Error('User not found');
+    }
+    return userDetails;
   } catch (error) {
     console.log(error);
     throw error;

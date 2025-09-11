@@ -13,10 +13,12 @@ import {
 interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
-  token: string | null;
   isStudent: boolean;
-  loading: boolean; // added loading here
+  token: string | null;
+  user: User | null;
+  loading: boolean;
   getTokens: () => void;
+  getToken: () => string | null;
   logout: () => void;
 }
 
@@ -24,44 +26,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [isStudent, setIsStudent] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isStudent, setIsStudent] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // loading state
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
-
-  const getTokens = useCallback(async () => {
-    try {
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
-        setIsAuthenticated(true);
-
-        const userDetails = await getMe(storedToken);
-        if (userDetails?.data?.role === "admin") {
-          setIsAdmin(true);
-          setIsStudent(false);
-        } else {
-          setIsAdmin(false);
-          setIsStudent(true);
-        }
-      } else {
-        setIsAuthenticated(false);
-        setToken(null);
-        setIsAdmin(false);
-        setIsStudent(false);
-      }
-    } catch (error) {
-      console.error("Error getting token from localStorage", error);
-      setIsAuthenticated(false);
-      setToken(null);
-      setIsAdmin(false);
-      setIsStudent(false);
-    } finally {
-      setLoading(false); // mark loading done
-    }
-  }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
@@ -69,8 +40,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setIsAdmin(false);
     setIsStudent(false);
-    router.push("/login"); // Optional: push to login after logout
+    setUser(null);
+    router.push("/login");
   }, [router]);
+
+  const getTokens = useCallback(async () => {
+    const storedToken = localStorage.getItem("token");
+
+    if (!storedToken) {
+      logout();
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const userDetails = await getMe(storedToken);
+
+      setToken(storedToken);
+      setIsAuthenticated(true);
+      setUser(userDetails?.data || null);
+
+      const role = userDetails?.data?.role;
+      if (role === "admin") {
+        setIsAdmin(true);
+        setIsStudent(false);
+      } else {
+        setIsAdmin(false);
+        setIsStudent(true);
+      }
+    } catch (error: any) {
+      console.error("Token invalid or expired", error);
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  }, [logout]);
+
+  const getToken = useCallback(() => {
+    return token;
+  }, [token]);
 
   useEffect(() => {
     getTokens();
@@ -81,14 +89,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         isAuthenticated,
         isAdmin,
+        isStudent,
         token,
+        user,
         loading,
         getTokens,
+        getToken,
         logout,
-        isStudent,
       }}
     >
-      {/* Only render children once loading is finished */}
       {loading ? null : children}
     </AuthContext.Provider>
   );
