@@ -8,6 +8,12 @@ from logger import log_chat
 from doc_engine import query_documents
 from fastapi.middleware.cors import CORSMiddleware
 
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
+
 load_dotenv()
 app = FastAPI()
 
@@ -19,9 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
-    return{"message":"welcome bro"}
+    return {"message": "welcome bro"}
+
 
 @app.post("/chat")
 def chat_with_memory(request: ChatRequest):
@@ -32,7 +40,7 @@ def chat_with_memory(request: ChatRequest):
     if contains_crisis_keywords(user_query):
         log_chat(session_id, user_query, SAFETY_MESSAGE, is_crisis=True)
         return {"response": SAFETY_MESSAGE}
-    
+
     # Normal short LLM response (2–3 sentences)
     response = get_response(session_id, user_query)
     log_chat(session_id, user_query, response, is_crisis=False)
@@ -44,6 +52,3 @@ def chat_with_documents(request: ChatRequest):
     # Long, detailed, structured response
     response = query_documents(request.query)
     return {"response": response}
-
-
-
