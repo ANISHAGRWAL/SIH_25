@@ -1,9 +1,11 @@
+import { eq } from 'drizzle-orm';
 import { db } from '../db';
 import {
   INewStudentMood,
   IStudentMood,
   IUser,
   studentMoods,
+  user as userSchema,
 } from '../db/schema';
 import { IAuthUser } from '../types';
 
@@ -33,6 +35,27 @@ export const facialDetection = async (
   }
 };
 
+export const getMe = async (user: IAuthUser): Promise<Partial<IUser>> => {
+  try {
+    const userDetails = await db.query.user.findFirst({
+      where: (u, { eq }) => eq(u.email, user.email),
+    });
+    if (!userDetails) {
+      throw new Error('User not found');
+    }
+    const returnData = {
+      id: userDetails.id,
+      email: userDetails.email,
+      role: userDetails.role,
+      name: userDetails.name,
+    };
+    return returnData;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const userDetails = async (authUser: IAuthUser): Promise<IUser> => {
   try {
     const userDetails = await db.query.user.findFirst({
@@ -42,6 +65,26 @@ export const userDetails = async (authUser: IAuthUser): Promise<IUser> => {
       throw new Error('User not found');
     }
     return userDetails;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const updateUserDetails = async (
+  authUser: IAuthUser,
+  updateData: Partial<IUser>,
+): Promise<IUser> => {
+  try {
+    const userDetails = await db
+      .update(userSchema)
+      .set(updateData)
+      .where(eq(userSchema.email, authUser.email))
+      .returning();
+    if (!userDetails) {
+      throw new Error('User not found or not updated');
+    }
+    return userDetails[0];
   } catch (error) {
     console.log(error);
     throw error;
