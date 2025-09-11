@@ -1,4 +1,7 @@
+
+
 "use client"
+
 
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
@@ -9,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 // Import the Formspree hook and component
 import { useForm, ValidationError } from '@formspree/react';
+
 
 // Blog data - same as in your blogs page
 const blogs = [
@@ -94,10 +98,12 @@ const blogs = [
   },
 ];
 
+
 // New ContactForm component using Formspree hook
 function ContactForm() {
   // Use the formspree hook with your unique form ID
   const [state, handleSubmit] = useForm("mqadwjzw");
+
 
   // If the form submission is successful, show a success message
   if (state.succeeded) {
@@ -105,6 +111,7 @@ function ContactForm() {
       Thanks! Your message has been sent successfully. We'll be in touch!
     </div>;
   }
+
 
   return (
     <Card className="p-6 rounded-3xl shadow-2xl border border-gray-200 hover:shadow-3xl transition-all duration-500 bg-white/90 backdrop-blur-sm">
@@ -122,23 +129,23 @@ function ContactForm() {
           </div>
           <Input placeholder="Email Address" type="email" name="email" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
           {/* Add validation error messages for specific fields */}
-          <ValidationError 
-            prefix="Email" 
+          <ValidationError
+            prefix="Email"
             field="email"
             errors={state.errors}
             className="text-red-500 text-sm"
           />
           <Input placeholder="Institution Name" name="institution" className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
           <Textarea placeholder="Your Message" name="message" rows={4} className="transition-all duration-200 focus:scale-105 focus:shadow-md" />
-          <ValidationError 
-            prefix="Message" 
+          <ValidationError
+            prefix="Message"
             field="message"
             errors={state.errors}
             className="text-red-500 text-sm"
           />
-          <Button 
-            type="submit" 
-            disabled={state.submitting} 
+          <Button
+            type="submit"
+            disabled={state.submitting}
             className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform"
           >
             {state.submitting ? "Sending..." : "Send Message"}
@@ -149,21 +156,27 @@ function ContactForm() {
   );
 }
 
+
 // Update the main HomePage component to use the new ContactForm component
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("")
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
 
   // Get the 3 most recent blogs for homepage display
   const featuredBlogs = blogs.slice(0, 3)
 
+
   useEffect(() => {
     setIsLoaded(true)
 
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
+
 
       // Active section detection
       const sections = ["about", "services", "contact", "blogs"]
@@ -178,12 +191,15 @@ export default function HomePage() {
       setActiveSection(current || "")
     }
 
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
 
+
     window.addEventListener("scroll", handleScroll)
     window.addEventListener("mousemove", handleMouseMove)
+
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
@@ -191,12 +207,21 @@ export default function HomePage() {
     }
   }, [])
 
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
       element.scrollIntoView({ behavior: "smooth" })
     }
+    // Close mobile menu after navigation
+    setIsMobileMenuOpen(false)
   }
+
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
 
   return (
     <div className="min-h-screen scroll-smooth bg-blue-50 font-sans text-slate-800 overflow-x-hidden">
@@ -219,6 +244,7 @@ export default function HomePage() {
           }}
         />
       </div>
+
 
       {/* Enhanced Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
@@ -245,6 +271,9 @@ export default function HomePage() {
               </div>
               <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">MindMates</span>
             </div>
+
+
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
               {["about", "services", "contact", "blogs"].map((section, index) => (
                 <button
@@ -259,24 +288,68 @@ export default function HomePage() {
                     }`} />
                 </button>
               ))}
-              <Link href="/signup">
+              <Link href="/login">
                 <Button className={`rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                     }`} style={{ transitionDelay: '400ms' }}>
                   Get Started
                 </Button>
               </Link>
             </div>
+
+
+            {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <Button variant="ghost" size="sm" className="hover:bg-blue-50 transition-colors duration-200">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleMobileMenu}
+                className="hover:bg-blue-50 transition-colors duration-200 p-2"
+              >
                 <span className="sr-only">Menu</span>
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <div className="relative w-6 h-6">
+                  <span className={`absolute left-0 top-0 w-6 h-0.5 bg-slate-700 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></span>
+                  <span className={`absolute left-0 top-2.5 w-6 h-0.5 bg-slate-700 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
+                  <span className={`absolute left-0 top-5 w-6 h-0.5 bg-slate-700 transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></span>
+                </div>
               </Button>
+            </div>
+          </div>
+
+
+          {/* Mobile Menu */}
+          <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-96 opacity-100 pt-4' : 'max-h-0 opacity-0'}`}>
+            <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 p-6 space-y-4">
+              {["about", "services", "contact", "blogs"].map((section, index) => (
+                <button
+                  key={section}
+                  onClick={() => scrollToSection(section)}
+                  className={`w-full text-left py-3 px-4 rounded-xl font-medium transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 capitalize ${activeSection === section ? 'text-blue-600 bg-blue-50' : 'text-slate-600'
+                    }`}
+                >
+                  {section}
+                </button>
+              ))}
+              <div className="pt-4 border-t border-gray-200">
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform">
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </nav>
+
+
+      {/* Overlay for mobile menu */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
 
       {/* Enhanced Hero Section */}
       <section className="pt-20 pb-16 bg-blue-50 relative overflow-hidden">
@@ -298,7 +371,7 @@ export default function HomePage() {
                 counseling for students in higher education.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/signup">
+                <Link href="/login">
                   <Button
                     size="lg"
                     className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-xl transform group"
@@ -334,6 +407,7 @@ export default function HomePage() {
         </div>
       </section>
 
+
       {/* Enhanced About Section */}
       <section id="about" className="py-16 bg-white relative">
         <div className="container mx-auto px-4">
@@ -367,6 +441,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* Enhanced Services Section */}
       <section id="services" className="py-16 bg-blue-50 relative">
@@ -404,6 +479,7 @@ export default function HomePage() {
         </div>
       </section>
 
+
       {/* Enhanced Contact Section */}
       <section id="contact" className="py-16 bg-white relative">
         <div className="container mx-auto px-4">
@@ -433,6 +509,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* Enhanced Blogs Section with No Background Cards */}
       <section id="blogs" className="py-16 bg-blue-50 relative">
@@ -466,6 +543,7 @@ export default function HomePage() {
                     )}
                   </div>
 
+
                   {/* Title + text wrapper - same width as image */}
                   <div className="p-4 bg-white">
                     <div className="text-sm text-slate-500 mb-2">{blog.date}</div>
@@ -478,6 +556,7 @@ export default function HomePage() {
                   </div>
                 </Link>
               </div>
+
 
             ))}
           </div>
@@ -493,6 +572,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* Enhanced Footer */}
       <footer className="bg-slate-900 text-white py-12 relative overflow-hidden">
@@ -575,3 +655,4 @@ export default function HomePage() {
     </div>
   )
 }
+

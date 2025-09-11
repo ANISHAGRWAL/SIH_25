@@ -1,6 +1,8 @@
 "use client";
 
+
 import React, { useState } from 'react';
+
 
 // Types
 interface GradientButtonProps {
@@ -9,25 +11,29 @@ interface GradientButtonProps {
   className?: string;
 }
 
+
 interface SelectedDate {
   day: number;
   dateKey: string;
   fullDate: Date;
 }
 
+
 interface DiaryEntries {
   [key: string]: string;
 }
 
+
 // Mock GradientButton component to match your design
 const GradientButton: React.FC<GradientButtonProps> = ({ children, onClick, className = "" }) => (
-  <button 
+  <button
     onClick={onClick}
-    className={`px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${className}`}
+    className={`px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base ${className}`}
   >
     {children}
   </button>
 );
+
 
 export default function MindLogPage() {
   const [currentView, setCurrentView] = useState<'calendar' | 'diary' | 'report'>('calendar');
@@ -36,10 +42,12 @@ export default function MindLogPage() {
   const [currentEntry, setCurrentEntry] = useState<string>('');
   const [currentWeekOffset, setCurrentWeekOffset] = useState<number>(0); // 0 = current week, -1 = previous week, etc.
 
+
   // Helper function to generate date key
   const getDateKey = (date: Date): string => {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   };
+
 
   // Get start of week (Sunday) for any date
   const getStartOfWeek = (date: Date): Date => {
@@ -50,45 +58,48 @@ export default function MindLogPage() {
     return startOfWeek;
   };
 
+
   // Generate array of dates for a specific week
   const getWeekDays = (weekOffset: number = 0): Date[] => {
     const today = new Date();
     const currentWeekStart = getStartOfWeek(today);
-    
+   
     // Calculate the target week
     const targetWeekStart = new Date(currentWeekStart);
     targetWeekStart.setDate(currentWeekStart.getDate() + (weekOffset * 7));
-    
+   
     const weekDays: Date[] = [];
-    
+   
     // Generate all 7 days of the week
     for (let i = 0; i < 7; i++) {
       const day = new Date(targetWeekStart);
       day.setDate(targetWeekStart.getDate() + i);
       weekDays.push(day);
     }
-    
+   
     return weekDays;
   };
+
 
   // Get week date range string
   const getWeekDateRange = (weekOffset: number = 0): string => {
     const weekDays = getWeekDays(weekOffset);
     const startDate = weekDays[0];
     const endDate = weekDays[6];
-    
+   
     const startMonth = startDate.toLocaleDateString('en-US', { month: 'short' });
     const endMonth = endDate.toLocaleDateString('en-US', { month: 'short' });
     const startDay = startDate.getDate();
     const endDay = endDate.getDate();
     const year = startDate.getFullYear();
-    
+   
     if (startMonth === endMonth) {
       return `${startMonth} ${startDay}-${endDay}, ${year}`;
     } else {
       return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
     }
   };
+
 
   // Check if a date is today
   const isToday = (date: Date): boolean => {
@@ -98,24 +109,28 @@ export default function MindLogPage() {
            date.getFullYear() === today.getFullYear();
   };
 
+
   // Check if a date is in the current week
   const isCurrentWeek = (): boolean => {
     return currentWeekOffset === 0;
   };
 
+
   const weekDays = getWeekDays(currentWeekOffset);
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+
   const handleDayClick = (date: Date) => {
     const dateKey = getDateKey(date);
-    setSelectedDate({ 
-      day: date.getDate(), 
+    setSelectedDate({
+      day: date.getDate(),
       dateKey,
       fullDate: date
     });
     setCurrentEntry(diaryEntries[dateKey] || '');
     setCurrentView('diary');
   };
+
 
   const handleSaveEntry = () => {
     if (selectedDate && currentEntry.trim()) {
@@ -127,41 +142,49 @@ export default function MindLogPage() {
     setCurrentView('calendar');
   };
 
+
   const handleBackToCalendar = () => {
     setCurrentView('calendar');
     setSelectedDate(null);
     setCurrentEntry('');
   };
 
+
   const handlePreviousWeek = () => {
     setCurrentWeekOffset(prev => prev - 1);
   };
+
 
   const handleNextWeek = () => {
     setCurrentWeekOffset(prev => prev + 1);
   };
 
+
   const handleCurrentWeek = () => {
     setCurrentWeekOffset(0);
   };
+
 
   const handleViewWeeklyReport = () => {
     setCurrentView('report');
   };
 
+
   const getFormattedDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
+
 
   // Calculate weekly statistics
   const currentWeekEntries = weekDays.filter(date => diaryEntries[getDateKey(date)]).length;
   const weeklyGoalPercentage = Math.round((currentWeekEntries / 7) * 100);
   const totalEntries = Object.keys(diaryEntries).length;
+
 
   // Weekly Report View
   if (currentView === 'report') {
@@ -171,77 +194,81 @@ export default function MindLogPage() {
       hasEntry: !!diaryEntries[getDateKey(date)]
     }));
 
+
     return (
-      <div className="space-y-6">
+      <div className="px-3 sm:px-6 space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <button 
+          <button
             onClick={handleBackToCalendar}
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Calendar
+            <span className="text-sm sm:text-base">Back</span>
           </button>
-          <h2 className="text-xl md:text-2xl font-semibold">Weekly Report</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Weekly Report</h2>
           <div></div>
         </div>
 
+
         {/* Report Card */}
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 shadow-xl border border-indigo-200/50">
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl border border-indigo-200/50">
           {/* Report Header */}
-          <div className="text-center mb-8">
-            <div className="inline-block bg-gradient-to-r from-indigo-600 to-purple-500 text-white px-6 py-2 rounded-full font-medium shadow-lg">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="inline-block bg-gradient-to-r from-indigo-600 to-purple-500 text-white px-3 py-2 sm:px-6 sm:py-2 rounded-full font-medium shadow-lg text-sm sm:text-base">
               Week of {getWeekDateRange(currentWeekOffset)}
             </div>
           </div>
 
+
           {/* Weekly Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/80 rounded-2xl p-6 shadow-lg">
+          <div className="grid grid-cols-3 gap-2 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white/80 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg">
               <div className="text-center">
-                <div className="text-3xl font-bold text-indigo-600 mb-2">{currentWeekEntries}</div>
-                <div className="text-slate-600">Entries Written</div>
+                <div className="text-xl sm:text-3xl font-bold text-indigo-600 mb-1 sm:mb-2">{currentWeekEntries}</div>
+                <div className="text-slate-600 text-xs sm:text-base">Entries</div>
               </div>
             </div>
-            <div className="bg-white/80 rounded-2xl p-6 shadow-lg">
+            <div className="bg-white/80 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg">
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">{weeklyGoalPercentage}%</div>
-                <div className="text-slate-600">Goal Completed</div>
+                <div className="text-xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2">{weeklyGoalPercentage}%</div>
+                <div className="text-slate-600 text-xs sm:text-base">Goal</div>
               </div>
             </div>
-            <div className="bg-white/80 rounded-2xl p-6 shadow-lg">
+            <div className="bg-white/80 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg">
               <div className="text-center">
-                <div className="text-3xl font-bold text-pink-600 mb-2">{7 - currentWeekEntries}</div>
-                <div className="text-slate-600">Days Remaining</div>
+                <div className="text-xl sm:text-3xl font-bold text-pink-600 mb-1 sm:mb-2">{7 - currentWeekEntries}</div>
+                <div className="text-slate-600 text-xs sm:text-base">Left</div>
               </div>
             </div>
           </div>
 
+
           {/* Daily Overview */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">Daily Overview</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Daily Overview</h3>
             {weeklyEntries.map(({ date, entry, hasEntry }, index) => (
-              <div key={index} className="bg-white/80 rounded-xl p-4 shadow-md">
+              <div key={index} className="bg-white/80 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${hasEntry ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="font-medium text-slate-700">
-                      {date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${hasEntry ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className="font-medium text-slate-700 text-sm sm:text-base">
+                      {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </span>
                     {isToday(date) && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Today</span>
+                      <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Today</span>
                     )}
                   </div>
-                  <div className="text-sm text-slate-500">
-                    {hasEntry ? 'Entry written ✓' : 'No entry'}
+                  <div className="text-xs sm:text-sm text-slate-500">
+                    {hasEntry ? 'Entry ✓' : 'No entry'}
                   </div>
                 </div>
                 {hasEntry && entry && (
-                  <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-                    <p className="text-sm text-slate-600 line-clamp-2">
-                      {entry.length > 100 ? `${entry.substring(0, 100)}...` : entry}
+                  <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-slate-50 rounded-lg">
+                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">
+                      {entry.length > 60 ? `${entry.substring(0, 60)}...` : entry}
                     </p>
                   </div>
                 )}
@@ -253,84 +280,104 @@ export default function MindLogPage() {
     );
   }
 
+
   // Diary View
   if (currentView === 'diary') {
     return (
-      <div className="space-y-6">
+      <div className="px-3 sm:px-6 space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <button 
+          <button
             onClick={handleBackToCalendar}
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Calendar
+            <span className="text-sm sm:text-base">Back</span>
           </button>
-          <h2 className="text-xl md:text-2xl font-semibold">My Diary</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">My Diary</h2>
           <div></div>
         </div>
 
+
         {/* Diary Interface */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-8 shadow-xl border border-orange-200/50">
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl border border-orange-200/50">
           {/* Diary Header */}
-          <div className="text-center mb-8">
-            <div className="inline-block bg-gradient-to-r from-amber-600 to-orange-500 text-white px-6 py-2 rounded-full font-medium shadow-lg">
-              {selectedDate && getFormattedDate(selectedDate.fullDate)}
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="inline-block bg-gradient-to-r from-amber-600 to-orange-500 text-white px-3 py-2 sm:px-6 sm:py-2 rounded-full font-medium shadow-lg text-sm sm:text-base">
+              {selectedDate && (
+                <span className="block sm:hidden">
+                  {selectedDate.fullDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
+              )}
+              {selectedDate && (
+                <span className="hidden sm:block">
+                  {getFormattedDate(selectedDate.fullDate)}
+                </span>
+              )}
             </div>
           </div>
 
+
           {/* Diary Paper Effect */}
-          <div 
-            className="bg-white rounded-2xl shadow-2xl p-8 min-h-[500px] relative"
+          <div
+            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-8 min-h-[400px] sm:min-h-[500px] relative"
             style={{
               backgroundImage: `repeating-linear-gradient(
                 transparent,
-                transparent 31px,
-                #e5e7eb 31px,
-                #e5e7eb 32px
+                transparent 27px,
+                #e5e7eb 27px,
+                #e5e7eb 28px
               )`,
-              backgroundSize: '100% 32px'
+              backgroundSize: '100% 28px'
             }}
           >
             {/* Red margin line */}
-            <div className="absolute left-16 top-0 bottom-0 w-px bg-red-300"></div>
-            
-            {/* Holes for ring binding */}
-            <div className="absolute left-6 top-12 w-4 h-4 bg-gray-200 rounded-full shadow-inner"></div>
-            <div className="absolute left-6 top-32 w-4 h-4 bg-gray-200 rounded-full shadow-inner"></div>
-            <div className="absolute left-6 top-52 w-4 h-4 bg-gray-200 rounded-full shadow-inner"></div>
+            <div className="absolute left-8 sm:left-16 top-0 bottom-0 w-px bg-red-300"></div>
+           
+            {/* Holes for ring binding - responsive positioning */}
+            <div className="absolute left-2 sm:left-6 top-8 sm:top-12 w-3 h-3 sm:w-4 sm:h-4 bg-gray-200 rounded-full shadow-inner"></div>
+            <div className="absolute left-2 sm:left-6 top-20 sm:top-32 w-3 h-3 sm:w-4 sm:h-4 bg-gray-200 rounded-full shadow-inner"></div>
+            <div className="absolute left-2 sm:left-6 top-32 sm:top-52 w-3 h-3 sm:w-4 sm:h-4 bg-gray-200 rounded-full shadow-inner"></div>
+
 
             {/* Dear Diary Header */}
-            <div className="ml-12 mb-8">
-              <h3 className="text-2xl font-bold text-slate-700">Dear Diary,</h3>
+            <div className="ml-8 sm:ml-12 mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-2xl font-bold text-slate-700">Dear Diary,</h3>
             </div>
+
 
             {/* Writing Area */}
             <textarea
               value={currentEntry}
               onChange={(e) => setCurrentEntry(e.target.value)}
               placeholder="How was your day? What are you feeling? Share your thoughts..."
-              className="w-full h-80 ml-12 pr-8 bg-transparent border-none outline-none resize-none text-slate-700 text-lg leading-8 placeholder-slate-400"
-              style={{ 
+              className="w-full h-60 sm:h-80 ml-8 sm:ml-12 pr-4 sm:pr-8 bg-transparent border-none outline-none resize-none text-slate-700 text-base sm:text-lg leading-7 sm:leading-8 placeholder-slate-400"
+              style={{
                 fontFamily: 'serif',
-                lineHeight: '32px'
+                lineHeight: '28px'
               }}
             />
 
+
             {/* Signature area */}
-            <div className="ml-12 mt-8 text-right pr-8">
-              <p className="text-slate-500 italic">With love,</p>
-              <p className="text-slate-700 font-semibold text-lg mt-2">Your Future Self 💙</p>
+            <div className="ml-8 sm:ml-12 mt-6 sm:mt-8 text-right pr-4 sm:pr-8">
+              <p className="text-slate-500 italic text-sm sm:text-base">With love,</p>
+              <p className="text-slate-700 font-semibold text-base sm:text-lg mt-1 sm:mt-2">Your Future Self 💙</p>
             </div>
           </div>
 
+
           {/* Save Button */}
-          <div className="flex justify-center mt-8">
-            <GradientButton 
+          <div className="flex justify-center mt-6 sm:mt-8">
+            <GradientButton
               onClick={handleSaveEntry}
-              className="px-8 py-3 text-lg"
+              className="px-6 py-2.5 sm:px-8 sm:py-3 text-base sm:text-lg"
             >
               Save My Thoughts
             </GradientButton>
@@ -340,80 +387,85 @@ export default function MindLogPage() {
     );
   }
 
+
   // Main Calendar View
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl md:text-2xl font-semibold">Weekly Mind Log</h2>
-        <div className="text-sm text-slate-600">
+    <div className="px-3 sm:px-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Weekly Mind Log</h2>
+        <div className="text-xs sm:text-sm text-slate-600">
           Click on any day to write in your diary
         </div>
       </div>
-      
+     
       {/* Weekly Calendar */}
-      <section className="rounded-3xl bg-white/90 backdrop-blur-sm ring-1 ring-slate-200 p-6 shadow-xl">
+      <section className="rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm ring-1 ring-slate-200 p-4 sm:p-6 shadow-xl">
         {/* Week Navigation Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <button 
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
+            <button
               onClick={handlePreviousWeek}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            
+           
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-slate-800">
+              <h3 className="text-sm sm:text-lg font-semibold text-slate-800">
                 {getWeekDateRange(currentWeekOffset)}
               </h3>
               {!isCurrentWeek() && (
-                <button 
+                <button
                   onClick={handleCurrentWeek}
-                  className="text-sm text-blue-600 hover:text-blue-700 mt-1"
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 mt-1"
                 >
                   Go to current week
                 </button>
               )}
             </div>
-            
-            <button 
+           
+            <button
               onClick={handleNextWeek}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
-          
-          <GradientButton onClick={handleViewWeeklyReport}>
-            View Weekly Report
+         
+          <GradientButton onClick={handleViewWeeklyReport} className="w-full sm:w-auto justify-center">
+            <span className="hidden sm:inline">View Weekly Report</span>
+            <span className="sm:hidden">Weekly Report</span>
           </GradientButton>
         </div>
 
+
         {/* Days of week header */}
-        <div className="grid grid-cols-7 gap-3 mb-4">
+        <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3 sm:mb-4">
           {days.map((day) => (
-            <div key={day} className="text-center font-medium text-slate-500 py-2">
-              {day}
+            <div key={day} className="text-center font-medium text-slate-500 py-2 text-xs sm:text-sm">
+              <span className="hidden sm:inline">{day}</span>
+              <span className="sm:hidden">{day.substring(0, 1)}</span>
             </div>
           ))}
         </div>
 
+
         {/* Week Grid */}
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-7 gap-1 sm:gap-3">
           {weekDays.map((date, index) => {
             const dateKey = getDateKey(date);
             const hasEntry = !!diaryEntries[dateKey];
             const isDateToday = isToday(date);
-            
+           
             return (
               <div key={index} className="aspect-square">
                 <button
                   onClick={() => handleDayClick(date)}
-                  className={`w-full h-full rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${
+                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${
                     isDateToday
                       ? 'bg-gradient-to-br from-blue-500 to-indigo-400 text-white shadow-lg'
                       : hasEntry
@@ -421,15 +473,15 @@ export default function MindLogPage() {
                       : 'bg-slate-50 hover:bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300'
                   }`}
                 >
-                  <span className="font-semibold text-lg">{date.getDate()}</span>
-                  <span className="text-xs opacity-80 mt-1">
+                  <span className="font-semibold text-sm sm:text-lg">{date.getDate()}</span>
+                  <span className="text-xs opacity-80 mt-0.5 sm:mt-1 hidden sm:block">
                     {date.toLocaleDateString('en-US', { month: 'short' })}
                   </span>
                   {hasEntry && (
-                    <div className="absolute bottom-2 w-2 h-2 rounded-full bg-white/80"></div>
+                    <div className="absolute bottom-1 sm:bottom-2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white/80"></div>
                   )}
                   {isDateToday && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                    <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-pulse"></div>
                   )}
                 </button>
               </div>
@@ -437,24 +489,26 @@ export default function MindLogPage() {
           })}
         </div>
 
+
         {/* Legend */}
-        <div className="flex items-center justify-center gap-6 mt-6 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gradient-to-br from-blue-500 to-indigo-400"></div>
+        <div className="flex items-center justify-center gap-3 sm:gap-6 mt-4 sm:mt-6 text-xs sm:text-sm">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-gradient-to-br from-blue-500 to-indigo-400"></div>
             <span className="text-slate-600">Today</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gradient-to-br from-green-400 to-emerald-500"></div>
-            <span className="text-slate-600">Entry Written</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-gradient-to-br from-green-400 to-emerald-500"></div>
+            <span className="text-slate-600">Entry</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-slate-100 ring-1 ring-slate-200"></div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-slate-100 ring-1 ring-slate-200"></div>
             <span className="text-slate-600">Available</span>
           </div>
         </div>
       </section>
 
-      {/* Weekly Stats */}
+
+       {/* Weekly Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
@@ -470,6 +524,7 @@ export default function MindLogPage() {
           </div>
         </div>
 
+
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center">
@@ -483,6 +538,7 @@ export default function MindLogPage() {
             </div>
           </div>
         </div>
+
 
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
@@ -501,3 +557,4 @@ export default function MindLogPage() {
     </div>
   );
 }
+
