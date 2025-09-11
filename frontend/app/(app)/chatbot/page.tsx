@@ -1,6 +1,7 @@
 "use client"
 
 
+import { chat } from "@/actions/chat";
 import { useState, useRef, useEffect } from "react"
 
 
@@ -74,79 +75,68 @@ export default function ChatbotPage() {
     setShowSettings(false)
   }
 
-
-  async function send() {
-    if (!input.trim() || loading) return
-
+async function send() {
+    if (!input.trim() || loading) return;
 
     const userMessage: Message = {
       id: generateId(),
       role: "user",
       text: input.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    }
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
 
-
-    setMessages(prev => [...prev, userMessage])
-    const currentInput = input.trim()
-    setInput("")
-    setLoading(true)
-
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input.trim();
+    setInput("");
+    setLoading(true);
 
     const typingMessage: Message = {
       id: "typing",
       role: "bot",
       text: "",
       time: "",
-      isTyping: true
-    }
-    setMessages(prev => [...prev, typingMessage])
-
+      isTyping: true,
+    };
+    setMessages((prev) => [...prev, typingMessage]);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: "frontend-user", query: currentInput }),
-      })
+      const data = await chat("frontend-user", currentInput);
 
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`)
-      }
-
-
-      const data = await res.json()
-
-
-      setMessages(prev => {
-        const filtered = prev.filter(msg => msg.id !== "typing")
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "typing");
         const botMessage: Message = {
           id: generateId(),
           role: "bot",
           text: data.response || "I'm here to help. Could you tell me more?",
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }
-        return [...filtered, botMessage]
-      })
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        return [...filtered, botMessage];
+      });
     } catch (error) {
-      console.error("Backend error:", error)
-      setMessages(prev => {
-        const filtered = prev.filter(msg => msg.id !== "typing")
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "typing");
         const errorMessage: Message = {
           id: generateId(),
           role: "bot",
           text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }
-        return [...filtered, errorMessage]
-      })
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        return [...filtered, errorMessage];
+      });
     } finally {
-      setLoading(false)
-      inputRef.current?.focus()
+      setLoading(false);
+      inputRef.current?.focus();
     }
   }
-
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
