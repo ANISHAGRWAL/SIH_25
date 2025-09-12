@@ -6,8 +6,8 @@ import type { CapacitorConfig } from "@capacitor/cli";
 const isDev = process.env.NODE_ENV === "development";
 
 const config: CapacitorConfig = {
-  appId: process.env.APP_ID || "com.example.mindmates",
-  appName: process.env.APP_NAME || "mindmates",
+  appId: process.env.APP_ID || "com.example.Sahayog",
+  appName: process.env.APP_NAME || "Sahayog",
   webDir: "out",
   server: isDev
     ? {

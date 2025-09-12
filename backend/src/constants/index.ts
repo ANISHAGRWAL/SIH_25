@@ -1,1 +1,1 @@
-export const TMP_ATTACHMENT_UPLOAD_DIR = '/tmp/mindmates/uploads';
+export const TMP_ATTACHMENT_UPLOAD_DIR = '/tmp/Sahayog/uploads';

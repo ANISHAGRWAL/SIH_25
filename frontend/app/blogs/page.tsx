@@ -167,7 +167,7 @@ export default function BlogsPage() {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">MindMates</span>
+              <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">Sahayog</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               {[

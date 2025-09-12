@@ -7,8 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 const poppins = Poppins({ weight: ["400", "700"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
+  title: "Sahayog",
+  description: "A Safe Space for Campus Minds",
   generator: "v0.app",
 };
 

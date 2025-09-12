@@ -1,62 +1,115 @@
-import { StatusDot } from "@/components/status-dot"
-import Link from "next/link"
+"use client";
 
-const tests = [
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { toast } from "sonner";
+import { getTestHistory } from "@/actions/test";
+
+const testsData = [
   {
-    key: "phq9",
+    key: "phq",
     title: "PHQ-9 (Patient Health Questionnaire-9)",
-    desc: "A quick self-assessment to screen for symptoms of depression. Understand how your mood and interest levels have changed over the past 2 weeks.",
-    status: "success" as const,
-    href: "/psych-tests/phq9",
+    desc: "A quick self-assessment to screen for symptoms of depression.",
     icon: "🧠",
     bgColor: "bg-blue-50",
     estimatedTime: "5-10 min",
+    cooldownDays: 7,
   },
   {
-    key: "gad7",
+    key: "gad",
     title: "GAD-7 (Generalized Anxiety Disorder-7)",
-    desc: "Helps identify signs of persistent anxiety and worry. Evaluate how anxiety has been affecting your thoughts and daily life over the last 2 weeks.",
-    status: "ongoing" as const,
-    href: "/psych-tests/gad7",
+    desc: "Helps identify signs of persistent anxiety and worry.",
     icon: "💭",
     bgColor: "bg-purple-50",
     estimatedTime: "3-7 min",
+    cooldownDays: 7,
   },
   {
     key: "pss",
     title: "PSS (Perceived Stress Scale)",
-    desc: "Measures your overall perception of stress over the past month. Get insights into how overwhelmed, in control, or stressed you've been feeling lately.",
-    status: "pending" as const,
-    href: "/psych-tests/pss",
+    desc: "Measures your overall perception of stress over the past month.",
     icon: "📊",
     bgColor: "bg-green-50",
     estimatedTime: "8-12 min",
+    cooldownDays: 30,
   },
-]
+];
 
-const getButtonText = (status: string) => {
-  switch (status) {
-    case "success":
-      return "Retake"
-    case "ongoing":
-      return "Continue"
-    default:
-      return "Start Test"
-  }
-}
+const getStatusText = (isEligible: boolean) => {
+  return isEligible ? "Eligible" : "Not Eligible";
+};
 
-const getStatusText = (status: string) => {
-  switch (status) {
-    case "success":
-      return "Completed"
-    case "ongoing":
-      return "In Progress"
-    default:
-      return "Available"
+// New function to get days until eligible
+const getDaysUntilEligible = (lastTakenDate: string | null, cooldownDays: number) => {
+  if (!lastTakenDate) {
+    return 0; // Test has never been taken
   }
-}
+  const lastDate = new Date(lastTakenDate);
+  const currentDate = new Date();
+  const diffTime = currentDate.getTime() - lastDate.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const remainingDays = cooldownDays - diffDays;
+  return Math.max(0, remainingDays);
+};
 
 export default function PsychTestsPage() {
+  const [loading, setLoading] = useState(true);
+  const [testHistory, setTestHistory] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!token) {
+        setError("Unauthorized. Please log in.");
+        setLoading(false);
+        return;
+      }
+
+      const res = await getTestHistory(token);
+      if (res.ok) {
+        setTestHistory(res.data);
+      } else {
+        setError(res.error || "Failed to load test history.");
+        toast.error(res.error || "Failed to load test history.");
+      }
+      setLoading(false);
+    };
+
+    fetchHistory();
+  }, [token]);
+
+  if (loading) {
+    return (
+      <div className="text-center text-slate-600 mt-20 text-lg">
+        Loading tests...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 mt-20 text-lg">
+        Error: {error}
+      </div>
+    );
+  }
+
+  const combinedTests = testsData.map(test => {
+    const history = testHistory?.[test.key];
+    const isEligible = history?.eligible ?? true;
+    const lastTaken = history?.lastTest?.takenOn;
+    const daysUntilEligible = getDaysUntilEligible(lastTaken, test.cooldownDays);
+    
+    return {
+      ...test,
+      isEligible,
+      lastTaken: lastTaken ? new Date(lastTaken).toLocaleDateString() : null,
+      daysUntilEligible,
+    };
+  });
+
   return (
     <div className="space-y-12 py-8">
       <header className="text-center">
@@ -70,7 +123,7 @@ export default function PsychTestsPage() {
       
       <section className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {tests.map((test) => (
+          {combinedTests.map((test) => (
             <div 
               key={test.key} 
               className="group relative rounded-3xl bg-white p-8 ring-1 ring-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl"
@@ -88,19 +141,37 @@ export default function PsychTestsPage() {
               </p>
               
               <div className="flex items-center gap-4 text-xs text-gray-400 mb-6">
-                <span className="font-medium text-gray-600">
-                  {getStatusText(test.status)}
+                <span className={`font-medium ${test.isEligible ? 'text-green-600' : 'text-red-500'}`}>
+                  {getStatusText(test.isEligible)}
                 </span>
                 <span>•</span>
                 <span>{test.estimatedTime}</span>
               </div>
               
-              <Link href={test.href} className="w-full">
+              <div className="text-xs text-slate-500 mb-4">
+                {test.lastTaken ? (
+                  <div className="flex justify-between items-center">
+                    <span>Last taken: {test.lastTaken}</span>
+                    {!test.isEligible && (
+                      <span className="font-semibold text-gray-700">
+                        {test.daysUntilEligible > 0 ? `Available in ${test.daysUntilEligible} days` : "Available now"}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    Test not taken yet.
+                  </div>
+                )}
+              </div>
+              
+              <Link href={`/psych-tests/${test.key}`} className="w-full">
                 <button 
-                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 font-semibold text-sm
-                    group-hover:-translate-y-1"
+                  className={`w-full px-6 py-3 text-white rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 font-semibold text-sm group-hover:-translate-y-1
+                  ${test.isEligible ? 'bg-gradient-to-r from-blue-500 to-indigo-500' : 'bg-gray-400 cursor-not-allowed'}`}
+                  disabled={!test.isEligible}
                 >
-                  {getButtonText(test.status)}
+                  {test.isEligible ? "Start Test" : "Not Available"}
                 </button>
               </Link>
             </div>
@@ -124,5 +195,5 @@ export default function PsychTestsPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

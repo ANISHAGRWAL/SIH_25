@@ -1,7 +1,202 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { StatusDot } from "@/components/status-dot";
 import { useAuth } from "@/contexts/AuthContext";
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, ListMusic } from "lucide-react";
+
+
+// MusicPlayer should not be a default export in the same file
+function MusicPlayer() {
+  // --- STATE MANAGEMENT ---
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // --- PLAYLIST DATA ---
+  const playlist = [
+    {
+      id: 1,
+      title: "Forest Rain",
+      artist: "Nature Sounds",
+      src: "https://www.soundjay.com/misc/sounds/rain-03.wav",
+      duration: "5:23",
+    },
+    {
+      id: 2,
+      title: "Ocean Waves",
+      artist: "Peaceful Sounds",
+      src: "https://www.soundjay.com/nature/sounds/ocean-wave-1.wav",
+      duration: "8:15",
+    },
+    {
+      id: 3,
+      title: "Meditation Bell",
+      artist: "Zen Collection",
+      src: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      duration: "10:00",
+    },
+    {
+      id: 4,
+      title: "Wind Chimes",
+      artist: "Garden Sounds",
+      src: "https://www.soundjay.com/misc/sounds/wind-chimes-1.wav",
+      duration: "6:45",
+    },
+    {
+      id: 5,
+      title: "Birdsong Dawn",
+      artist: "Morning Sounds",
+      src: "https://www.soundjay.com/nature/sounds/birds-chirping-1.wav",
+      duration: "7:30",
+    },
+  ];
+
+  const currentTrack = playlist[currentTrackIndex];
+
+  // --- HOOKS FOR AUDIO LOGIC ---
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration);
+    const handleEnded = () => nextTrack();
+    
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('ended', handleEnded);
+    
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [currentTrackIndex]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (isPlaying) {
+        audio.play().catch(e => console.error("Audio play failed:", e));
+      } else {
+        audio.pause();
+      }
+    }
+  }, [isPlaying, currentTrackIndex]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
+  // --- CONTROL FUNCTIONS ---
+  const togglePlay = () => setIsPlaying(!isPlaying);
+
+  const nextTrack = () => {
+    const nextIndex = (currentTrackIndex + 1) % playlist.length;
+    setCurrentTrackIndex(nextIndex);
+    setIsPlaying(true);
+  };
+
+  const prevTrack = () => {
+    const prevIndex = currentTrackIndex === 0 ? playlist.length - 1 : currentTrackIndex - 1;
+    setCurrentTrackIndex(prevIndex);
+    setIsPlaying(true);
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    const progressBar = e.currentTarget;
+    const clickX = e.clientX - progressBar.getBoundingClientRect().left;
+    const width = progressBar.offsetWidth;
+    const newTime = (clickX / width) * duration;
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+  
+  const toggleMute = () => setIsMuted(!isMuted);
+
+  const formatTime = (time: number) => {
+    if (isNaN(time) || time === 0) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-2xl">
+      <div className="rounded-xl bg-white/95 backdrop-blur-sm p-4 space-y-3">
+        {/* Top Row: Track Info, Main Controls, Volume */}
+        <div className="flex items-center gap-4">
+          {/* Track Info */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-14 h-14 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center text-white text-2xl font-bold shadow-lg flex-shrink-0">
+              🎶
+            </div>
+            <div className="min-w-0">
+              <h4 className="font-semibold text-gray-800 text-md truncate">{currentTrack.title}</h4>
+              <p className="text-gray-500 text-sm truncate">{currentTrack.artist}</p>
+            </div>
+          </div>
+
+          {/* Main Controls */}
+          <div className="flex items-center gap-2">
+            <button onClick={prevTrack} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 active:scale-90" aria-label="Previous track"><SkipBack className="w-5 h-5" /></button>
+            <button onClick={togglePlay} className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110 active:scale-95 text-white" aria-label={isPlaying ? "Pause" : "Play"}>{isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}</button>
+            <button onClick={nextTrack} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 active:scale-90" aria-label="Next track"><SkipForward className="w-5 h-5" /></button>
+          </div>
+          
+          {/* Volume & Playlist Toggle */}
+          <div className="hidden md:flex items-center gap-2">
+            <button onClick={toggleMute} className="p-2 hover:bg-gray-100 rounded-full" aria-label={isMuted ? "Unmute" : "Mute"}>{isMuted ? <VolumeX className="w-5 h-5 text-gray-600" /> : <Volume2 className="w-5 h-5 text-gray-600" />}</button>
+            <input type="range" min="0" max="1" step="0.05" value={isMuted ? 0 : volume} onChange={(e) => { setVolume(parseFloat(e.target.value)); if (isMuted) setIsMuted(false); }} className="w-24 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer music-player-slider" />
+            <button onClick={() => setShowPlaylist(!showPlaylist)} className={`p-2 rounded-full transition-colors ${showPlaylist ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'}`} aria-label="Show playlist"><ListMusic className="w-5 h-5" /></button>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full">
+          <div className="w-full bg-gray-200 rounded-full h-1.5 cursor-pointer group" onClick={handleProgressClick}>
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full relative" style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}>
+              <div className="absolute right-0 top-1/2 -mt-1.5 w-3 h-3 rounded-full bg-white shadow border border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{formatTime(currentTime)}</span>
+            <span>{currentTrack.duration}</span>
+          </div>
+        </div>
+
+        {/* Collapsible Playlist */}
+        {showPlaylist && (
+          <div className="pt-2 border-t border-gray-100 animate-fadeIn">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {playlist.map((track, index) => (
+                <div key={track.id} onClick={() => setCurrentTrackIndex(index)} className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${index === currentTrackIndex ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}>
+                  <div className="text-sm font-medium text-gray-400 w-4">{index + 1}</div>
+                  <div>
+                    <div className={`text-sm font-medium ${index === currentTrackIndex ? 'text-indigo-700' : 'text-gray-800'}`}>{track.title}</div>
+                    <div className="text-xs text-gray-500">{track.artist}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <audio ref={audioRef} src={currentTrack.src} preload="metadata" onCanPlayThrough={() => duration === 0 && setDuration(audioRef.current?.duration || 0)} />
+    </div>
+  );
+}
+
 
 export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -160,7 +355,7 @@ export default function DashboardPage() {
     // <ProtectedRoute>
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-xl md:text-2xl font-semibold text-slate-800 animate-slideInDown">
-        Welcome {user?.name}! How are you feeling today?,
+        Welcome {user?.name}
       </h2>
 
       <section className="space-y-4">
@@ -448,32 +643,45 @@ export default function DashboardPage() {
         </div>
 
         {/* Media Player Controls */}
-        <div
-          className="rounded-2xl bg-white p-4 ring-1 ring-slate-200 hover:shadow-lg transition-all duration-300 animate-slideInUp bg-gradient-to-r from-white to-slate-50/50"
-          style={{ animationDelay: "300ms" }}
-        >
-          <div className="h-24 rounded-xl flex items-center justify-center gap-6 px-6">
-            <button
-              className="size-12 rounded-full bg-white shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-slate-600 hover:text-slate-800 hover:scale-110 active:scale-95 hover:-translate-y-1"
-              aria-label="Play"
-            >
-              <span className="text-lg">▶</span>
-            </button>
-            <button
-              className="size-12 rounded-full bg-white shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-slate-600 hover:text-slate-800 hover:scale-110 active:scale-95 hover:-translate-y-1"
-              aria-label="Pause"
-            >
-              <span className="text-lg">⏸</span>
-            </button>
-            <button
-              className="size-12 rounded-full bg-white shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-slate-600 hover:text-slate-800 hover:scale-110 active:scale-95 hover:-translate-y-1"
-              aria-label="Next"
-            >
-              <span className="text-lg">»</span>
-            </button>
-          </div>
-        </div>
+        <MusicPlayer />
+
       </section>
+      
+      {/* --- STYLES --- */}
+      <style jsx>{`
+        .music-player-slider::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            appearance: none; 
+            width: 14px; 
+            height: 14px; 
+            border-radius: 50%; 
+            background: #64748b; 
+            cursor: pointer; 
+            margin-top: -5px; 
+            transition: background 0.2s; 
+        }
+        .music-player-slider:hover::-webkit-slider-thumb { 
+            background: #475569; 
+        }
+        .music-player-slider::-moz-range-thumb { 
+            width: 14px; 
+            height: 14px; 
+            border-radius: 50%; 
+            background: #64748b; 
+            cursor: pointer; 
+            border: none; 
+        }
+        .music-player-slider:hover::-moz-range-thumb { 
+            background: #475569; 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        .animate-fadeIn { 
+            animation: fadeIn 0.5s ease-in-out;
+        }
+      `}</style>
 
       <style jsx>{`
         @keyframes fadeIn {

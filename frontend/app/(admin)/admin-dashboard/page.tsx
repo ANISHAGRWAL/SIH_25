@@ -53,10 +53,10 @@ export default function AdminDashboard() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-400 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">M</span>
+                  <span className="text-white font-bold text-lg">S</span>
                 </div>
                 <span className="font-bold text-xl text-slate-900">
-                  MindMates Admin
+                  Sahayog Admin
                 </span>
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
                 : "opacity-0 max-h-0 overflow-hidden"
             }`}
           >
-            <div className="space-y-2 pb-4">
+            <div className="space-y-0">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -534,24 +534,6 @@ export default function AdminDashboard() {
                       thresholds for privacy protection.
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Quick Settings */}
-              <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-3xl overflow-hidden">
-                <div className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-200 p-6">
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-gray-600" />
-                    Quick Settings
-                  </h2>
-                </div>
-                <div className="p-6">
-                  <button className="w-full flex items-center justify-start space-x-3 px-4 py-3 bg-white/60 hover:bg-white border border-gray-200 hover:border-gray-300 rounded-xl transition-all duration-200 hover:shadow-md hover:-translate-y-1">
-                    <Settings className="h-4 w-4 text-gray-500" />
-                    <span className="text-slate-700 font-medium">
-                      Manage Admin Accounts
-                    </span>
-                  </button>
                 </div>
               </div>
             </>

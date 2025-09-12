@@ -191,7 +191,7 @@ export default function SignupPage() {
               </h1>
               <p className="text-sm text-gray-600">
                 {step === 1
-                  ? "Sign up for your MindMates account"
+                  ? "Sign up for your Sahayog account"
                   : "Complete your profile setup"}
               </p>
             </div>
