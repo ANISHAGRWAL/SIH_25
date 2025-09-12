@@ -30,8 +30,8 @@ export const blogPosts = {
     `,
   },
   "digital-detox": {
-    title: "Digital Detox: How to Reset Your Mind",
-    date: "March 10, 2024",
+    title: "DIGITAL_DETOX",
+    date: "March_10_2024",
     category: "wellness",
     image: "/Detox.png",
     content: `
@@ -71,8 +71,8 @@ export const blogPosts = {
     `,
   },
   "simple-habit-to-boost-your-mind": {
-    title: "Simple Habits to Boost Your Mental Wellness Daily",
-    date: "March 5, 2024",
+    title: "SIMPLE_HABITS_TO_BOOST_YOUR_MENTAL_WELLNESS_DAILY",
+    date: "March_5_2024",
     category: "community",
     image: "/peaceful-meditation.png",
     content: `
@@ -99,8 +99,8 @@ export const blogPosts = {
     `,
   },
   "sleep-secret-mental-health": {
-    title: "Sleep: The Secret Pillar of Mental Health",
-    date: "March 12, 2024",
+    title: "SLEEP_THE_SECRET_PILLAR_OF_MENTAL_HEALTH",
+    date: "March_12_2024",
     category: "wellness",
     image: "/Sleep.png",
     content: `
@@ -136,8 +136,8 @@ export const blogPosts = {
   `,
   },
   "journaling-for-clarity": {
-    title: "Journaling for Clarity: Turning Thoughts Into Healing Words",
-    date: "March 19, 2024",
+    title: "JOURNALING_FOR_CLARITY",
+    date: "March_19_2024",
     category: "selfCare",
     image: "/chatjournal.jpeg",
     content: `
@@ -170,8 +170,8 @@ export const blogPosts = {
   `,
   },
   "creativity-mental-health-link": {
-    title: "The Hidden Link Between Creativity and Mental Health",
-    date: "March 26, 2024",
+    title: "THE_HIDDEN_LINK_BETWEEN_CREATIVITY_AND_MENTAL_HEALTH",
+    date: "March_26_2024",
     category: "expression",
     image: "/Creativity.jpeg",
     content: `
@@ -212,8 +212,8 @@ export const blogPosts = {
   `,
   },
   "resilience-building": {
-    title: "Resilience Building: How to Bounce Back from Setbacks Stronger",
-    date: "April 2, 2024",
+    title: "RESILIENCE_BUILDING",
+    date: "April_2_2024",
     category: "growth",
     image: "/Resilience.png",
     content: `
@@ -254,8 +254,8 @@ export const blogPosts = {
   `,
   },
   "mental-health-and-connection": {
-    title: "When Mental Health Makes Connections Harder: Anxiety, Overthinking, and Social Awkwardness",
-    date: "April 9, 2024",
+    title: "WHEN_MENTAL_HEALTH_MAKES_CONNECTIONS_HARDER",
+    date: "April_9_2024",
     category: "anxiety",
     image: "/Connections.jpeg",
     content: `
@@ -299,8 +299,8 @@ export const blogPosts = {
   `,
   },
   "silence-and-solitude": {
-    title: "Silence and Solitude: Why Doing Nothing is Sometimes Everything",
-    date: "April 16, 2024",
+    title: "SILENCE_AND_SOLITUDE",
+    date: "April_16_2024",
     category: "mindfulness",
     image: "/Silence.png",
     content: `
