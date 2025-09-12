@@ -10,6 +10,7 @@ import adminMiddleware from './middleware/admin_middleware';
 import chatRouter from './routes/chat';
 import adminRoutes from './routes/admin';
 import docChatRouter from './routes/doc_chat';
+import journalRoutes from './routes/journal';
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -45,6 +46,7 @@ app.use('/api/doc-chat', docChatRouter);
 app.use(authMiddleware);
 app.use(`${BASE_PATH}/student`, studentRoutes);
 app.use(`${BASE_PATH}/test`, testRoutes);
+app.use(`${BASE_PATH}/journal`, journalRoutes);
 
 // admin router
 app.use(adminMiddleware);

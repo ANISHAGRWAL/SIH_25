@@ -1,13 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
-
 // Utility: backend base URL
-const API_BASE = "http://127.0.0.1:8000";
+// const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://localhost:5000";
 // Types
 interface GradientButtonProps {
   children: React.ReactNode;
@@ -51,7 +59,11 @@ interface PieChartsData {
 }
 
 // Mock GradientButton component
-const GradientButton: React.FC<GradientButtonProps> = ({ children, onClick, className = "" }) => (
+const GradientButton: React.FC<GradientButtonProps> = ({
+  children,
+  onClick,
+  className = "",
+}) => (
   <button
     onClick={onClick}
     className={`px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base ${className}`}
@@ -61,9 +73,13 @@ const GradientButton: React.FC<GradientButtonProps> = ({ children, onClick, clas
 );
 
 export default function MindLogPage() {
-  const [currentView, setCurrentView] = useState<"calendar" | "diary" | "report">("calendar");
+  const [currentView, setCurrentView] = useState<
+    "calendar" | "diary" | "report"
+  >("calendar");
   const [selectedDate, setSelectedDate] = useState<any>(null);
-  const [diaryEntries, setDiaryEntries] = useState<{ [key: string]: string }>({});
+  const [diaryEntries, setDiaryEntries] = useState<{ [key: string]: string }>(
+    {}
+  );
   const [currentEntry, setCurrentEntry] = useState<string>("");
   const [currentWeekOffset, setCurrentWeekOffset] = useState<number>(0);
   const [selectedMetric, setSelectedMetric] = useState<string>("average");
@@ -74,10 +90,9 @@ export default function MindLogPage() {
     sleepDisruption: [],
     appetiteIssues: [],
     academicDisengagement: [],
-    socialWithdrawal: []
+    socialWithdrawal: [],
   });
-  const userId = "student_12"; // TODO: dynamic from login/session 
-  
+
   // Helper functions (keeping existing ones)
   const getDateKey = (date: Date): string => {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
@@ -95,7 +110,7 @@ export default function MindLogPage() {
     const today = new Date();
     const currentWeekStart = getStartOfWeek(today);
     const targetWeekStart = new Date(currentWeekStart);
-    targetWeekStart.setDate(currentWeekStart.getDate() + (weekOffset * 7));
+    targetWeekStart.setDate(currentWeekStart.getDate() + weekOffset * 7);
 
     const weekDays: Date[] = [];
     for (let i = 0; i < 7; i++) {
@@ -111,8 +126,10 @@ export default function MindLogPage() {
     const startDate = weekDays[0];
     const endDate = weekDays[6];
 
-    const startMonth = startDate.toLocaleDateString('en-US', { month: 'short' });
-    const endMonth = endDate.toLocaleDateString('en-US', { month: 'short' });
+    const startMonth = startDate.toLocaleDateString("en-US", {
+      month: "short",
+    });
+    const endMonth = endDate.toLocaleDateString("en-US", { month: "short" });
     const startDay = startDate.getDate();
     const endDay = endDate.getDate();
     const year = startDate.getFullYear();
@@ -126,9 +143,11 @@ export default function MindLogPage() {
 
   const isToday = (date: Date): boolean => {
     const today = new Date();
-    return date.getDate() === today.getDate() &&
+    return (
+      date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear();
+      date.getFullYear() === today.getFullYear()
+    );
   };
 
   const isCurrentWeek = (): boolean => {
@@ -143,31 +162,35 @@ export default function MindLogPage() {
     setSelectedDate({
       day: date.getDate(),
       dateKey,
-      fullDate: date
+      fullDate: date,
     });
-    setCurrentEntry(diaryEntries[dateKey] || '');
-    setCurrentView('diary');
+    setCurrentEntry(diaryEntries[dateKey] || "");
+    setCurrentView("diary");
   };
 
   const handleSaveEntry = async () => {
     if (!selectedDate || !currentEntry.trim()) return;
 
     const dateStr = selectedDate.fullDate.toISOString().split("T")[0];
+    const token = localStorage.getItem("token") || "";
 
     try {
-      const res = await fetch(`${API_BASE}/add_entry/`, {
+      console.log(`💾 Saving entry for ${dateStr}:`, currentEntry);
+      console.log("url", `${API_BASE}/api/journal/add_entry`);
+      const res = await fetch(`${API_BASE}/api/journal/add_entry`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          user_id: userId,
-          date: dateStr,
-          entry: currentEntry
+          entryText: currentEntry,
         }),
       });
       const data = await res.json();
 
       // update local state too
-      setDiaryEntries(prev => ({
+      setDiaryEntries((prev) => ({
         ...prev,
         [selectedDate.dateKey]: currentEntry,
       }));
@@ -181,203 +204,229 @@ export default function MindLogPage() {
   };
 
   const handleBackToCalendar = () => {
-    setCurrentView('calendar');
+    setCurrentView("calendar");
     setSelectedDate(null);
-    setCurrentEntry('');
+    setCurrentEntry("");
   };
 
   const handlePreviousWeek = () => {
-    setCurrentWeekOffset(prev => prev - 1);
+    setCurrentWeekOffset((prev) => prev - 1);
   };
 
   const handleNextWeek = () => {
-    setCurrentWeekOffset(prev => prev + 1);
+    setCurrentWeekOffset((prev) => prev + 1);
   };
 
   const handleCurrentWeek = () => {
     setCurrentWeekOffset(0);
   };
 
-// Fix the fetchWeeklyReport function - replace the pie chart handling section
+  // Fix the fetchWeeklyReport function - replace the pie chart handling section
 
-const fetchWeeklyReport = async () => {
-  try {
-    // Get the exact week we want to display
-    const weekDays = getWeekDays(currentWeekOffset);
-    const startDate = weekDays[0].toISOString().split('T')[0]; 
-    const endDate = weekDays[6].toISOString().split('T')[0];   
-
-    console.log(`📅 Fetching data for week: ${startDate} to ${endDate}`);
-
-    // Try with date parameters first, fallback to basic call
-    let res;
+  const fetchWeeklyReport = async () => {
     try {
-      res = await fetch(`${API_BASE}/weekly_report/${userId}?start_date=${startDate}&end_date=${endDate}`);
-    } catch {
-      res = await fetch(`${API_BASE}/weekly_report/${userId}`);
-    }
-    
-    const data = await res.json();
+      // Get the exact week we want to display
+      const weekDays = getWeekDays(currentWeekOffset);
+      const startDate = weekDays[0].toISOString().split("T")[0];
+      const endDate = weekDays[6].toISOString().split("T")[0];
 
-    if (data.error) {
-      console.warn("Backend error:", data.error);
-      return;
-    }
+      console.log(`📅 Fetching data for week: ${startDate} to ${endDate}`);
 
-    console.log("🔍 Raw backend data:", data);
+      // Try with date parameters first, fallback to basic call
+      let res;
+      const token = localStorage.getItem("token") || "";
+      try {
+        res = await fetch(
+          `${API_BASE}/api/journal/report?start_date=${startDate}&end_date=${endDate}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              Authorization: token ? `Bearer ${token}` : "",
+            }),
+          }
+        );
+      } catch {
+        res = await fetch(`${API_BASE}/api/journal/report`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            Authorization: token ? `Bearer ${token}` : "",
+          }),
+        });
+      }
 
-    // 🔧 FIXED: Handle PIE CHART data with proper parameter mapping
-    if (data.weekly_summary && Array.isArray(data.weekly_summary)) {
-      const pieMap: any = {};
-      const colorMap: any = {
-        "Mood Disturbance": "#ef4444",
-        "Sleep Disruption": "#3b82f6", 
-        "Appetite Issues": "#f59e0b",
-        "Academic Disengagement": "#8b5cf6",
-        "Social Withdrawal": "#10b981",
-      };
+      const data = await res.json();
 
-      // Create mapping from backend parameter names to frontend keys
-      const parameterMapping: any = {
-        "Mood Disturbance": "moodDisturbance",
-        "Sleep Disruption": "sleepDisruption",
-        "Appetite Issues": "appetiteIssues",
-        "Academic Disengagement": "academicDisengagement",
-        "Social Withdrawal": "socialWithdrawal"
-      };
+      if (data.error) {
+        console.warn("Backend error:", data.error);
+        return;
+      }
 
-      data.weekly_summary.forEach((item: any) => {
-        const backendParam = item.Parameter;
-        const frontendKey = parameterMapping[backendParam];
-        
-        if (frontendKey) {
-          pieMap[frontendKey] = [{
-            label: backendParam,
-            value: parseFloat(item["Weekly Score (out of 10)"] || 0),
-            color: colorMap[backendParam] || "#6b7280"
-          }];
-        }
-      });
+      console.log("🔍 Raw backend data:", data);
 
-      console.log("🥧 Pie chart data mapped:", pieMap);
-      setPieChartsData(pieMap);
-    }
-
-    // Handle LINE CHART data (daily records) - keep existing logic
-    let weeklyChartData: any[] = [];
-
-    if (data.daily_records && Array.isArray(data.daily_records)) {
-      console.log(`📊 Backend returned ${data.daily_records.length} daily records`);
-      
-      // FILTER: Only keep records from the current week
-      const filteredRecords = data.daily_records.filter((record: any) => {
-        const recordDate = new Date(record.date);
-        const weekStart = new Date(startDate);
-        const weekEnd = new Date(endDate);
-        
-        return recordDate >= weekStart && recordDate <= weekEnd;
-      });
-
-      console.log(`✅ Filtered to ${filteredRecords.length} records for current week`);
-
-      // SORT by date to ensure correct order
-      filteredRecords.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-      // 🔧 FIXED: Handle multiple possible field name formats from backend
-      weeklyChartData = filteredRecords.map((record: any, index: number) => {
-        const recordDate = new Date(record.date);
-        const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][recordDate.getDay()];
-        
-        return {
-          day: dayName,
-          date: record.date,
-          // Handle both snake_case and camelCase from backend
-          moodDisturbance: parseFloat(
-            record["Mood Disturbance"] || 
-            record.mood_disturbance || 
-            record.moodDisturbance || 
-            0
-          ),
-          sleepDisruption: parseFloat(
-            record["Sleep Disruption"] || 
-            record.sleep_disruption || 
-            record.sleepDisruption || 
-            0
-          ), 
-          appetiteIssues: parseFloat(
-            record["Appetite Issues"] || 
-            record.appetite_issues || 
-            record.appetiteIssues || 
-            0
-          ),
-          academicDisengagement: parseFloat(
-            record["Academic Disengagement"] || 
-            record.academic_disengagement || 
-            record.academicDisengagement || 
-            0
-          ),
-          socialWithdrawal: parseFloat(
-            record["Social Withdrawal"] || 
-            record.social_withdrawal || 
-            record.socialWithdrawal || 
-            0
-          ),
-          average: parseFloat(record.average || record.overall_score || 0)
+      // 🔧 FIXED: Handle PIE CHART data with proper parameter mapping
+      if (data.weekly_summary && Array.isArray(data.weekly_summary)) {
+        const pieMap: any = {};
+        const colorMap: any = {
+          "Mood Disturbance": "#ef4444",
+          "Sleep Disruption": "#3b82f6",
+          "Appetite Issues": "#f59e0b",
+          "Academic Disengagement": "#8b5cf6",
+          "Social Withdrawal": "#10b981",
         };
-      });
-    }
 
-    // If no data for this week, create empty structure
-    if (weeklyChartData.length === 0) {
-      console.log("⚠️ No data found for this week, creating empty structure");
-      weeklyChartData = weekDays.map((date, index) => {
-        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        // Create mapping from backend parameter names to frontend keys
+        const parameterMapping: any = {
+          "Mood Disturbance": "moodDisturbance",
+          "Sleep Disruption": "sleepDisruption",
+          "Appetite Issues": "appetiteIssues",
+          "Academic Disengagement": "academicDisengagement",
+          "Social Withdrawal": "socialWithdrawal",
+        };
+
+        data.weekly_summary.forEach((item: any) => {
+          const backendParam = item.Parameter;
+          const frontendKey = parameterMapping[backendParam];
+
+          if (frontendKey) {
+            pieMap[frontendKey] = [
+              {
+                label: backendParam,
+                value: parseFloat(item["Weekly Score (out of 10)"] || 0),
+                color: colorMap[backendParam] || "#6b7280",
+              },
+            ];
+          }
+        });
+
+        console.log("🥧 Pie chart data mapped:", pieMap);
+        setPieChartsData(pieMap);
+      }
+
+      // Handle LINE CHART data (daily records) - keep existing logic
+      let weeklyChartData: any[] = [];
+
+      if (data.daily_records && Array.isArray(data.daily_records)) {
+        console.log(
+          `📊 Backend returned ${data.daily_records.length} daily records`
+        );
+
+        // FILTER: Only keep records from the current week
+        const filteredRecords = data.daily_records.filter((record: any) => {
+          const recordDate = new Date(record.date);
+          const weekStart = new Date(startDate);
+          const weekEnd = new Date(endDate);
+
+          return recordDate >= weekStart && recordDate <= weekEnd;
+        });
+
+        console.log(
+          `✅ Filtered to ${filteredRecords.length} records for current week`
+        );
+
+        // SORT by date to ensure correct order
+        filteredRecords.sort(
+          (a: any, b: any) =>
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        // 🔧 FIXED: Handle multiple possible field name formats from backend
+        weeklyChartData = filteredRecords.map((record: any, index: number) => {
+          const recordDate = new Date(record.date);
+          const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+            recordDate.getDay()
+          ];
+
+          return {
+            day: dayName,
+            date: record.date,
+            // Handle both snake_case and camelCase from backend
+            moodDisturbance: parseFloat(
+              record["Mood Disturbance"] ||
+                record.mood_disturbance ||
+                record.moodDisturbance ||
+                0
+            ),
+            sleepDisruption: parseFloat(
+              record["Sleep Disruption"] ||
+                record.sleep_disruption ||
+                record.sleepDisruption ||
+                0
+            ),
+            appetiteIssues: parseFloat(
+              record["Appetite Issues"] ||
+                record.appetite_issues ||
+                record.appetiteIssues ||
+                0
+            ),
+            academicDisengagement: parseFloat(
+              record["Academic Disengagement"] ||
+                record.academic_disengagement ||
+                record.academicDisengagement ||
+                0
+            ),
+            socialWithdrawal: parseFloat(
+              record["Social Withdrawal"] ||
+                record.social_withdrawal ||
+                record.socialWithdrawal ||
+                0
+            ),
+            average: parseFloat(record.average || record.overall_score || 0),
+          };
+        });
+      }
+
+      // If no data for this week, create empty structure
+      if (weeklyChartData.length === 0) {
+        console.log("⚠️ No data found for this week, creating empty structure");
+        weeklyChartData = weekDays.map((date, index) => {
+          const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+          return {
+            day: dayNames[index],
+            date: date.toISOString().split("T")[0],
+            moodDisturbance: 0,
+            sleepDisruption: 0,
+            appetiteIssues: 0,
+            academicDisengagement: 0,
+            socialWithdrawal: 0,
+            average: 0,
+          };
+        });
+      }
+
+      console.log("📈 Final chart data:", weeklyChartData);
+      setWeeklyData(weeklyChartData);
+    } catch (error) {
+      console.error("❌ API Error:", error);
+
+      // Create empty week data on error
+      const weekDays = getWeekDays(currentWeekOffset);
+      const emptyData = weekDays.map((date, index) => {
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         return {
           day: dayNames[index],
-          date: date.toISOString().split('T')[0],
+          date: date.toISOString().split("T")[0],
           moodDisturbance: 0,
           sleepDisruption: 0,
-          appetiteIssues: 0, 
+          appetiteIssues: 0,
           academicDisengagement: 0,
           socialWithdrawal: 0,
-          average: 0
+          average: 0,
         };
       });
+      setWeeklyData(emptyData);
+
+      // Set empty pie chart data on error
+      setPieChartsData({
+        moodDisturbance: [],
+        sleepDisruption: [],
+        appetiteIssues: [],
+        academicDisengagement: [],
+        socialWithdrawal: [],
+      });
     }
-
-    console.log("📈 Final chart data:", weeklyChartData);
-    setWeeklyData(weeklyChartData);
-
-  } catch (error) {
-    console.error("❌ API Error:", error);
-    
-    // Create empty week data on error
-    const weekDays = getWeekDays(currentWeekOffset);
-    const emptyData = weekDays.map((date, index) => {
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; 
-      return {
-        day: dayNames[index],
-        date: date.toISOString().split('T')[0],
-        moodDisturbance: 0,
-        sleepDisruption: 0,
-        appetiteIssues: 0,
-        academicDisengagement: 0, 
-        socialWithdrawal: 0,
-        average: 0
-      };
-    });
-    setWeeklyData(emptyData);
-    
-    // Set empty pie chart data on error
-    setPieChartsData({
-      moodDisturbance: [],
-      sleepDisruption: [],
-      appetiteIssues: [],
-      academicDisengagement: [],
-      socialWithdrawal: []
-    });
-  }
-};
+  };
 
   const handleViewWeeklyReport = () => {
     setCurrentView("report");
@@ -392,36 +441,38 @@ const fetchWeeklyReport = async () => {
   }, [currentWeekOffset]);
 
   const getFormattedDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   // Calculate weekly statistics
-  const currentWeekEntries = weekDays.filter(date => diaryEntries[getDateKey(date)]).length;
+  const currentWeekEntries = weekDays.filter(
+    (date) => diaryEntries[getDateKey(date)]
+  ).length;
   const weeklyGoalPercentage = Math.round((currentWeekEntries / 7) * 100);
   const totalEntries = Object.keys(diaryEntries).length;
 
   const getMetricLabel = (metric: string) => {
     const labels: { [key: string]: string } = {
-      average: 'Overall Wellbeing',
-      moodDisturbance: 'Mood Disturbance',
-      sleepDisruption: 'Sleep Disruption',
-      appetiteIssues: 'Appetite Issues',
-      academicDisengagement: 'Academic Disengagement',
-      socialWithdrawal: 'Social Withdrawal'
+      average: "Overall Wellbeing",
+      moodDisturbance: "Mood Disturbance",
+      sleepDisruption: "Sleep Disruption",
+      appetiteIssues: "Appetite Issues",
+      academicDisengagement: "Academic Disengagement",
+      socialWithdrawal: "Social Withdrawal",
     };
     return labels[metric] || metric;
   };
 
   const getLevelLabel = (level: number) => {
-    if (level >= 8) return 'High Concern';
-    if (level >= 6) return 'Moderate';
-    if (level >= 4) return 'Mild';
-    return 'Stable';
+    if (level >= 8) return "High Concern";
+    if (level >= 6) return "Moderate";
+    if (level >= 4) return "Mild";
+    return "Stable";
   };
 
   const renderPieChart = (data: PieChartItem[] | undefined, title: string) => {
@@ -464,7 +515,10 @@ const fetchWeeklyReport = async () => {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-lg font-bold" style={{ color: data[0].color }}>
+                <div
+                  className="text-lg font-bold"
+                  style={{ color: data[0].color }}
+                >
                   {data[0].value.toFixed(1)}
                 </div>
                 <div className="text-xs text-slate-500">/ 10</div>
@@ -480,7 +534,7 @@ const fetchWeeklyReport = async () => {
   };
 
   // Weekly Report View
-  if (currentView === 'report') {
+  if (currentView === "report") {
     return (
       <div className="px-3 sm:px-6 space-y-4 sm:space-y-6">
         {/* Header */}
@@ -489,18 +543,29 @@ const fetchWeeklyReport = async () => {
             onClick={handleBackToCalendar}
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
           >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             <span className="text-sm sm:text-base">Back</span>
           </button>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-800">Weekly Report</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-800">
+            Weekly Report
+          </h2>
           <div></div>
         </div>
 
         {/* Mental Health Dashboard */}
         <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl border border-slate-200">
-
           {/* Week Range Header */}
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-block bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-medium shadow-lg text-sm sm:text-base">
@@ -514,12 +579,24 @@ const fetchWeeklyReport = async () => {
               onClick={handlePreviousWeek}
               className="p-2 rounded-full hover:bg-white/80 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <div className="text-center">
-              <div className="text-sm font-medium text-slate-600">Week Navigation</div>
+              <div className="text-sm font-medium text-slate-600">
+                Week Navigation
+              </div>
               {!isCurrentWeek() && (
                 <button
                   onClick={handleCurrentWeek}
@@ -533,8 +610,18 @@ const fetchWeeklyReport = async () => {
               onClick={handleNextWeek}
               className="p-2 rounded-full hover:bg-white/80 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -542,7 +629,9 @@ const fetchWeeklyReport = async () => {
           {/* Activity Graph */}
           <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg mb-6 sm:mb-8 border border-slate-100">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-800 mb-2 sm:mb-0">Your Activity</h3>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2 sm:mb-0">
+                Your Activity
+              </h3>
               <select
                 value={selectedMetric}
                 onChange={(e) => setSelectedMetric(e.target.value)}
@@ -552,44 +641,59 @@ const fetchWeeklyReport = async () => {
                 <option value="moodDisturbance">Mood Disturbance</option>
                 <option value="sleepDisruption">Sleep Disruption</option>
                 <option value="appetiteIssues">Appetite Issues</option>
-                <option value="academicDisengagement">Academic Disengagement</option>
+                <option value="academicDisengagement">
+                  Academic Disengagement
+                </option>
                 <option value="socialWithdrawal">Social Withdrawal</option>
               </select>
             </div>
 
             <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={weeklyData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <LineChart
+                  data={weeklyData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis
                     dataKey="day"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    tick={{ fontSize: 12, fill: "#64748b" }}
                   />
                   <YAxis
                     domain={[0, 10]}
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    tick={{ fontSize: 12, fill: "#64748b" }}
                     tickFormatter={(value) => `${value}`}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                     }}
                     formatter={(value: number) => [
                       `${value.toFixed(1)} - ${getLevelLabel(value)}`,
-                      getMetricLabel(selectedMetric)
+                      getMetricLabel(selectedMetric),
                     ]}
                   />
                   <defs>
-                    <linearGradient id="activityGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="activityGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
+                      <stop
+                        offset="95%"
+                        stopColor="#3b82f6"
+                        stopOpacity={0.05}
+                      />
                     </linearGradient>
                   </defs>
                   <Line
@@ -597,8 +701,13 @@ const fetchWeeklyReport = async () => {
                     dataKey={selectedMetric}
                     stroke="#3b82f6"
                     strokeWidth={3}
-                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 5 }}
-                    activeDot={{ r: 7, stroke: '#3b82f6', strokeWidth: 2, fill: 'white' }}
+                    dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
+                    activeDot={{
+                      r: 7,
+                      stroke: "#3b82f6",
+                      strokeWidth: 2,
+                      fill: "white",
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -607,32 +716,45 @@ const fetchWeeklyReport = async () => {
 
           {/* Mental Health Metrics Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
-            {renderPieChart(pieChartsData.moodDisturbance, 'Mood Disturbance')}
-            {renderPieChart(pieChartsData.sleepDisruption, 'Sleep Disruption')}
-            {renderPieChart(pieChartsData.appetiteIssues, 'Appetite Issues')}
-            {renderPieChart(pieChartsData.academicDisengagement, 'Academic Disengagement')}
-            {renderPieChart(pieChartsData.socialWithdrawal, 'Social Withdrawal')}
+            {renderPieChart(pieChartsData.moodDisturbance, "Mood Disturbance")}
+            {renderPieChart(pieChartsData.sleepDisruption, "Sleep Disruption")}
+            {renderPieChart(pieChartsData.appetiteIssues, "Appetite Issues")}
+            {renderPieChart(
+              pieChartsData.academicDisengagement,
+              "Academic Disengagement"
+            )}
+            {renderPieChart(
+              pieChartsData.socialWithdrawal,
+              "Social Withdrawal"
+            )}
           </div>
 
           {/* Weekly Summary */}
           <div className="mt-6 sm:mt-8 bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-slate-100">
-            <h4 className="text-lg font-semibold text-slate-800 mb-4">Weekly Summary</h4>
+            <h4 className="text-lg font-semibold text-slate-800 mb-4">
+              Weekly Summary
+            </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600 mb-1">
-                  {weeklyData.length > 0 ? (weeklyData.reduce((acc, day) => acc + day.average, 0) / weeklyData.length).toFixed(1) : '0.0'}
+                  {weeklyData.length > 0
+                    ? (
+                        weeklyData.reduce((acc, day) => acc + day.average, 0) /
+                        weeklyData.length
+                      ).toFixed(1)
+                    : "0.0"}
                 </div>
                 <div className="text-sm text-slate-600">Average Wellbeing</div>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-2xl font-bold text-green-600 mb-1">
-                  {weeklyData.filter(day => day.average <= 5).length}
+                  {weeklyData.filter((day) => day.average <= 5).length}
                 </div>
                 <div className="text-sm text-slate-600">Stable Days</div>
               </div>
               <div className="text-center p-4 bg-amber-50 rounded-lg">
                 <div className="text-2xl font-bold text-amber-600 mb-1">
-                  {weeklyData.filter(day => day.average > 7).length}
+                  {weeklyData.filter((day) => day.average > 7).length}
                 </div>
                 <div className="text-sm text-slate-600">High Concern Days</div>
               </div>
@@ -644,7 +766,7 @@ const fetchWeeklyReport = async () => {
   }
 
   // Diary View (keeping existing implementation)
-  if (currentView === 'diary') {
+  if (currentView === "diary") {
     return (
       <div className="px-3 sm:px-6 space-y-4 sm:space-y-6">
         {/* Header */}
@@ -653,12 +775,24 @@ const fetchWeeklyReport = async () => {
             onClick={handleBackToCalendar}
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
           >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             <span className="text-sm sm:text-base">Back</span>
           </button>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">My Diary</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+            My Diary
+          </h2>
           <div></div>
         </div>
 
@@ -669,10 +803,10 @@ const fetchWeeklyReport = async () => {
             <div className="inline-block bg-gradient-to-r from-amber-600 to-orange-500 text-white px-3 py-2 sm:px-6 sm:py-2 rounded-full font-medium shadow-lg text-sm sm:text-base">
               {selectedDate && (
                 <span className="block sm:hidden">
-                  {selectedDate.fullDate.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
+                  {selectedDate.fullDate.toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
                   })}
                 </span>
               )}
@@ -694,7 +828,7 @@ const fetchWeeklyReport = async () => {
                 #e5e7eb 27px,
                 #e5e7eb 28px
               )`,
-              backgroundSize: '100% 28px'
+              backgroundSize: "100% 28px",
             }}
           >
             {/* Red margin line */}
@@ -707,7 +841,9 @@ const fetchWeeklyReport = async () => {
 
             {/* Dear Diary Header */}
             <div className="ml-8 sm:ml-12 mb-6 sm:mb-8">
-              <h3 className="text-lg sm:text-2xl font-bold text-slate-700">Dear Diary,</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-slate-700">
+                Dear Diary,
+              </h3>
             </div>
 
             {/* Writing Area */}
@@ -717,15 +853,19 @@ const fetchWeeklyReport = async () => {
               placeholder="How was your day? What are you feeling? Share your thoughts..."
               className="w-full h-60 sm:h-80 ml-8 sm:ml-12 pr-4 sm:pr-8 bg-transparent border-none outline-none resize-none text-slate-700 text-base sm:text-lg leading-7 sm:leading-8 placeholder-slate-400"
               style={{
-                fontFamily: 'serif',
-                lineHeight: '28px'
+                fontFamily: "serif",
+                lineHeight: "28px",
               }}
             />
 
             {/* Signature area */}
             <div className="ml-8 sm:ml-12 mt-6 sm:mt-8 text-right pr-4 sm:pr-8">
-              <p className="text-slate-500 italic text-sm sm:text-base">With love,</p>
-              <p className="text-slate-700 font-semibold text-base sm:text-lg mt-1 sm:mt-2">Your Future Self 💙</p>
+              <p className="text-slate-500 italic text-sm sm:text-base">
+                With love,
+              </p>
+              <p className="text-slate-700 font-semibold text-base sm:text-lg mt-1 sm:mt-2">
+                Your Future Self 💙
+              </p>
             </div>
           </div>
 
@@ -747,7 +887,9 @@ const fetchWeeklyReport = async () => {
   return (
     <div className="px-3 sm:px-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Weekly Mind Log</h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+          Weekly Mind Log
+        </h2>
         <div className="text-xs sm:text-sm text-slate-600">
           Click on any day to write in your diary
         </div>
@@ -762,8 +904,18 @@ const fetchWeeklyReport = async () => {
               onClick={handlePreviousWeek}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
 
@@ -785,13 +937,26 @@ const fetchWeeklyReport = async () => {
               onClick={handleNextWeek}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
 
-          <GradientButton onClick={handleViewWeeklyReport} className="w-full sm:w-auto justify-center">
+          <GradientButton
+            onClick={handleViewWeeklyReport}
+            className="w-full sm:w-auto justify-center"
+          >
             <span className="hidden sm:inline">View Weekly Report</span>
             <span className="sm:hidden">Weekly Report</span>
           </GradientButton>
@@ -800,7 +965,10 @@ const fetchWeeklyReport = async () => {
         {/* Days of week header */}
         <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3 sm:mb-4">
           {days.map((day) => (
-            <div key={day} className="text-center font-medium text-slate-500 py-2 text-xs sm:text-sm">
+            <div
+              key={day}
+              className="text-center font-medium text-slate-500 py-2 text-xs sm:text-sm"
+            >
               <span className="hidden sm:inline">{day}</span>
               <span className="sm:hidden">{day.substring(0, 1)}</span>
             </div>
@@ -818,16 +986,19 @@ const fetchWeeklyReport = async () => {
               <div key={index} className="aspect-square">
                 <button
                   onClick={() => handleDayClick(date)}
-                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${isDateToday
-                    ? 'bg-gradient-to-br from-blue-500 to-indigo-400 text-white shadow-lg'
-                    : hasEntry
-                      ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-md hover:shadow-lg'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300'
-                    }`}
+                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${
+                    isDateToday
+                      ? "bg-gradient-to-br from-blue-500 to-indigo-400 text-white shadow-lg"
+                      : hasEntry
+                      ? "bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-md hover:shadow-lg"
+                      : "bg-slate-50 hover:bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
+                  }`}
                 >
-                  <span className="font-semibold text-sm sm:text-lg">{date.getDate()}</span>
+                  <span className="font-semibold text-sm sm:text-lg">
+                    {date.getDate()}
+                  </span>
                   <span className="text-xs opacity-80 mt-0.5 sm:mt-1 hidden sm:block">
-                    {date.toLocaleDateString('en-US', { month: 'short' })}
+                    {date.toLocaleDateString("en-US", { month: "short" })}
                   </span>
                   {hasEntry && (
                     <div className="absolute bottom-1 sm:bottom-2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white/80"></div>
@@ -863,12 +1034,24 @@ const fetchWeeklyReport = async () => {
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-400 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                />
               </svg>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{currentWeekEntries}</p>
+              <p className="text-2xl font-bold text-slate-800">
+                {currentWeekEntries}
+              </p>
               <p className="text-slate-600 text-sm">This Week</p>
             </div>
           </div>
@@ -877,12 +1060,24 @@ const fetchWeeklyReport = async () => {
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{weeklyGoalPercentage}%</p>
+              <p className="text-2xl font-bold text-slate-800">
+                {weeklyGoalPercentage}%
+              </p>
               <p className="text-slate-600 text-sm">Weekly Goal</p>
             </div>
           </div>
@@ -891,12 +1086,24 @@ const fetchWeeklyReport = async () => {
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
               </svg>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{totalEntries}</p>
+              <p className="text-2xl font-bold text-slate-800">
+                {totalEntries}
+              </p>
               <p className="text-slate-600 text-sm">Total Entries</p>
             </div>
           </div>
