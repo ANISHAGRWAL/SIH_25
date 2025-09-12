@@ -39,11 +39,11 @@ app.use(`${BASE_PATH}/health`, (req, res) => {
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/organizations`, organizationRoutes);
 
-app.use('/api/chat', chatRouter);
 app.use('/api/doc-chat', docChatRouter);
 
 // student router
 app.use(authMiddleware);
+app.use('/api/chat', chatRouter);
 app.use(`${BASE_PATH}/student`, studentRoutes);
 app.use(`${BASE_PATH}/test`, testRoutes);
 app.use(`${BASE_PATH}/journal`, journalRoutes);

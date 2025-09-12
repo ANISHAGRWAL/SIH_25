@@ -4,7 +4,7 @@ import { eq, and, gte, lte } from 'drizzle-orm';
 import { PARAMS } from '../utils/labelParser.js';
 import { IAuthUser } from '../types';
 
-interface JournalData {
+export interface JournalData {
   date: Date | null;
   mood_disturbance: number | null;
   sleep_disruption: number | null;
