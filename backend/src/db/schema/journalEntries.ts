@@ -8,7 +8,7 @@ import {
   integer,
   doublePrecision,
 } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { user } from './user'; // Assuming user schema is defined
 
 export const journalEntries = pgTable(
@@ -42,6 +42,13 @@ export const journalEntries = pgTable(
       .onUpdate('cascade'),
   ],
 );
+
+export const journalEntriesRelations = relations(journalEntries, ({ one }) => ({
+  student: one(user, {
+    fields: [journalEntries.studentId],
+    references: [user.id],
+  }),
+}));
 
 export type IJournalEntry = typeof journalEntries.$inferSelect;
 export type INewJournalEntry = typeof journalEntries.$inferInsert;

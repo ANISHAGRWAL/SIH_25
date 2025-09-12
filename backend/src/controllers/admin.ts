@@ -101,8 +101,8 @@ export async function generateAdminWeeklyReport(
 ) {
   const conditions = [
     and(
-      eq(journalEntries.studentId, authUser.id),
       eq(journalEntries.studentId, studentId),
+      eq(journalEntries.organizationId, authUser.organizationId),
     ),
     eq(journalEntries.organizationId, authUser.organizationId),
   ];
@@ -191,6 +191,49 @@ export const getSessions = async (authUser: IAuthUser) => {
       throw new Error('No sessions found');
     }
     return sessions;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getUserDetails = async (authUser: IAuthUser, userId: string) => {
+  try {
+    const user = await db.query.user.findFirst({
+      where: (u, { eq, and }) =>
+        and(eq(u.id, userId), eq(u.organizationId, authUser.organizationId)),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        emergencyContact: true,
+        emergencyContactPerson: true,
+      },
+      with: {
+        phqs: {
+          orderBy: (phq, { desc }) => [desc(phq.takenOn)],
+          limit: 1,
+        },
+        gads: {
+          orderBy: (gad, { desc }) => [desc(gad.takenOn)],
+          limit: 1,
+        },
+        pss: {
+          orderBy: (pss, { desc }) => [desc(pss.takenOn)],
+          limit: 1,
+        },
+        sessionBookings: {
+          orderBy: (booking, { desc }) => [desc(booking.createdAt)],
+          limit: 10,
+        },
+      },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const journalReport = await generateAdminWeeklyReport(authUser, userId);
+    return { user, journalReport };
   } catch (error) {
     console.log(error);
     throw error;

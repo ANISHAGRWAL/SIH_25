@@ -12,6 +12,8 @@ import { phq } from './phq';
 import { gad } from './gad';
 import { pss } from './pss';
 import { organization } from './organization';
+import { journalEntries } from './journalEntries';
+import { sessionBooking } from './sessionBooking';
 
 export const RoleEnum = pgEnum('role', ['student', 'admin']);
 export const GenderEnum = pgEnum('gender', ['male', 'female']);
@@ -59,13 +61,15 @@ export const user = pgTable(
 
 export const userRelations = relations(user, ({ many, one }) => ({
   moods: many(studentMoods, { relationName: 'student_moods' }),
-  phqs: many(phq, { relationName: 'phq_student' }),
-  gads: many(gad, { relationName: 'gad_student' }),
-  pss: many(pss, { relationName: 'pss_student' }),
+  phqs: many(phq),
+  gads: many(gad),
+  pss: many(pss),
   organization: one(organization, {
     fields: [user.organizationId],
     references: [organization.id],
   }),
+  journalEntries: many(journalEntries),
+  sessionBookings: many(sessionBooking),
 }));
 
 export type IRole = (typeof RoleEnum.enumValues)[number];
