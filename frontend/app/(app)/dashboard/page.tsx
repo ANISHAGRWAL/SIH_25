@@ -26,43 +26,42 @@ function MusicPlayer() {
 
   // --- PLAYLIST DATA ---
   const playlist = [
-  {
-    id: 1,
-    title: "Ambient Forest",
-    artist: "Alexander Nakarada",
-    src: "https://www.chosic.com/wp-content/uploads/2021/07/Alexander-Nakarada-Ambient-Forest-Music.mp3",
-    duration: "2:21",
-  },
-  {
-    id: 2,
-    title: "Morning Routine",
-    artist: "Ghostrifter Official",
-    src: "https://www.chosic.com/wp-content/uploads/2021/07/Morning-Routine-Lofi-Study-Music.mp3",
-    duration: "2:00",
-  },
-  {
-    id: 3,
-    title: "Acoustic Breeze",
-    artist: "Bensound",
-    src: "https://www.bensound.com/bensound-music/bensound-acousticbreeze.mp3",
-    duration: "2:35",
-  },
-  {
-    id: 4,
-    title: "Relaxing in Nature",
-    artist: "chilledmusic",
-    src: "https://cdn.pixabay.com/audio/2023/10/24/audio_341f238260.mp3",
-    duration: "2:30",
-  },
-  {
-    id: 5,
-    title: "Hopeful Cinematic",
-    artist: "Scott Buckley",
-    src: "https://www.scottbuckley.com.au/library/wp-content/uploads/Hopeful-Cinematic-Background-Music.mp3",
-    duration: "4:25",
-  },
-];
-
+    {
+      id: 1,
+      title: "Mind Relaxing Melodies",
+      artist: "Gentle instrumental tracks to calm the mind.",
+      src: "https://audio-previews.elements.envatousercontent.com/files/269472238/preview.mp3",
+      duration: "2:24",
+    },
+    {
+      id: 2,
+      title: "Calm & Serene",
+      artist: "Peaceful music to ease anxiety and stress.",
+      src: "https://audio-previews.elements.envatousercontent.com/files/342819361/preview.mp3",
+      duration: "7:17",
+    },
+    {
+      id: 3,
+      title: "Inner Peace Sounds",
+      artist: "Music designed for meditation and focus.",
+      src: "https://audio-previews.elements.envatousercontent.com/files/557077988/preview.mp3",
+      duration: "3:49",
+    },
+    {
+      id: 4,
+      title: "Stress-Free Harmony",
+      artist: "Relaxing instrumental pieces for mental clarity.",
+      src: "https://audio-previews.elements.envatousercontent.com/files/283217227/preview.mp3",
+      duration: "2:20",
+    },
+    {
+      id: 5,
+      title: "Gentle Mind Escape",
+      artist: "A soft retreat for your busy thoughts.",
+      src: "https://audio-previews.elements.envatousercontent.com/files/604850502/preview.mp3",
+      duration: "2:52",
+    },
+  ];
 
   const currentTrack = playlist[currentTrackIndex];
 
@@ -308,98 +307,98 @@ export default function DashboardPage() {
   const { user } = useAuth();
 
   const motivationalMessages = {
-    happy: [
-      "It's wonderful to see you happy! Let this positive energy guide your day.",
-      "Your happiness is shining through. Keep embracing this wonderful feeling!",
-      "Great to see you in high spirits! What's one thing you can do to share this joy?",
-      "Happiness looks great on you! May this feeling stay with you throughout the day.",
-      "Embrace this joy! You deserve every bit of this happiness.",
-    ],
-    neutral: [
-      "Feeling neutral is a state of calm and balance. It's a perfect moment for clarity.",
-      "This is a moment of peace. Take a deep breath and center yourself.",
-      "A neutral state is a great foundation. From here, you can choose where you want to go.",
-      "It's okay to just be. This calmness is a form of self-care.",
-      "You are in a stable place. Use this clarity to plan your next step.",
-    ],
-    sad: [
-      "It's okay to feel sad. Allow yourself this moment. These feelings are valid and will pass.",
-      "Be gentle with yourself today. Your feelings are a natural part of being human.",
-      "Remember that even after the heaviest rain, the sun shines again. You are not alone.",
-      "This feeling is temporary. You have the strength to navigate through it.",
-      "Allow yourself to feel this, but know that brighter days are ahead. You've got this.",
-    ],
-    angry: [
-      "Your feelings of anger are valid. Take a moment to breathe and understand its source.",
-      "Anger can be a powerful signal. What is it telling you right now?",
-      "It's okay to feel angry. Channel this energy into something constructive when you're ready.",
-      "Take a step back and a deep breath. You are in control, not the anger.",
-      "This feeling will subside. Focus on finding your calm and releasing the tension.",
-    ],
-    fearful: [
-      "It's natural to feel fear. Acknowledge it without letting it take over. You are safe.",
-      "This feeling of fear is just a visitor; it doesn't have to stay. Breathe through it.",
-      "You are stronger than your fears. Take one small, brave step at a time.",
-      "Focus on the present moment. In this breath, you are okay.",
-      "Acknowledge your fear, and then remind yourself of your strength and resilience.",
-    ],
-    disgusted: [
-      "It's okay to feel this way in response to something unpleasant. This feeling will pass.",
-      "Your reaction is a sign of your values. Let it go and focus on what brings you peace.",
-      "Take a moment to cleanse your mind. Think of something beautiful and pure.",
-      "This feeling doesn't define your day. Shift your focus to something that makes you feel good.",
-      "Release this negative feeling. You deserve to feel calm and at ease.",
-    ],
+    stressed: [
+  "This feeling is temporary. Take a deep breath and focus on one thing at a time.",
+  "Acknowledge the stress, but don't let it consume you. You are in control.",
+  "Remember to be kind to yourself. It's okay to take a break.",
+  "Try a short walk or stretch to release tension and reset your mind.",
+  "Focus on what you can control right now, and let go of what you cannot.",
+],
+overwhelmed: [
+  "It's okay to feel overwhelmed. Break your tasks into smaller, manageable steps.",
+  "You don't have to do everything at once. Prioritize what's most important.",
+  "Give yourself permission to pause and recharge. You've got this.",
+  "Make a simple to-do list and tackle one thing at a time.",
+  "Remember, progress is progress, no matter how small each step seems.",
+],
+lonely: [
+  "You are not alone in feeling this way. Reach out to someone you trust.",
+  "This is a good time for self-reflection. What activities bring you comfort?",
+  "Remember that feelings of loneliness will pass. Be patient with yourself.",
+  "Engage in a hobby or activity that brings you joy and connection.",
+  "Consider sending a message or calling a friend; small connections matter.",
+],
+confused: [
+  "It's okay to not have all the answers right now. Clarity will come with time.",
+  "Take a step back and look at the bigger picture. What information are you missing?",
+  "Trust your intuition. Sometimes the best path forward reveals itself slowly.",
+  "Write down your thoughts to organize your mind and identify priorities.",
+  "Ask questions and seek advice from someone you trust; perspectives help.",
+],
+motivated: [
+  "Harness this energy! You're on the right track to achieving great things.",
+  "Your focus is your superpower right now. Keep pushing forward!",
+  "Celebrate your progress, no matter how small. Every step counts.",
+  "Use this momentum to tackle a challenging task you've been avoiding.",
+  "Visualize your goals clearly; motivation grows when purpose is clear.",
+],
+happy: [
+  "Embrace this joy! Let this positive energy guide your day.",
+  "Your happiness is contagious. Share it with others!",
+  "It's wonderful to see you happy. Savor this wonderful feeling.",
+  "Take a moment to reflect on what brought you this happiness today.",
+  "Use this positive energy to spread kindness and encouragement to others.",
+],
   };
 
   const moods = [
     {
-      key: "happy",
-      emoji: "😊",
-      label: "Happy",
-      color: "bg-yellow-100 hover:bg-yellow-200",
-      gradient: "from-yellow-50 to-amber-50",
-      shadow: "shadow-yellow-100",
-    },
-    {
-      key: "neutral",
-      emoji: "😐",
-      label: "Neutral",
-      color: "bg-gray-100 hover:bg-gray-200",
-      gradient: "from-gray-50 to-slate-50",
-      shadow: "shadow-gray-100",
-    },
-    {
-      key: "sad",
-      emoji: "😢",
-      label: "Sad",
-      color: "bg-blue-100 hover:bg-blue-200",
-      gradient: "from-blue-50 to-indigo-50",
-      shadow: "shadow-blue-100",
-    },
-    {
-      key: "angry",
-      emoji: "😠",
-      label: "Angry",
+      key: "stressed",
+      emoji: "😰",
+      label: "Stressed / Anxious",
       color: "bg-red-100 hover:bg-red-200",
       gradient: "from-red-50 to-rose-50",
       shadow: "shadow-red-100",
     },
     {
-      key: "fearful",
-      emoji: "😰",
-      label: "Fearful",
+      key: "overwhelmed",
+      emoji: "😩",
+      label: "Overwhelmed / Burnout",
+      color: "bg-orange-100 hover:bg-orange-200",
+      gradient: "from-orange-50 to-amber-50",
+      shadow: "shadow-orange-100",
+    },
+    {
+      key: "lonely",
+      emoji: "😔",
+      label: "Lonely / Isolated",
+      color: "bg-blue-100 hover:bg-blue-200",
+      gradient: "from-blue-50 to-indigo-50",
+      shadow: "shadow-blue-100",
+    },
+    {
+      key: "confused",
+      emoji: "🤔",
+      label: "Confused / Unsure",
       color: "bg-purple-100 hover:bg-purple-200",
       gradient: "from-purple-50 to-violet-50",
       shadow: "shadow-purple-100",
     },
     {
-      key: "disgusted",
-      emoji: "🤢",
-      label: "Disgusted",
+      key: "motivated",
+      emoji: "💪",
+      label: "Motivated / Focused",
       color: "bg-green-100 hover:bg-green-200",
       gradient: "from-green-50 to-emerald-50",
       shadow: "shadow-green-100",
+    },
+    {
+      key: "happy",
+      emoji: "😄",
+      label: "Happy / Content",
+      color: "bg-yellow-100 hover:bg-yellow-200",
+      gradient: "from-yellow-50 to-amber-50",
+      shadow: "shadow-yellow-100",
     },
   ];
 
