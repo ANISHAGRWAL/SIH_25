@@ -5,6 +5,7 @@ import {
   getAvgTestScores,
   getSessions,
   getStudents,
+  getUserDetails,
 } from '../controllers/admin';
 const router = express.Router();
 
@@ -76,6 +77,23 @@ router.get('/sessions', (req: IApiRequest, res: Response) => {
       .json({ success: false, error: { message: 'Forbidden' } });
   }
   getSessions(req.user)
+    .then((data) => {
+      res.status(200).json({ success: true, data });
+    })
+    .catch((error) => {
+      res
+        .status(400)
+        .json({ success: false, error: { message: error.message } });
+    });
+});
+
+router.get('/user', (req: IApiRequest, res: Response) => {
+  if (req.user?.role !== 'admin') {
+    return res
+      .status(403)
+      .json({ success: false, error: { message: 'Forbidden' } });
+  }
+  getUserDetails(req.user, req.query.userId as string)
     .then((data) => {
       res.status(200).json({ success: true, data });
     })

@@ -41,7 +41,10 @@ export const gad = pgTable(
 );
 
 export const gadRelations = relations(gad, ({ one }) => ({
-  student: one(user),
+  student: one(user, {
+    fields: [gad.studentId],
+    references: [user.id],
+  }),
   organization: one(organization),
 }));
 

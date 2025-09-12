@@ -41,7 +41,10 @@ export const pss = pgTable(
 );
 
 export const pssRelations = relations(pss, ({ one }) => ({
-  student: one(user),
+  student: one(user, {
+    fields: [pss.studentId],
+    references: [user.id],
+  }),
   organization: one(organization),
 }));
 
