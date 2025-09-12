@@ -1,6 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import { submitTestScore } from "@/actions/test";
+import { toast } from "sonner";
 
 const questions = [
   "In the last month, how often have you been upset because of something that happened unexpectedly?",
@@ -13,7 +15,7 @@ const questions = [
   "In the last month, how often have you felt that you were on top of things?",
   "In the last month, how often have you been angered because of things that happened that were outside of your control?",
   "In the last month, how often have you felt difficulties were piling up so high that you could not overcome them?",
-]
+];
 
 const options = [
   { value: 0, label: "Never" },
@@ -21,10 +23,10 @@ const options = [
   { value: 2, label: "Sometimes" },
   { value: 3, label: "Fairly often" },
   { value: 4, label: "Very often" },
-]
+];
 
 // Questions 4, 5, 7, 8 need reverse scoring (0=4, 1=3, 2=2, 3=1, 4=0)
-const reverseScoreQuestions = [3, 4, 6, 7] // 0-indexed
+const reverseScoreQuestions = [3, 4, 6, 7]; // 0-indexed
 
 const getResultInterpretation = (score: number) => {
   if (score <= 13)
@@ -33,55 +35,81 @@ const getResultInterpretation = (score: number) => {
       color: "text-green-600",
       bgColor: "bg-green-50",
       message: "You're managing stress well. Keep up your healthy coping strategies!",
-    }
+    };
   if (score <= 26)
     return {
       level: "Moderate",
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
       message: "You're experiencing moderate stress. Consider stress management techniques.",
-    }
+    };
   return {
     level: "High",
     color: "text-red-600",
     bgColor: "bg-red-50",
     message: "You're experiencing high perceived stress. Consider seeking support and stress reduction strategies.",
-  }
-}
+  };
+};
 
 export default function PSSTestPage() {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState<number[]>([])
-  const [showResults, setShowResults] = useState(false)
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAnswer = (value: number) => {
-    const newAnswers = [...answers, value]
-    setAnswers(newAnswers)
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  const handleAnswer = async (value: number) => {
+    const newAnswers = [...answers, value];
+    setAnswers(newAnswers);
 
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion(currentQuestion + 1);
     } else {
-      setShowResults(true)
+      const finalScore = newAnswers.reduce((sum, answer, index) => {
+        if (reverseScoreQuestions.includes(index)) {
+          return sum + (4 - answer);
+        }
+        return sum + answer;
+      }, 0);
+
+      if (!token) {
+        toast.error("Authentication token missing. Please log in.");
+        setShowResults(true);
+        return;
+      }
+      
+      setIsSubmitting(true);
+      const res = await submitTestScore("pss", finalScore, token);
+      
+      if (res.ok) {
+        toast.success("Your PSS results have been saved!");
+      } else {
+        toast.error(res.error || "Failed to save results.");
+      }
+      
+      setIsSubmitting(false);
+      setShowResults(true);
     }
-  }
+  };
 
   const calculateScore = () => {
     return answers.reduce((sum, answer, index) => {
       if (reverseScoreQuestions.includes(index)) {
-        return sum + (4 - answer)
+        return sum + (4 - answer);
       }
-      return sum + answer
-    }, 0)
-  }
-
-  const totalScore = calculateScore()
-  const result = getResultInterpretation(totalScore)
+      return sum + answer;
+    }, 0);
+  };
+  
+  const totalScore = calculateScore();
+  const result = getResultInterpretation(totalScore);
 
   const resetTest = () => {
-    setCurrentQuestion(0)
-    setAnswers([])
-    setShowResults(false)
-  }
+    setCurrentQuestion(0);
+    setAnswers([]);
+    setShowResults(false);
+  };
 
   if (showResults) {
     return (
@@ -91,7 +119,8 @@ export default function PSSTestPage() {
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">PSS Assessment Complete</h1>
             <p className="text-base md:text-lg text-gray-500">Your Perceived Stress Scale Results</p>
           </div>
-          
+          {isSubmitting && <p className="text-center text-slate-600">Saving your results...</p>}
+
           <div className="rounded-2xl md:rounded-3xl bg-white shadow-lg md:shadow-2xl ring-1 ring-gray-100 p-6 md:p-8 space-y-6 md:space-y-8">
             <div className="space-y-6">
               <div className="text-center">
@@ -106,7 +135,6 @@ export default function PSSTestPage() {
                 </div>
                 <p className="text-sm md:text-lg text-gray-700 leading-relaxed">{result.message}</p>
               </div>
-
               <div className="space-y-4">
                 <h3 className="text-base md:text-xl font-semibold text-gray-800">Score Interpretation</h3>
                 <div className="grid grid-cols-3 gap-2 md:gap-4 text-center">
@@ -126,7 +154,6 @@ export default function PSSTestPage() {
               </div>
             </div>
           </div>
-          
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={resetTest}
@@ -143,7 +170,7 @@ export default function PSSTestPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -153,7 +180,6 @@ export default function PSSTestPage() {
           <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">PSS Assessment</h1>
           <p className="text-sm md:text-lg text-gray-500">Answer based on your feelings over the past month.</p>
         </div>
-
         <div className="rounded-2xl md:rounded-3xl bg-white shadow-lg md:shadow-2xl ring-1 ring-gray-100 p-6 md:p-8 space-y-6 md:space-y-8">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-xs md:text-base font-medium text-gray-600">
@@ -167,12 +193,10 @@ export default function PSSTestPage() {
               />
             </div>
           </div>
-
           <div className="space-y-6">
             <h2 className="text-lg md:text-2xl font-semibold text-gray-800 text-center leading-relaxed">
               {questions[currentQuestion]}
             </h2>
-
             <div className="space-y-3">
               {options.map((option) => (
                 <button
@@ -191,5 +215,5 @@ export default function PSSTestPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

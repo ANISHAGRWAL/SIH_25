@@ -64,22 +64,22 @@ const techniques = [
     ],
     color: "from-purple-100 to-pink-100",
   },
-  {
-    id: 5,
-    name: "Legs Up the Wall",
-    duration: "10 minutes",
-    emoji: "🦵",
-    benefits: "Reduces fatigue and calms nervous system",
-    instructions: [
-      "Lie on your back near a wall",
-      "Extend legs up against the wall",
-      "Arms relaxed at your sides",
-      "Close your eyes and breathe naturally",
-      "Focus on releasing tension",
-      "Stay for 5-15 minutes",
-    ],
-    color: "from-teal-100 to-cyan-100",
-  },
+  // {
+  //   id: 5,
+  //   name: "Legs Up the Wall",
+  //   duration: "10 minutes",
+  //   emoji: "🦵",
+  //   benefits: "Reduces fatigue and calms nervous system",
+  //   instructions: [
+  //     "Lie on your back near a wall",
+  //     "Extend legs up against the wall",
+  //     "Arms relaxed at your sides",
+  //     "Close your eyes and breathe naturally",
+  //     "Focus on releasing tension",
+  //     "Stay for 5-15 minutes",
+  //   ],
+  //   color: "from-teal-100 to-cyan-100",
+  // },
   {
     id: 6,
     name: "Mindful Body Scan",
@@ -94,7 +94,7 @@ const techniques = [
       "Acknowledge tension without judgment",
       "End at the top of your head",
     ],
-    color: "from-lavender-100 to-violet-100",
+    color: "from-slate-100 to-gray-100",
   },
 ]
 
@@ -112,7 +112,7 @@ export default function WellnessPage() {
 
   if (selectedTechnique) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+      <div className="min-h-screen bg-blue-50 p-4">
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
@@ -138,16 +138,16 @@ export default function WellnessPage() {
             <p className="text-slate-600 mb-6">{selectedTechnique.benefits}</p>
           </div>
 
-          <Card className="mb-8">
+          <Card className="mb-8 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-slate-800">
                 <Brain className="h-5 w-5" />
                 Step-by-Step Instructions
               </h3>
               <ol className="space-y-3">
                 {selectedTechnique.instructions?.map((instruction, index) => (
                   <li key={index} className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-teal-400 to-sky-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    <span className="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}
                     </span>
                     <span className="text-slate-700">{instruction}</span>
@@ -158,7 +158,7 @@ export default function WellnessPage() {
           </Card>
 
           <div className="text-center">
-            <Button className="bg-gradient-to-r from-teal-400 to-sky-600 hover:from-teal-500 hover:to-sky-700 text-white px-8 py-3 rounded-full text-lg">
+            <Button className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white px-8 py-3 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200">
               <Play className="h-5 w-5 mr-2" />
               Begin Practice
             </Button>
@@ -170,7 +170,7 @@ export default function WellnessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-blue-50">
       <div className="max-w-6xl mx-auto p-6">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -189,7 +189,7 @@ export default function WellnessPage() {
             {techniques.map((technique) => (
               <Card
                 key={technique.id}
-                className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-br ${technique.color} border-0`}
+                className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br ${technique.color} border border-gray-200`}
                 onClick={() => startTechnique(technique)}
               >
                 <CardContent className="p-6 text-center">
@@ -200,7 +200,7 @@ export default function WellnessPage() {
                     <span className="text-sm">{technique.duration}</span>
                   </div>
                   <p className="text-slate-600 text-sm mb-4">{technique.benefits}</p>
-                  <Button size="sm" className="bg-white/80 hover:bg-white text-slate-700 rounded-full">
+                  <Button size="sm" className="bg-white/90 hover:bg-white text-slate-700 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                     Try Now
                   </Button>
                 </CardContent>
@@ -210,13 +210,13 @@ export default function WellnessPage() {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+        <div className="text-center bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
           <h2 className="text-2xl font-semibold text-slate-800 mb-3">Ready to Begin Your Wellness Journey?</h2>
           <p className="text-slate-600 mb-6 max-w-lg mx-auto">
             Begin your journey to inner calm and clarity. All you need is a few minutes and a quiet space.
           </p>
           <Button
-            className="bg-gradient-to-r from-teal-400 to-sky-600 hover:from-teal-500 hover:to-sky-700 text-white px-8 py-3 rounded-full text-lg"
+            className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white px-8 py-3 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={() => startTechnique(techniques[0])}
           >
             <Play className="h-5 w-5 mr-2" />

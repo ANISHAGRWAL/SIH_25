@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 const corsOptions = {
   origin: '*',
   // origin: [
-  //   /^https?:\/\/([a-zA-Z0-9-]+\.)*mindmates\.com$/,
+  //   /^https?:\/\/([a-zA-Z0-9-]+\.)*Sahayog\.com$/,
   //   "http://localhost:3000",
   // ],
   optionsSuccessStatus: 200,

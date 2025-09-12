@@ -269,7 +269,7 @@ export default function HomePage() {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">MindMates</span>
+              <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">Sahayog</span>
             </div>
 
 
@@ -412,7 +412,7 @@ export default function HomePage() {
       <section id="about" className="py-16 bg-white relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">About MindMates</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">About Sahayog</h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto text-pretty">
               Breaking barriers to mental health support with innovative technology, cultural sensitivity, and
               stigma-free care for students.
@@ -491,7 +491,7 @@ export default function HomePage() {
               </p>
               <div className="space-y-4">
                 {[
-                  { icon: "📧", text: "support@mindmates.edu" },
+                  { icon: "📧", text: "support@Sahayog.edu" },
                   { icon: "📞", text: "24/7 Crisis Helpline: 1-800-MINDMATE" },
                   { icon: "🏫", text: "Available at 500+ Educational Institutions" }
                 ].map((contact, index) => (
@@ -596,7 +596,7 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <span className="text-xl font-bold">MindMates</span>
+                <span className="text-xl font-bold">Sahayog</span>
               </div>
               <p className="text-slate-400 text-pretty">
                 Empowering students with accessible, stigma-free mental health support through innovative technology.
@@ -648,7 +648,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>&copy; 2024 MindMates. All rights reserved. Developed with ❤️ for student mental health.</p>
+            <p>&copy; 2024 Sahayog. All rights reserved. Developed with ❤️ for student mental health.</p>
           </div>
         </div>
       </footer>

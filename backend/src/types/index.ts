@@ -1,5 +1,8 @@
 import { type Request, Response } from 'express';
 import { IRole } from '../db/schema/user';
+import { IPhq } from '../db/schema/phq'; // Make sure to import these types
+import { IGad } from '../db/schema/gad';
+import { IPss } from '../db/schema/pss'
 
 export interface IApiResponse {
   success: boolean;
@@ -22,4 +25,15 @@ export interface IApiRequest extends Request {
 export interface ChatRequest {
   session_id: string;
   query: string;
+}
+
+export interface ITestResult {
+  lastTest: IPhq | IGad | IPss | undefined;
+  eligible: boolean;
+}
+
+export interface ITestHistory {
+  phq: ITestResult;
+  gad: ITestResult;
+  pss: ITestResult;
 }
