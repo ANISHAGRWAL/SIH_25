@@ -179,6 +179,13 @@ export const getSessions = async (authUser: IAuthUser) => {
             new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
           ),
         ),
+      with: {
+        user: {
+          columns: {
+            name: true,
+          },
+        },
+      },
     });
     if (!sessions || sessions.length === 0) {
       throw new Error('No sessions found');
