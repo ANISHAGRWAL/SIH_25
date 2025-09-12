@@ -103,7 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 />
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[60]">
                   <Link
-                    href="/admin/profile"
+                    href="/admin-profile"
                     onClick={() => setIsProfileDropdownOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                   >
@@ -192,7 +192,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     />
                     <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[110]">
                       <Link
-                        href="/admin/profile"
+                        href="/admin-profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-3 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                       >

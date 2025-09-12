@@ -1,7 +1,41 @@
-import { IAuthUser } from "../../backend/src/types"; 
+import { IAuthUser } from "../../backend/src/types";
 
 const BASE_URL =
   `${process.env.NEXT_PUBLIC_API_BASE_URL}/api` || "http://localhost:5000/api";
+
+// New function to fetch all students
+export const getAdminStudents = async (token: string): Promise<{ ok: boolean; status?: number; data?: IAuthUser[] | any; error?: string }> => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/students`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to fetch students");
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data || [],
+    };
+  } catch (error: any) {
+    console.error("Error fetching students:", error);
+    return {
+      ok: false,
+      status: 500,
+      error: error.message || "Failed to fetch students. Please try again.",
+    };
+  }
+};
+
+// ... (other functions remain the same)
+// Note: We are not changing getStudentsCount as it returns a count, not the full list.
 
 export const getStudentsCount = async (token: string): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
   try {
@@ -34,6 +68,8 @@ export const getStudentsCount = async (token: string): Promise<{ ok: boolean; st
     };
   }
 };
+
+
 
 export const getTestAverages = async (token: string): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
   try {
