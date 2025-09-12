@@ -175,30 +175,15 @@ export default function PHQ9TestPage() {
           </div>
 
           {/* Action Buttons */}
-          {/* Action Buttons */}
           <div className="">
             <button
               disabled={isSubmitting}
-              onClick={async () => {
-                if (!token) {
-                  toast.error("Authentication token missing. Please log in.");
-                  return;
-                }
-
-                setIsSubmitting(true);
-                const res = await submitTestScore("phq", totalScore, token);
-
-                if (res.ok) {
-                  toast.success("Your PHQ-9 results have been submitted!");
-                } else {
-                  toast.error(res.error || "Failed to submit results.");
-                }
-                setIsSubmitting(false);
+              onClick={() => {
                 router.push("/psych-tests");
               }}
               className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              Back to tests
             </button>
           </div>
         </div>
