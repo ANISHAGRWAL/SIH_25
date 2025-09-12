@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitTestScore } from "@/actions/test";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const questions = [
@@ -56,6 +57,7 @@ export default function PSSTestPage() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -154,18 +156,17 @@ export default function PSSTestPage() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4">
+          
+          {/* Updated Action Button to match GAD style */}
+          <div className="flex justify-center items-center">
             <button
-              onClick={resetTest}
-              className="w-full px-4 py-3 md:px-6 md:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg md:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 font-semibold text-sm md:text-lg"
+              disabled={isSubmitting}
+              onClick={() => {
+                router.push("/psych-tests");
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
             >
-              Retake Test
-            </button>
-            <button
-              onClick={() => window.history.back()}
-              className="w-full px-4 py-3 md:px-6 md:py-4 bg-white border border-gray-200 hover:border-gray-300 text-gray-700 rounded-lg md:rounded-xl shadow-sm hover:shadow-md transition-all duration-300 font-semibold text-sm md:text-lg"
-            >
-              Go Back
+              Back to tests
             </button>
           </div>
         </div>
