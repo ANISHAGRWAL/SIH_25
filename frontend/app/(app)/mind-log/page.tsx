@@ -1,8 +1,13 @@
 "use client";
+import React, { useState, useEffect } from "react";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell
+} from "recharts";
 
-import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
+// Utility: backend base URL
+const API_BASE = "http://127.0.0.1:8000";
 // Types
 interface GradientButtonProps {
   children: React.ReactNode;
@@ -56,32 +61,23 @@ const GradientButton: React.FC<GradientButtonProps> = ({ children, onClick, clas
 );
 
 export default function MindLogPage() {
-  const [currentView, setCurrentView] = useState<'calendar' | 'diary' | 'report'>('calendar');
-  const [selectedDate, setSelectedDate] = useState<SelectedDate | null>(null);
-  const [diaryEntries, setDiaryEntries] = useState<DiaryEntries>({});
-  const [currentEntry, setCurrentEntry] = useState<string>('');
+  const [currentView, setCurrentView] = useState<"calendar" | "diary" | "report">("calendar");
+  const [selectedDate, setSelectedDate] = useState<any>(null);
+  const [diaryEntries, setDiaryEntries] = useState<{ [key: string]: string }>({});
+  const [currentEntry, setCurrentEntry] = useState<string>("");
   const [currentWeekOffset, setCurrentWeekOffset] = useState<number>(0);
-  const [selectedMetric, setSelectedMetric] = useState<string>('average');
+  const [selectedMetric, setSelectedMetric] = useState<string>("average");
 
-  // Sample data - replace with your backend API calls
-  const weeklyData: DailyData[] = [
-    { day: "Mon", date: "2025-09-01", moodDisturbance: 9.4, sleepDisruption: 6.9, appetiteIssues: 6.0, academicDisengagement: 8.3, socialWithdrawal: 8.6, average: 7.8 },
-    { day: "Tue", date: "2025-09-02", moodDisturbance: 7.2, sleepDisruption: 5.8, appetiteIssues: 4.5, academicDisengagement: 6.7, socialWithdrawal: 7.1, average: 6.3 },
-    { day: "Wed", date: "2025-09-03", moodDisturbance: 8.1, sleepDisruption: 7.3, appetiteIssues: 5.9, academicDisengagement: 7.8, socialWithdrawal: 6.9, average: 7.2 },
-    { day: "Thu", date: "2025-09-04", moodDisturbance: 6.8, sleepDisruption: 4.9, appetiteIssues: 3.8, academicDisengagement: 5.9, socialWithdrawal: 5.2, average: 5.3 },
-    { day: "Fri", date: "2025-09-05", moodDisturbance: 8.9, sleepDisruption: 8.1, appetiteIssues: 7.2, academicDisengagement: 8.7, socialWithdrawal: 8.3, average: 8.2 },
-    { day: "Sat", date: "2025-09-06", moodDisturbance: 5.4, sleepDisruption: 3.7, appetiteIssues: 2.9, academicDisengagement: 4.2, socialWithdrawal: 4.8, average: 4.2 },
-    { day: "Sun", date: "2025-09-07", moodDisturbance: 7.6, sleepDisruption: 6.4, appetiteIssues: 5.7, academicDisengagement: 7.1, socialWithdrawal: 6.9, average: 6.7 }
-  ];
-
-  const pieChartsData: PieChartsData = {
-    moodDisturbance: [{ label: "Mood Disturbance", value: 7.8, color: "#ef4444" }],
-    sleepDisruption: [{ label: "Sleep Disruption", value: 6.2, color: "#3b82f6" }],
-    appetiteIssues: [{ label: "Appetite Issues", value: 5.1, color: "#f59e0b" }],
-    academicDisengagement: [{ label: "Academic Disengagement", value: 7.0, color: "#8b5cf6" }],
-    socialWithdrawal: [{ label: "Social Withdrawal", value: 6.8, color: "#10b981" }]
-  };
-
+  const [weeklyData, setWeeklyData] = useState<any[]>([]); // <- from backend
+  const [pieChartsData, setPieChartsData] = useState<any>({
+    moodDisturbance: [],
+    sleepDisruption: [],
+    appetiteIssues: [],
+    academicDisengagement: [],
+    socialWithdrawal: []
+  });
+  const userId = "student_12"; // TODO: dynamic from login/session 
+  
   // Helper functions (keeping existing ones)
   const getDateKey = (date: Date): string => {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
@@ -100,7 +96,7 @@ export default function MindLogPage() {
     const currentWeekStart = getStartOfWeek(today);
     const targetWeekStart = new Date(currentWeekStart);
     targetWeekStart.setDate(currentWeekStart.getDate() + (weekOffset * 7));
-    
+
     const weekDays: Date[] = [];
     for (let i = 0; i < 7; i++) {
       const day = new Date(targetWeekStart);
@@ -114,13 +110,13 @@ export default function MindLogPage() {
     const weekDays = getWeekDays(weekOffset);
     const startDate = weekDays[0];
     const endDate = weekDays[6];
-    
+
     const startMonth = startDate.toLocaleDateString('en-US', { month: 'short' });
     const endMonth = endDate.toLocaleDateString('en-US', { month: 'short' });
     const startDay = startDate.getDate();
     const endDay = endDate.getDate();
     const year = startDate.getFullYear();
-    
+
     if (startMonth === endMonth) {
       return `${startMonth} ${startDay}-${endDay}, ${year}`;
     } else {
@@ -131,8 +127,8 @@ export default function MindLogPage() {
   const isToday = (date: Date): boolean => {
     const today = new Date();
     return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
   };
 
   const isCurrentWeek = (): boolean => {
@@ -153,14 +149,35 @@ export default function MindLogPage() {
     setCurrentView('diary');
   };
 
-  const handleSaveEntry = () => {
-    if (selectedDate && currentEntry.trim()) {
+  const handleSaveEntry = async () => {
+    if (!selectedDate || !currentEntry.trim()) return;
+
+    const dateStr = selectedDate.fullDate.toISOString().split("T")[0];
+
+    try {
+      const res = await fetch(`${API_BASE}/add_entry/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId,
+          date: dateStr,
+          entry: currentEntry
+        }),
+      });
+      const data = await res.json();
+
+      // update local state too
       setDiaryEntries(prev => ({
         ...prev,
-        [selectedDate.dateKey]: currentEntry
+        [selectedDate.dateKey]: currentEntry,
       }));
+
+      alert("Entry saved ✅");
+    } catch (err) {
+      console.error("Save failed:", err);
     }
-    setCurrentView('calendar');
+
+    setCurrentView("calendar");
   };
 
   const handleBackToCalendar = () => {
@@ -181,9 +198,198 @@ export default function MindLogPage() {
     setCurrentWeekOffset(0);
   };
 
+// Fix the fetchWeeklyReport function - replace the pie chart handling section
+
+const fetchWeeklyReport = async () => {
+  try {
+    // Get the exact week we want to display
+    const weekDays = getWeekDays(currentWeekOffset);
+    const startDate = weekDays[0].toISOString().split('T')[0]; 
+    const endDate = weekDays[6].toISOString().split('T')[0];   
+
+    console.log(`📅 Fetching data for week: ${startDate} to ${endDate}`);
+
+    // Try with date parameters first, fallback to basic call
+    let res;
+    try {
+      res = await fetch(`${API_BASE}/weekly_report/${userId}?start_date=${startDate}&end_date=${endDate}`);
+    } catch {
+      res = await fetch(`${API_BASE}/weekly_report/${userId}`);
+    }
+    
+    const data = await res.json();
+
+    if (data.error) {
+      console.warn("Backend error:", data.error);
+      return;
+    }
+
+    console.log("🔍 Raw backend data:", data);
+
+    // 🔧 FIXED: Handle PIE CHART data with proper parameter mapping
+    if (data.weekly_summary && Array.isArray(data.weekly_summary)) {
+      const pieMap: any = {};
+      const colorMap: any = {
+        "Mood Disturbance": "#ef4444",
+        "Sleep Disruption": "#3b82f6", 
+        "Appetite Issues": "#f59e0b",
+        "Academic Disengagement": "#8b5cf6",
+        "Social Withdrawal": "#10b981",
+      };
+
+      // Create mapping from backend parameter names to frontend keys
+      const parameterMapping: any = {
+        "Mood Disturbance": "moodDisturbance",
+        "Sleep Disruption": "sleepDisruption",
+        "Appetite Issues": "appetiteIssues",
+        "Academic Disengagement": "academicDisengagement",
+        "Social Withdrawal": "socialWithdrawal"
+      };
+
+      data.weekly_summary.forEach((item: any) => {
+        const backendParam = item.Parameter;
+        const frontendKey = parameterMapping[backendParam];
+        
+        if (frontendKey) {
+          pieMap[frontendKey] = [{
+            label: backendParam,
+            value: parseFloat(item["Weekly Score (out of 10)"] || 0),
+            color: colorMap[backendParam] || "#6b7280"
+          }];
+        }
+      });
+
+      console.log("🥧 Pie chart data mapped:", pieMap);
+      setPieChartsData(pieMap);
+    }
+
+    // Handle LINE CHART data (daily records) - keep existing logic
+    let weeklyChartData: any[] = [];
+
+    if (data.daily_records && Array.isArray(data.daily_records)) {
+      console.log(`📊 Backend returned ${data.daily_records.length} daily records`);
+      
+      // FILTER: Only keep records from the current week
+      const filteredRecords = data.daily_records.filter((record: any) => {
+        const recordDate = new Date(record.date);
+        const weekStart = new Date(startDate);
+        const weekEnd = new Date(endDate);
+        
+        return recordDate >= weekStart && recordDate <= weekEnd;
+      });
+
+      console.log(`✅ Filtered to ${filteredRecords.length} records for current week`);
+
+      // SORT by date to ensure correct order
+      filteredRecords.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+      // 🔧 FIXED: Handle multiple possible field name formats from backend
+      weeklyChartData = filteredRecords.map((record: any, index: number) => {
+        const recordDate = new Date(record.date);
+        const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][recordDate.getDay()];
+        
+        return {
+          day: dayName,
+          date: record.date,
+          // Handle both snake_case and camelCase from backend
+          moodDisturbance: parseFloat(
+            record["Mood Disturbance"] || 
+            record.mood_disturbance || 
+            record.moodDisturbance || 
+            0
+          ),
+          sleepDisruption: parseFloat(
+            record["Sleep Disruption"] || 
+            record.sleep_disruption || 
+            record.sleepDisruption || 
+            0
+          ), 
+          appetiteIssues: parseFloat(
+            record["Appetite Issues"] || 
+            record.appetite_issues || 
+            record.appetiteIssues || 
+            0
+          ),
+          academicDisengagement: parseFloat(
+            record["Academic Disengagement"] || 
+            record.academic_disengagement || 
+            record.academicDisengagement || 
+            0
+          ),
+          socialWithdrawal: parseFloat(
+            record["Social Withdrawal"] || 
+            record.social_withdrawal || 
+            record.socialWithdrawal || 
+            0
+          ),
+          average: parseFloat(record.average || record.overall_score || 0)
+        };
+      });
+    }
+
+    // If no data for this week, create empty structure
+    if (weeklyChartData.length === 0) {
+      console.log("⚠️ No data found for this week, creating empty structure");
+      weeklyChartData = weekDays.map((date, index) => {
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return {
+          day: dayNames[index],
+          date: date.toISOString().split('T')[0],
+          moodDisturbance: 0,
+          sleepDisruption: 0,
+          appetiteIssues: 0, 
+          academicDisengagement: 0,
+          socialWithdrawal: 0,
+          average: 0
+        };
+      });
+    }
+
+    console.log("📈 Final chart data:", weeklyChartData);
+    setWeeklyData(weeklyChartData);
+
+  } catch (error) {
+    console.error("❌ API Error:", error);
+    
+    // Create empty week data on error
+    const weekDays = getWeekDays(currentWeekOffset);
+    const emptyData = weekDays.map((date, index) => {
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; 
+      return {
+        day: dayNames[index],
+        date: date.toISOString().split('T')[0],
+        moodDisturbance: 0,
+        sleepDisruption: 0,
+        appetiteIssues: 0,
+        academicDisengagement: 0, 
+        socialWithdrawal: 0,
+        average: 0
+      };
+    });
+    setWeeklyData(emptyData);
+    
+    // Set empty pie chart data on error
+    setPieChartsData({
+      moodDisturbance: [],
+      sleepDisruption: [],
+      appetiteIssues: [],
+      academicDisengagement: [],
+      socialWithdrawal: []
+    });
+  }
+};
+
   const handleViewWeeklyReport = () => {
-    setCurrentView('report');
+    setCurrentView("report");
+    fetchWeeklyReport();
   };
+
+  // 📌 ADDED: useEffect to refetch when week changes
+  useEffect(() => {
+    if (currentView === "report") {
+      fetchWeeklyReport();
+    }
+  }, [currentWeekOffset]);
 
   const getFormattedDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -218,12 +424,19 @@ export default function MindLogPage() {
     return 'Stable';
   };
 
-  const renderPieChart = (data: PieChartItem[], title: string) => {
-    // Create pie chart data for visualization
-    const totalValue = 10; // Assuming scale of 0-10
+  const renderPieChart = (data: PieChartItem[] | undefined, title: string) => {
+    if (!data || data.length === 0) {
+      return (
+        <div className="bg-white rounded-xl p-4 shadow-lg border border-slate-100 flex items-center justify-center">
+          <p className="text-sm text-slate-500">Loading...</p>
+        </div>
+      );
+    }
+
+    const totalValue = 10;
     const pieData = [
-      { name: 'Current Level', value: data[0].value, fill: data[0].color },
-      { name: 'Remaining', value: totalValue - data[0].value, fill: '#f1f5f9' }
+      { name: "Current Level", value: data[0].value, fill: data[0].color },
+      { name: "Remaining", value: totalValue - data[0].value, fill: "#f1f5f9" },
     ];
 
     return (
@@ -287,12 +500,43 @@ export default function MindLogPage() {
 
         {/* Mental Health Dashboard */}
         <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl border border-slate-200">
-          
+
           {/* Week Range Header */}
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-block bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-medium shadow-lg text-sm sm:text-base">
               Mental Health Overview - {getWeekDateRange(currentWeekOffset)}
             </div>
+          </div>
+
+          {/* Week Navigation in Report */}
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <button
+              onClick={handlePreviousWeek}
+              className="p-2 rounded-full hover:bg-white/80 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="text-center">
+              <div className="text-sm font-medium text-slate-600">Week Navigation</div>
+              {!isCurrentWeek() && (
+                <button
+                  onClick={handleCurrentWeek}
+                  className="text-xs text-blue-600 hover:text-blue-700 mt-1"
+                >
+                  Go to current week
+                </button>
+              )}
+            </div>
+            <button
+              onClick={handleNextWeek}
+              className="p-2 rounded-full hover:bg-white/80 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
 
           {/* Activity Graph */}
@@ -317,13 +561,13 @@ export default function MindLogPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={weeklyData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="day" 
+                  <XAxis
+                    dataKey="day"
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 12, fill: '#64748b' }}
                   />
-                  <YAxis 
+                  <YAxis
                     domain={[0, 10]}
                     axisLine={false}
                     tickLine={false}
@@ -344,8 +588,8 @@ export default function MindLogPage() {
                   />
                   <defs>
                     <linearGradient id="activityGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
                   <Line
@@ -376,7 +620,7 @@ export default function MindLogPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600 mb-1">
-                  {(weeklyData.reduce((acc, day) => acc + day.average, 0) / weeklyData.length).toFixed(1)}
+                  {weeklyData.length > 0 ? (weeklyData.reduce((acc, day) => acc + day.average, 0) / weeklyData.length).toFixed(1) : '0.0'}
                 </div>
                 <div className="text-sm text-slate-600">Average Wellbeing</div>
               </div>
@@ -455,7 +699,7 @@ export default function MindLogPage() {
           >
             {/* Red margin line */}
             <div className="absolute left-8 sm:left-16 top-0 bottom-0 w-px bg-red-300"></div>
-           
+
             {/* Holes for ring binding - responsive positioning */}
             <div className="absolute left-2 sm:left-6 top-8 sm:top-12 w-3 h-3 sm:w-4 sm:h-4 bg-gray-200 rounded-full shadow-inner"></div>
             <div className="absolute left-2 sm:left-6 top-20 sm:top-32 w-3 h-3 sm:w-4 sm:h-4 bg-gray-200 rounded-full shadow-inner"></div>
@@ -508,7 +752,7 @@ export default function MindLogPage() {
           Click on any day to write in your diary
         </div>
       </div>
-     
+
       {/* Weekly Calendar */}
       <section className="rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm ring-1 ring-slate-200 p-4 sm:p-6 shadow-xl">
         {/* Week Navigation Header */}
@@ -522,7 +766,7 @@ export default function MindLogPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-           
+
             <div className="text-center">
               <h3 className="text-sm sm:text-lg font-semibold text-slate-800">
                 {getWeekDateRange(currentWeekOffset)}
@@ -536,7 +780,7 @@ export default function MindLogPage() {
                 </button>
               )}
             </div>
-           
+
             <button
               onClick={handleNextWeek}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors"
@@ -546,7 +790,7 @@ export default function MindLogPage() {
               </svg>
             </button>
           </div>
-         
+
           <GradientButton onClick={handleViewWeeklyReport} className="w-full sm:w-auto justify-center">
             <span className="hidden sm:inline">View Weekly Report</span>
             <span className="sm:hidden">Weekly Report</span>
@@ -569,18 +813,17 @@ export default function MindLogPage() {
             const dateKey = getDateKey(date);
             const hasEntry = !!diaryEntries[dateKey];
             const isDateToday = isToday(date);
-           
+
             return (
               <div key={index} className="aspect-square">
                 <button
                   onClick={() => handleDayClick(date)}
-                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${
-                    isDateToday
-                      ? 'bg-gradient-to-br from-blue-500 to-indigo-400 text-white shadow-lg'
-                      : hasEntry
+                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${isDateToday
+                    ? 'bg-gradient-to-br from-blue-500 to-indigo-400 text-white shadow-lg'
+                    : hasEntry
                       ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-md hover:shadow-lg'
                       : 'bg-slate-50 hover:bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300'
-                  }`}
+                    }`}
                 >
                   <span className="font-semibold text-sm sm:text-lg">{date.getDate()}</span>
                   <span className="text-xs opacity-80 mt-0.5 sm:mt-1 hidden sm:block">
@@ -615,7 +858,7 @@ export default function MindLogPage() {
         </div>
       </section>
 
-       {/* Weekly Stats */}
+      {/* Weekly Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg">
           <div className="flex items-center gap-3">
