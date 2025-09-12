@@ -8,6 +8,7 @@ import organizationRoutes from './routes/organization';
 import authMiddleware from './middleware/auth_middleware';
 import adminMiddleware from './middleware/admin_middleware';
 import chatRouter from './routes/chat';
+import adminRoutes from './routes/admin';
 import docChatRouter from './routes/doc_chat';
 const app = express();
 const port = process.env.PORT || 3000;
@@ -47,9 +48,7 @@ app.use(`${BASE_PATH}/test`, testRoutes);
 
 // admin router
 app.use(adminMiddleware);
-app.use(`${BASE_PATH}/admin`, (req, res) => {
-  res.status(200).send('OK2');
-});
+app.use(`${BASE_PATH}/admin`, adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
