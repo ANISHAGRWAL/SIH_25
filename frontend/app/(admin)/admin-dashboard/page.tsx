@@ -16,9 +16,133 @@ import {
   FileText,
 } from "lucide-react";
 
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+// Assuming your actions file is at this path, relative to the page
+import {
+  getStudentsCount,
+  getTestAverages,
+  getSessionsCount,
+} from "../../../actions/admin";
+
+interface ITestAverageData {
+  phqAvg: number;
+  gadAvg: number;
+  pssAvg: number;
+  phqCount: number;
+  gadCount: number;
+  pssCount: number;
+}
+
 export default function AdminDashboard() {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    activeUsers: 0,
+    activeSessions: 0,
+    assessments: 0,
+    phqAvg: 0,
+    gadAvg: 0,
+    pssAvg: 0,
+    phqCount: 0,
+    gadCount: 0,
+    pssCount: 0,
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) {
+        setError("Unauthorized. Please log in as an administrator.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const [studentsRes, averagesRes, sessionsRes] = await Promise.all([
+          getStudentsCount(token),
+          getTestAverages(token),
+          getSessionsCount(token),
+        ]);
+
+        if (studentsRes.ok && averagesRes.ok && sessionsRes.ok) {
+          const { result, counts } = averagesRes.data || {};
+          const activeSessions = sessionsRes.data.count || 0;
+
+          // Correcting the property names to match the backend's response
+          const phqAvg = result?.avgPhqScore || 0;
+          const gadAvg = result?.avgGadScore || 0;
+          const pssAvg = result?.avgPssScore || 0;
+
+          const phqCount = counts?.phqCount || 0;
+          const gadCount = counts?.gadCount || 0;
+          const pssCount = counts?.pssCount || 0;
+
+          setData({
+            activeUsers: studentsRes.data.count,
+            activeSessions: activeSessions,
+            assessments: phqCount + gadCount + pssCount,
+            phqAvg: phqAvg,
+            gadAvg: gadAvg,
+            pssAvg: pssAvg,
+            phqCount: phqCount,
+            gadCount: gadCount,
+            pssCount: pssCount,
+          });
+        } else {
+          setError(
+            studentsRes.error ||
+              averagesRes.error ||
+              sessionsRes.error ||
+              "Failed to load dashboard data."
+          );
+          toast.error(
+            studentsRes.error ||
+              averagesRes.error ||
+              sessionsRes.error ||
+              "Failed to load dashboard data."
+          );
+        }
+      } catch (err: any) {
+        console.error("Dashboard fetch error:", err);
+        setError(err.message || "An unexpected error occurred.");
+        toast.error(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token]);
+
+  if (loading) {
+    return (
+      <div className="text-center text-slate-600 mt-20 text-lg">
+        Loading dashboard data...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 mt-20 text-lg">
+        Error: {error}
+      </div>
+    );
+  }
+
+  const getProgressBarWidth = (score: number, maxScore: number) => {
+    if (maxScore === 0) return "0%";
+    const percentage = (score / maxScore) * 100;
+    return `${Math.min(percentage, 100)}%`;
+  };
+
   return (
-<div className="space-y-4 lg:space-y-6 max-w-7xl mx-auto">      {/* Page Header */}
+    <div className="space-y-4 lg:space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
           <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-400 rounded-lg flex items-center justify-center">
@@ -34,7 +158,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-3">
             <UserCheck className="h-7 w-7 opacity-80" />
             <div className="text-right">
-              <div className="text-2xl font-bold">354</div>
+              <div className="text-2xl font-bold">{data.activeUsers}</div>
               <div className="text-blue-100 text-sm">Active Users</div>
             </div>
           </div>
@@ -48,7 +172,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-3">
             <Clock className="h-7 w-7 text-green-500" />
             <div className="text-right">
-              <div className="text-2xl font-bold text-slate-900">28</div>
+              <div className="text-2xl font-bold text-slate-900">
+                {data.activeSessions}
+              </div>
               <div className="text-slate-500 text-sm">Active Sessions</div>
             </div>
           </div>
@@ -62,7 +188,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-3">
             <FileText className="h-7 w-7 text-purple-500" />
             <div className="text-right">
-              <div className="text-2xl font-bold text-slate-900">381</div>
+              <div className="text-2xl font-bold text-slate-900">
+                {data.assessments}
+              </div>
               <div className="text-slate-500 text-sm">Assessments</div>
             </div>
           </div>
@@ -87,7 +215,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      ---
+      <hr />
 
       {/* Assessment Breakdown */}
       <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
@@ -104,7 +232,9 @@ export default function AdminDashboard() {
                 Depression
               </span>
             </div>
-            <div className="text-3xl font-bold text-blue-900 mb-1">127</div>
+            <div className="text-3xl font-bold text-blue-900 mb-1">
+              {data.phqCount}
+            </div>
             <div className="text-blue-600 text-sm">Completed this week</div>
           </div>
 
@@ -115,7 +245,9 @@ export default function AdminDashboard() {
                 Anxiety
               </span>
             </div>
-            <div className="text-3xl font-bold text-purple-900 mb-1">98</div>
+            <div className="text-3xl font-bold text-purple-900 mb-1">
+              {data.gadCount}
+            </div>
             <div className="text-purple-600 text-sm">Completed this week</div>
           </div>
 
@@ -126,94 +258,15 @@ export default function AdminDashboard() {
                 Stress
               </span>
             </div>
-            <div className="text-3xl font-bold text-green-900 mb-1">156</div>
+            <div className="text-3xl font-bold text-green-900 mb-1">
+              {data.pssCount}
+            </div>
             <div className="text-green-600 text-sm">Completed this week</div>
           </div>
         </div>
       </div>
 
-      ---
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Appointments Management */}
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-slate-50 to-teal-50 border-b border-gray-200 p-5">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-teal-600" />
-              Appointments
-            </h2>
-          </div>
-          <div className="p-5 space-y-3">
-            {[
-              {
-                icon: Eye,
-                label: "View by Counselor",
-                color: "text-blue-500",
-              },
-              {
-                icon: Calendar,
-                label: "Set Availability",
-                color: "text-green-500",
-              },
-              {
-                icon: AlertTriangle,
-                label: "See Missed Sessions",
-                color: "text-orange-500",
-              },
-            ].map((item, index) => (
-              <button
-                key={index}
-                className="w-full flex items-center justify-start space-x-3 px-4 py-2.5 bg-white/60 hover:bg-white border border-gray-200 hover:border-gray-300 rounded-lg transition-all duration-200 hover:shadow-sm hover:-translate-y-0.5"
-              >
-                <item.icon className={`h-4 w-4 ${item.color}`} />
-                <span className="text-slate-700 font-medium">{item.label}</span>
-              </button>
-            ))}
-            <button className="w-full flex items-center justify-center space-x-3 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 font-semibold">
-              <Download className="h-4 w-4" />
-              <span>Export PDF Report</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Assessment Analytics */}
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-slate-50 to-indigo-50 border-b border-gray-200 p-5">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-indigo-600" />
-              Analytics Tools
-            </h2>
-          </div>
-          <div className="p-5 space-y-3">
-            {[
-              {
-                icon: TrendingUp,
-                label: "Heatmap View",
-                color: "text-purple-500",
-              },
-              {
-                icon: ArrowUpRight,
-                label: "Trend Analysis",
-                color: "text-blue-500",
-              },
-            ].map((item, index) => (
-              <button
-                key={index}
-                className="w-full flex items-center justify-start space-x-3 px-4 py-2.5 bg-white/60 hover:bg-white border border-gray-200 hover:border-gray-300 rounded-lg transition-all duration-200 hover:shadow-sm hover:-translate-y-0.5"
-              >
-                <item.icon className={`h-4 w-4 ${item.color}`} />
-                <span className="text-slate-700 font-medium">{item.label}</span>
-              </button>
-            ))}
-            <button className="w-full flex items-center justify-center space-x-3 px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 font-semibold">
-              <Download className="h-4 w-4" />
-              <span>Export Analytics</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      ---
+      <hr />
 
       {/* Forum Monitoring - Enhanced Alert */}
       <div className="bg-white/80 backdrop-blur-sm border border-red-200 shadow-lg rounded-2xl overflow-hidden">
@@ -243,7 +296,8 @@ export default function AdminDashboard() {
               </span>
             </div>
             <p className="text-slate-700 mb-3 text-sm font-medium">
-              "Suicide Mention Detected" - Automated content flagging system triggered
+              "Suicide Mention Detected" - Automated content flagging system
+              triggered
             </p>
             <div className="flex space-x-2">
               <button className="flex items-center space-x-2 px-3 py-1.5 bg-white hover:bg-green-50 hover:text-green-700 border border-gray-200 hover:border-green-300 rounded-lg transition-all duration-200 text-sm font-medium">
@@ -258,12 +312,14 @@ export default function AdminDashboard() {
           </div>
           <button className="w-full flex items-center justify-center space-x-3 px-4 py-2.5 bg-white/60 hover:bg-white border border-gray-200 hover:border-gray-300 rounded-lg transition-all duration-200 hover:shadow-sm font-medium">
             <Eye className="h-4 w-4 text-slate-600" />
-            <span className="text-slate-700 text-sm">View All Flagged Posts</span>
+            <span className="text-slate-700 text-sm">
+              View All Flagged Posts
+            </span>
           </button>
         </div>
       </div>
 
-      ---
+      <hr />
 
       {/* Weekly Trends Chart */}
       <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
@@ -283,14 +339,16 @@ export default function AdminDashboard() {
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-xl font-bold text-slate-900">7.0</div>
+                <div className="text-xl font-bold text-slate-900">
+                  {data.phqAvg.toFixed(1)}
+                </div>
                 <div className="text-xs text-slate-500">avg this week</div>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
                 className="bg-blue-500 h-2.5 rounded-full relative overflow-hidden"
-                style={{ width: "70%" }}
+                style={{ width: getProgressBarWidth(data.phqAvg, 27) }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30"></div>
               </div>
@@ -304,14 +362,16 @@ export default function AdminDashboard() {
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-xl font-bold text-slate-900">5.5</div>
+                <div className="text-xl font-bold text-slate-900">
+                  {data.gadAvg.toFixed(1)}
+                </div>
                 <div className="text-xs text-slate-500">avg this week</div>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
                 className="bg-purple-500 h-2.5 rounded-full relative overflow-hidden"
-                style={{ width: "55%" }}
+                style={{ width: getProgressBarWidth(data.gadAvg, 21) }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30"></div>
               </div>
@@ -320,17 +380,21 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 bg-green-500 rounded"></div>
-                <span className="font-medium text-slate-700 text-sm">PSS (Stress)</span>
+                <span className="font-medium text-slate-700 text-sm">
+                  PSS (Stress)
+                </span>
               </div>
               <div className="text-right">
-                <div className="text-xl font-bold text-slate-900">9.8</div>
+                <div className="text-xl font-bold text-slate-900">
+                  {data.pssAvg.toFixed(1)}
+                </div>
                 <div className="text-xs text-slate-500">avg this week</div>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
                 className="bg-green-500 h-2.5 rounded-full relative overflow-hidden"
-                style={{ width: "98%" }}
+                style={{ width: getProgressBarWidth(data.pssAvg, 40) }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30"></div>
               </div>
