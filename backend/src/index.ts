@@ -11,6 +11,7 @@ import chatRouter from './routes/chat';
 import adminRoutes from './routes/admin';
 import docChatRouter from './routes/doc_chat';
 import journalRoutes from './routes/journal';
+import bookingRoutes from './routes/booking';
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -47,6 +48,7 @@ app.use('/api/chat', chatRouter);
 app.use(`${BASE_PATH}/student`, studentRoutes);
 app.use(`${BASE_PATH}/test`, testRoutes);
 app.use(`${BASE_PATH}/journal`, journalRoutes);
+app.use(`${BASE_PATH}/booking`, bookingRoutes);
 
 // admin router
 app.use(adminMiddleware);

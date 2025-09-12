@@ -225,182 +225,107 @@ export default function MindLogPage() {
 
   const fetchWeeklyReport = async () => {
     try {
-      // Get the exact week we want to display
       const weekDays = getWeekDays(currentWeekOffset);
       const startDate = weekDays[0].toISOString().split("T")[0];
       const endDate = weekDays[6].toISOString().split("T")[0];
+      const token = localStorage.getItem("token") || "";
 
       console.log(`📅 Fetching data for week: ${startDate} to ${endDate}`);
 
-      // Try with date parameters first, fallback to basic call
-      let res;
-      const token = localStorage.getItem("token") || "";
-      try {
-        res = await fetch(
-          `${API_BASE}/api/journal/report?start_date=${startDate}&end_date=${endDate}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              Authorization: token ? `Bearer ${token}` : "",
-            }),
-          }
-        );
-      } catch {
-        res = await fetch(`${API_BASE}/api/journal/report`, {
+      const res = await fetch(
+        `${API_BASE}/api/journal/report?startDate=${startDate}&endDate=${endDate}`,
+        {
           method: "GET",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            Authorization: token ? `Bearer ${token}` : "",
-          }),
-        });
-      }
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await res.json();
 
-      if (data.error) {
-        console.warn("Backend error:", data.error);
+      if (!data.success) {
+        console.warn("Backend error:", data);
         return;
       }
 
       console.log("🔍 Raw backend data:", data);
 
-      // 🔧 FIXED: Handle PIE CHART data with proper parameter mapping
-      if (data.weekly_summary && Array.isArray(data.weekly_summary)) {
-        const pieMap: any = {};
-        const colorMap: any = {
-          "Mood Disturbance": "#ef4444",
-          "Sleep Disruption": "#3b82f6",
-          "Appetite Issues": "#f59e0b",
-          "Academic Disengagement": "#8b5cf6",
-          "Social Withdrawal": "#10b981",
-        };
+      const trend = data.data.trend || [];
+      const summary = data.data.summary || [];
 
-        // Create mapping from backend parameter names to frontend keys
-        const parameterMapping: any = {
-          "Mood Disturbance": "moodDisturbance",
-          "Sleep Disruption": "sleepDisruption",
-          "Appetite Issues": "appetiteIssues",
-          "Academic Disengagement": "academicDisengagement",
-          "Social Withdrawal": "socialWithdrawal",
-        };
+      // Map pie chart data from summary
+      const colorMap: Record<string, string> = {
+        "Mood Disturbance": "#ef4444",
+        "Sleep Disruption": "#3b82f6",
+        "Appetite Issues": "#f59e0b",
+        "Academic Disengagement": "#8b5cf6",
+        "Social Withdrawal": "#10b981",
+      };
 
-        data.weekly_summary.forEach((item: any) => {
-          const backendParam = item.Parameter;
-          const frontendKey = parameterMapping[backendParam];
+      const parameterMapping: Record<string, keyof PieChartsData> = {
+        "Mood Disturbance": "moodDisturbance",
+        "Sleep Disruption": "sleepDisruption",
+        "Appetite Issues": "appetiteIssues",
+        "Academic Disengagement": "academicDisengagement",
+        "Social Withdrawal": "socialWithdrawal",
+      };
 
-          if (frontendKey) {
-            pieMap[frontendKey] = [
-              {
-                label: backendParam,
-                value: parseFloat(item["Weekly Score (out of 10)"] || 0),
-                color: colorMap[backendParam] || "#6b7280",
-              },
-            ];
-          }
-        });
+      const pieMap: Partial<PieChartsData> = {
+        moodDisturbance: [],
+        sleepDisruption: [],
+        appetiteIssues: [],
+        academicDisengagement: [],
+        socialWithdrawal: [],
+      };
 
-        console.log("🥧 Pie chart data mapped:", pieMap);
-        setPieChartsData(pieMap);
-      }
-
-      // Handle LINE CHART data (daily records) - keep existing logic
-      let weeklyChartData: any[] = [];
-
-      if (data.daily_records && Array.isArray(data.daily_records)) {
-        console.log(
-          `📊 Backend returned ${data.daily_records.length} daily records`
-        );
-
-        // FILTER: Only keep records from the current week
-        const filteredRecords = data.daily_records.filter((record: any) => {
-          const recordDate = new Date(record.date);
-          const weekStart = new Date(startDate);
-          const weekEnd = new Date(endDate);
-
-          return recordDate >= weekStart && recordDate <= weekEnd;
-        });
-
-        console.log(
-          `✅ Filtered to ${filteredRecords.length} records for current week`
-        );
-
-        // SORT by date to ensure correct order
-        filteredRecords.sort(
-          (a: any, b: any) =>
-            new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-
-        // 🔧 FIXED: Handle multiple possible field name formats from backend
-        weeklyChartData = filteredRecords.map((record: any, index: number) => {
-          const recordDate = new Date(record.date);
-          const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
-            recordDate.getDay()
+      summary.forEach((item: any) => {
+        const frontendKey = parameterMapping[item.parameter];
+        if (frontendKey) {
+          pieMap[frontendKey] = [
+            {
+              label: item.parameter,
+              value: parseFloat(item.avg) || 0,
+              color: colorMap[item.parameter] || "#6b7280",
+            },
           ];
+        }
+      });
 
-          return {
-            day: dayName,
-            date: record.date,
-            // Handle both snake_case and camelCase from backend
-            moodDisturbance: parseFloat(
-              record["Mood Disturbance"] ||
-                record.mood_disturbance ||
-                record.moodDisturbance ||
-                0
-            ),
-            sleepDisruption: parseFloat(
-              record["Sleep Disruption"] ||
-                record.sleep_disruption ||
-                record.sleepDisruption ||
-                0
-            ),
-            appetiteIssues: parseFloat(
-              record["Appetite Issues"] ||
-                record.appetite_issues ||
-                record.appetiteIssues ||
-                0
-            ),
-            academicDisengagement: parseFloat(
-              record["Academic Disengagement"] ||
-                record.academic_disengagement ||
-                record.academicDisengagement ||
-                0
-            ),
-            socialWithdrawal: parseFloat(
-              record["Social Withdrawal"] ||
-                record.social_withdrawal ||
-                record.socialWithdrawal ||
-                0
-            ),
-            average: parseFloat(record.average || record.overall_score || 0),
-          };
-        });
-      }
+      console.log("🥧 Pie chart data mapped:", pieMap);
+      setPieChartsData(pieMap);
 
-      // If no data for this week, create empty structure
-      if (weeklyChartData.length === 0) {
-        console.log("⚠️ No data found for this week, creating empty structure");
-        weeklyChartData = weekDays.map((date, index) => {
-          const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-          return {
-            day: dayNames[index],
-            date: date.toISOString().split("T")[0],
-            moodDisturbance: 0,
-            sleepDisruption: 0,
-            appetiteIssues: 0,
-            academicDisengagement: 0,
-            socialWithdrawal: 0,
-            average: 0,
-          };
-        });
-      }
+      // Map line chart data from trend
+      let weeklyChartData = weekDays.map((date) => {
+        const dateStr = date.toISOString().split("T")[0];
+        const record = trend.find((t: any) => t.date === dateStr);
 
-      console.log("📈 Final chart data:", weeklyChartData);
+        return {
+          day: days[date.getDay()],
+          date: dateStr,
+          moodDisturbance: record ? parseFloat(record.mood_disturbance) : 0,
+          sleepDisruption: record ? parseFloat(record.sleep_disruption) : 0,
+          appetiteIssues: record ? parseFloat(record.appetite_issues) : 0,
+          academicDisengagement: record
+            ? parseFloat(record.academic_disengagement)
+            : 0,
+          socialWithdrawal: record ? parseFloat(record.social_withdrawal) : 0,
+          average: record
+            ? (parseFloat(record.mood_disturbance) +
+                parseFloat(record.sleep_disruption) +
+                parseFloat(record.appetite_issues) +
+                parseFloat(record.academic_disengagement) +
+                parseFloat(record.social_withdrawal)) /
+              5
+            : 0,
+        };
+      });
+
       setWeeklyData(weeklyChartData);
     } catch (error) {
       console.error("❌ API Error:", error);
 
-      // Create empty week data on error
       const weekDays = getWeekDays(currentWeekOffset);
       const emptyData = weekDays.map((date, index) => {
         const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -417,7 +342,6 @@ export default function MindLogPage() {
       });
       setWeeklyData(emptyData);
 
-      // Set empty pie chart data on error
       setPieChartsData({
         moodDisturbance: [],
         sleepDisruption: [],
@@ -436,6 +360,15 @@ export default function MindLogPage() {
   // 📌 ADDED: useEffect to refetch when week changes
   useEffect(() => {
     if (currentView === "report") {
+      console.log("🔄 Week changed, refetching report...");
+      // setWeeklyData([]);
+      // setPieChartsData({
+      //   moodDisturbance: [],
+      //   sleepDisruption: [],
+      //   appetiteIssues: [],
+      //   academicDisengagement: [],
+      //   socialWithdrawal: [],
+      // });
       fetchWeeklyReport();
     }
   }, [currentWeekOffset]);
@@ -479,7 +412,7 @@ export default function MindLogPage() {
     if (!data || data.length === 0) {
       return (
         <div className="bg-white rounded-xl p-4 shadow-lg border border-slate-100 flex items-center justify-center">
-          <p className="text-sm text-slate-500">Loading...</p>
+          <p className="text-sm text-slate-500">No Data</p>
         </div>
       );
     }

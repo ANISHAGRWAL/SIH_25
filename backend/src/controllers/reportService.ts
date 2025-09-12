@@ -19,7 +19,7 @@ export async function generateWeeklyReport(
   endDate?: string,
 ) {
   const conditions = [eq(journalEntries.studentId, authUser.id)];
-
+  console.log(startDate, endDate);
   if (startDate) {
     conditions.push(gte(journalEntries.date, new Date(startDate)));
   } else {
@@ -71,7 +71,7 @@ export async function generateWeeklyReport(
       avg: +(total / data.length).toFixed(2),
     };
   });
-
+  console.log('Generated report summary:', summary);
   return {
     trend: data.map((d) => ({
       ...d,
