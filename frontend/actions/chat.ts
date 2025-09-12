@@ -6,6 +6,7 @@ type ChatResponse = {
 };
 
 export async function chat(
+  token: string,
   sessionId: string,
   query: string
 ): Promise<ChatResponse> {
@@ -14,6 +15,7 @@ export async function chat(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         session_id: sessionId,

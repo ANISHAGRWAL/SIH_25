@@ -16,6 +16,7 @@ export async function saveJournalEntry(
       .values({
         studentId: authUser.id,
         content: entryText,
+        organizationId: authUser.organizationId,
       })
       .returning();
 

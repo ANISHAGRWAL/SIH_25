@@ -25,6 +25,7 @@ export const journalEntries = pgTable(
     academic_disengagement: doublePrecision('academic_disengagement'),
     social_withdrawal: doublePrecision('social_withdrawal'),
     date: timestamp('taken_on', { withTimezone: false }).notNull().defaultNow(),
+    organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
     updatedAt: timestamp('updated_at')
       .default(sql`CURRENT_TIMESTAMP`)
