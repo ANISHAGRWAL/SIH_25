@@ -1,16 +1,39 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Calendar, Shield, AlertTriangle, CheckCircle, Clock, User, MessageCircle, Video, MapPin } from "lucide-react"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Calendar,
+  Shield,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  User,
+  MessageCircle,
+  Video,
+  MapPin,
+} from "lucide-react";
+import { submitBooking } from "@/actions/student";
 
 export default function BookSessionPage() {
   const [formData, setFormData] = useState({
@@ -21,21 +44,59 @@ export default function BookSessionPage() {
     preferredDate: "",
     preferredTime: "",
     additionalNotes: "",
-  })
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    console.log("Booking submission:", formData)
-    setIsSubmitted(true)
-  }
+  const handleSubmit = async () => {
+    console.log("Booking submission:", formData);
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("You need to be logged in to submit a booking.");
+      return;
+    }
+
+    const bookingPayload = {
+      mode: formData.mode,
+      urgency: formData.urgency,
+      preferredDate: formData.preferredDate,
+      preferredTime: formData.preferredTime,
+      additionalNotes: formData.additionalNotes,
+      sessionType: formData.sessionType,
+      reason: formData.reason,
+    };
+
+    try {
+      setLoading(true); // if you have a loading state
+      const res = await submitBooking(token, bookingPayload);
+      setLoading(false);
+
+      if (res.ok) {
+        alert("Booking submitted successfully!");
+        setIsSubmitted(true);
+        // reset form or navigate here if needed
+      } else {
+        alert(`Booking failed: ${res.error || "Unknown error"}`);
+      }
+    } catch (err: any) {
+      setLoading(false);
+      alert(`An error occurred: ${err.message || err}`);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const canProceedToStep2 = formData.sessionType && formData.reason && formData.mode
-  const canSubmit = canProceedToStep2 && formData.urgency && formData.preferredDate && formData.preferredTime
+  const canProceedToStep2 =
+    formData.sessionType && formData.reason && formData.mode;
+  const canSubmit =
+    canProceedToStep2 &&
+    formData.urgency &&
+    formData.preferredDate &&
+    formData.preferredTime;
 
   if (isSubmitted) {
     return (
@@ -50,7 +111,8 @@ export default function BookSessionPage() {
               Request Submitted Successfully
             </h2>
             <p className="text-slate-700 mb-6 text-base md:text-lg">
-              Your session request has been securely sent to our mental health team.
+              Your session request has been securely sent to our mental health
+              team.
             </p>
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border border-green-200">
               <p className="text-sm text-green-700 font-medium flex items-center justify-center gap-2">
@@ -59,12 +121,13 @@ export default function BookSessionPage() {
               </p>
             </div>
             <p className="text-slate-600 text-sm mb-8">
-              You'll receive confirmation within 24 hours. For urgent matters, contact our crisis helpline immediately.
+              You'll receive confirmation within 24 hours. For urgent matters,
+              contact our crisis helpline immediately.
             </p>
             <Button
               onClick={() => {
-                setIsSubmitted(false)
-                setCurrentStep(1)
+                setIsSubmitted(false);
+                setCurrentStep(1);
                 setFormData({
                   sessionType: "",
                   reason: "",
@@ -73,7 +136,7 @@ export default function BookSessionPage() {
                   preferredDate: "",
                   preferredTime: "",
                   additionalNotes: "",
-                })
+                });
               }}
               className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 py-3 text-base md:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200"
             >
@@ -82,7 +145,7 @@ export default function BookSessionPage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -97,25 +160,36 @@ export default function BookSessionPage() {
             </h1>
           </div>
           <p className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed px-2">
-            Connect with our mental health professionals in a secure, confidential environment.
+            Connect with our mental health professionals in a secure,
+            confidential environment.
           </p>
         </div>
 
         {/* Progress Indicator */}
         <div className="mb-6">
           <div className="flex items-center justify-center space-x-2 sm:space-x-4">
-            <div className={`flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-full transition-all duration-300 ${
-              currentStep >= 1 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
-            }`}>
+            <div
+              className={`flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-full transition-all duration-300 ${
+                currentStep >= 1
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-slate-100 text-slate-400"
+              }`}
+            >
               <User className="h-4 w-4" />
               <span className="font-medium text-sm">Details</span>
             </div>
-            <div className={`h-1 w-8 rounded transition-all duration-300 ${
-              currentStep >= 2 ? 'bg-blue-500' : 'bg-slate-300'
-            }`}></div>
-            <div className={`flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-full transition-all duration-300 ${
-              currentStep >= 2 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
-            }`}>
+            <div
+              className={`h-1 w-8 rounded transition-all duration-300 ${
+                currentStep >= 2 ? "bg-blue-500" : "bg-slate-300"
+              }`}
+            ></div>
+            <div
+              className={`flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-full transition-all duration-300 ${
+                currentStep >= 2
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-slate-100 text-slate-400"
+              }`}
+            >
               <Calendar className="h-4 w-4" />
               <span className="font-medium text-sm">Schedule</span>
             </div>
@@ -153,46 +227,75 @@ export default function BookSessionPage() {
             <CardDescription className="text-indigo-100">
               {currentStep === 1
                 ? "Help us understand what kind of support you're looking for."
-                : "Select your preferred date, time, and any additional preferences."
-              }
+                : "Select your preferred date, time, and any additional preferences."}
             </CardDescription>
           </CardHeader>
-         
+
           <CardContent className="p-4 md:p-6">
             <div className="space-y-6">
               {currentStep === 1 && (
                 <div className="space-y-6">
                   {/* Session Type */}
                   <div className="space-y-3">
-                    <Label className="text-base md:text-lg font-semibold text-slate-800">What type of session do you need?</Label>
-                    <Select onValueChange={(value) => handleInputChange("sessionType", value)} value={formData.sessionType}>
+                    <Label className="text-base md:text-lg font-semibold text-slate-800">
+                      What type of session do you need?
+                    </Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleInputChange("sessionType", value)
+                      }
+                      value={formData.sessionType}
+                    >
                       <SelectTrigger className="w-full h-12 text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors">
                         <SelectValue placeholder="Choose the type of support" />
                       </SelectTrigger>
                       <SelectContent>
-                         <SelectItem value="individual-counseling">💬 Individual Counseling</SelectItem>
-                         <SelectItem value="crisis-support">🚨 Crisis Support</SelectItem>
-                         <SelectItem value="academic-stress">📚 Academic Stress Management</SelectItem>
-                         <SelectItem value="anxiety-depression">🌱 Anxiety & Depression Support</SelectItem>
-                         <SelectItem value="relationship-issues">❤️ Relationship & Social Issues</SelectItem>
-                         <SelectItem value="career-guidance">🎯 Career & Future Planning</SelectItem>
-                         <SelectItem value="trauma-support">🛡️ Trauma & PTSD Support</SelectItem>
-                         <SelectItem value="group-therapy">👥 Group Therapy Session</SelectItem>
-                         <SelectItem value="other">✨ Other (please specify below)</SelectItem>
+                        <SelectItem value="individual-counseling">
+                          💬 Individual Counseling
+                        </SelectItem>
+                        <SelectItem value="crisis-support">
+                          🚨 Crisis Support
+                        </SelectItem>
+                        <SelectItem value="academic-stress">
+                          📚 Academic Stress Management
+                        </SelectItem>
+                        <SelectItem value="anxiety-depression">
+                          🌱 Anxiety & Depression Support
+                        </SelectItem>
+                        <SelectItem value="relationship-issues">
+                          ❤️ Relationship & Social Issues
+                        </SelectItem>
+                        <SelectItem value="career-guidance">
+                          🎯 Career & Future Planning
+                        </SelectItem>
+                        <SelectItem value="trauma-support">
+                          🛡️ Trauma & PTSD Support
+                        </SelectItem>
+                        <SelectItem value="group-therapy">
+                          👥 Group Therapy Session
+                        </SelectItem>
+                        <SelectItem value="other">
+                          ✨ Other (please specify below)
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Reason */}
                   <div className="space-y-3">
-                    <Label htmlFor="reason" className="text-base md:text-lg font-semibold text-slate-800">
+                    <Label
+                      htmlFor="reason"
+                      className="text-base md:text-lg font-semibold text-slate-800"
+                    >
                       What would you like to discuss?
                     </Label>
                     <Textarea
                       id="reason"
                       placeholder="Share what's on your mind..."
                       value={formData.reason}
-                      onChange={(e) => handleInputChange("reason", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("reason", e.target.value)
+                      }
                       className="min-h-[100px] resize-none text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
                       required
                     />
@@ -200,26 +303,36 @@ export default function BookSessionPage() {
 
                   {/* Session Mode - UPDATED WITH BETTER VISUAL FEEDBACK */}
                   <div className="space-y-3">
-                    <Label className="text-base md:text-lg font-semibold text-slate-800">How would you prefer to meet?</Label>
+                    <Label className="text-base md:text-lg font-semibold text-slate-800">
+                      How would you prefer to meet?
+                    </Label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Virtual Session Option */}
-                      <div 
+                      <div
                         onClick={() => handleInputChange("mode", "virtual")}
                         className={`cursor-pointer transition-all duration-200 rounded-xl p-4 md:p-5 border-2 ${
-                          formData.mode === "virtual" 
-                            ? "border-blue-600 bg-blue-50 shadow-lg ring-2 ring-blue-200" 
+                          formData.mode === "virtual"
+                            ? "border-blue-600 bg-blue-50 shadow-lg ring-2 ring-blue-200"
                             : "border-slate-300 bg-white hover:border-blue-400 hover:shadow-md"
                         }`}
                       >
                         <div className="flex items-center space-x-4">
                           <Video className="h-7 w-7 md:h-8 md:w-8 text-blue-600 flex-shrink-0" />
                           <div className="flex-grow">
-                            <div className="font-semibold text-slate-800">Virtual Session</div>
-                            <div className="text-slate-600 text-sm">Secure video call</div>
+                            <div className="font-semibold text-slate-800">
+                              Virtual Session
+                            </div>
+                            <div className="text-slate-600 text-sm">
+                              Secure video call
+                            </div>
                           </div>
-                          <div className={`transition-all duration-200 ${
-                            formData.mode === "virtual" ? "opacity-100 scale-100" : "opacity-0 scale-75"
-                          }`}>
+                          <div
+                            className={`transition-all duration-200 ${
+                              formData.mode === "virtual"
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-75"
+                            }`}
+                          >
                             <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
@@ -228,23 +341,31 @@ export default function BookSessionPage() {
                       </div>
 
                       {/* In-Person Session Option */}
-                      <div 
+                      <div
                         onClick={() => handleInputChange("mode", "physical")}
                         className={`cursor-pointer transition-all duration-200 rounded-xl p-4 md:p-5 border-2 ${
-                          formData.mode === "physical" 
-                            ? "border-purple-600 bg-purple-50 shadow-lg ring-2 ring-purple-200" 
+                          formData.mode === "physical"
+                            ? "border-purple-600 bg-purple-50 shadow-lg ring-2 ring-purple-200"
                             : "border-slate-300 bg-white hover:border-purple-400 hover:shadow-md"
                         }`}
                       >
                         <div className="flex items-center space-x-4">
                           <MapPin className="h-7 w-7 md:h-8 md:w-8 text-purple-600 flex-shrink-0" />
                           <div className="flex-grow">
-                            <div className="font-semibold text-slate-800">In-Person Session</div>
-                            <div className="text-slate-600 text-sm">At our center</div>
+                            <div className="font-semibold text-slate-800">
+                              In-Person Session
+                            </div>
+                            <div className="text-slate-600 text-sm">
+                              At our center
+                            </div>
                           </div>
-                          <div className={`transition-all duration-200 ${
-                            formData.mode === "physical" ? "opacity-100 scale-100" : "opacity-0 scale-75"
-                          }`}>
+                          <div
+                            className={`transition-all duration-200 ${
+                              formData.mode === "physical"
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-75"
+                            }`}
+                          >
                             <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
@@ -272,76 +393,102 @@ export default function BookSessionPage() {
                 <div className="space-y-6">
                   {/* Urgency Level - UPDATED WITH BETTER VISUAL FEEDBACK */}
                   <div className="space-y-3">
-                    <Label className="text-base md:text-lg font-semibold text-slate-800">How soon do you need this session?</Label>
+                    <Label className="text-base md:text-lg font-semibold text-slate-800">
+                      How soon do you need this session?
+                    </Label>
                     <div className="space-y-3">
                       {/* Routine Option */}
-                      <div 
+                      <div
                         onClick={() => handleInputChange("urgency", "routine")}
                         className={`cursor-pointer transition-all duration-200 rounded-xl p-4 border-2 ${
-                          formData.urgency === "routine" 
-                            ? "border-green-600 bg-green-50 shadow-lg ring-2 ring-green-200" 
+                          formData.urgency === "routine"
+                            ? "border-green-600 bg-green-50 shadow-lg ring-2 ring-green-200"
                             : "border-green-300 bg-white hover:border-green-400 hover:shadow-md"
                         }`}
                       >
                         <div className="flex items-center space-x-4">
                           <Clock className="h-6 w-6 text-green-600 flex-shrink-0" />
                           <div className="flex-grow">
-                            <div className="font-semibold text-green-700 text-base mb-1">Routine</div>
-                            <div className="text-slate-600 text-sm">Within 1-2 weeks</div>
+                            <div className="font-semibold text-green-700 text-base mb-1">
+                              Routine
+                            </div>
+                            <div className="text-slate-600 text-sm">
+                              Within 1-2 weeks
+                            </div>
                           </div>
-                          <div className={`transition-all duration-200 ${
-                            formData.urgency === "routine" ? "opacity-100 scale-100" : "opacity-0 scale-75"
-                          }`}>
+                          <div
+                            className={`transition-all duration-200 ${
+                              formData.urgency === "routine"
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-75"
+                            }`}
+                          >
                             <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Priority Option */}
-                      <div 
+                      <div
                         onClick={() => handleInputChange("urgency", "priority")}
                         className={`cursor-pointer transition-all duration-200 rounded-xl p-4 border-2 ${
-                          formData.urgency === "priority" 
-                            ? "border-orange-600 bg-orange-50 shadow-lg ring-2 ring-orange-200" 
+                          formData.urgency === "priority"
+                            ? "border-orange-600 bg-orange-50 shadow-lg ring-2 ring-orange-200"
                             : "border-orange-300 bg-white hover:border-orange-400 hover:shadow-md"
                         }`}
                       >
                         <div className="flex items-center space-x-4">
                           <Clock className="h-6 w-6 text-orange-600 flex-shrink-0" />
                           <div className="flex-grow">
-                            <div className="font-semibold text-orange-700 text-base mb-1">Priority</div>
-                            <div className="text-slate-600 text-sm">Within 3-5 days</div>
+                            <div className="font-semibold text-orange-700 text-base mb-1">
+                              Priority
+                            </div>
+                            <div className="text-slate-600 text-sm">
+                              Within 3-5 days
+                            </div>
                           </div>
-                          <div className={`transition-all duration-200 ${
-                            formData.urgency === "priority" ? "opacity-100 scale-100" : "opacity-0 scale-75"
-                          }`}>
+                          <div
+                            className={`transition-all duration-200 ${
+                              formData.urgency === "priority"
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-75"
+                            }`}
+                          >
                             <div className="w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Urgent Option */}
-                      <div 
+                      <div
                         onClick={() => handleInputChange("urgency", "urgent")}
                         className={`cursor-pointer transition-all duration-200 rounded-xl p-4 border-2 ${
-                          formData.urgency === "urgent" 
-                            ? "border-red-700 bg-red-50 shadow-lg ring-2 ring-red-200" 
+                          formData.urgency === "urgent"
+                            ? "border-red-700 bg-red-50 shadow-lg ring-2 ring-red-200"
                             : "border-red-300 bg-white hover:border-red-500 hover:shadow-md"
                         }`}
                       >
                         <div className="flex items-center space-x-4">
                           <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
                           <div className="flex-grow">
-                            <div className="font-semibold text-red-700 text-base mb-1">Urgent</div>
-                            <div className="text-red-600 text-sm">Within 24-48 hours</div>
+                            <div className="font-semibold text-red-700 text-base mb-1">
+                              Urgent
+                            </div>
+                            <div className="text-red-600 text-sm">
+                              Within 24-48 hours
+                            </div>
                           </div>
-                          <div className={`transition-all duration-200 ${
-                            formData.urgency === "urgent" ? "opacity-100 scale-100" : "opacity-0 scale-75"
-                          }`}>
+                          <div
+                            className={`transition-all duration-200 ${
+                              formData.urgency === "urgent"
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-75"
+                            }`}
+                          >
                             <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
@@ -354,24 +501,37 @@ export default function BookSessionPage() {
                   {/* Date & Time */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="date" className="text-base md:text-lg font-semibold text-slate-800">
+                      <Label
+                        htmlFor="date"
+                        className="text-base md:text-lg font-semibold text-slate-800"
+                      >
                         Preferred Date
                       </Label>
                       <Input
                         id="date"
                         type="date"
                         value={formData.preferredDate}
-                        onChange={(e) => handleInputChange("preferredDate", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("preferredDate", e.target.value)
+                        }
                         min={new Date().toISOString().split("T")[0]}
                         className="h-12 text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="time" className="text-base md:text-lg font-semibold text-slate-800">
+                      <Label
+                        htmlFor="time"
+                        className="text-base md:text-lg font-semibold text-slate-800"
+                      >
                         Preferred Time
                       </Label>
-                      <Select onValueChange={(value) => handleInputChange("preferredTime", value)} value={formData.preferredTime}>
+                      <Select
+                        onValueChange={(value) =>
+                          handleInputChange("preferredTime", value)
+                        }
+                        value={formData.preferredTime}
+                      >
                         <SelectTrigger className="h-12 text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors">
                           <SelectValue placeholder="Choose a time" />
                         </SelectTrigger>
@@ -391,14 +551,19 @@ export default function BookSessionPage() {
 
                   {/* Additional Notes */}
                   <div className="space-y-2">
-                    <Label htmlFor="notes" className="text-base md:text-lg font-semibold text-slate-800">
+                    <Label
+                      htmlFor="notes"
+                      className="text-base md:text-lg font-semibold text-slate-800"
+                    >
                       Additional Notes (Optional)
                     </Label>
                     <Textarea
                       id="notes"
                       placeholder="Any specific preferences..."
                       value={formData.additionalNotes}
-                      onChange={(e) => handleInputChange("additionalNotes", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("additionalNotes", e.target.value)
+                      }
                       className="min-h-[80px] resize-none text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
                     />
                   </div>
@@ -434,7 +599,9 @@ export default function BookSessionPage() {
             <div className="flex items-start gap-4">
               <AlertTriangle className="h-6 w-6 text-red-600 mt-1 flex-shrink-0" />
               <div>
-                <h4 className="font-bold text-red-800 text-lg mb-2">Need Immediate Help?</h4>
+                <h4 className="font-bold text-red-800 text-lg mb-2">
+                  Need Immediate Help?
+                </h4>
                 <p className="text-red-700 mb-3">
                   If you're in crisis, please reach out now:
                 </p>
@@ -452,5 +619,5 @@ export default function BookSessionPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
