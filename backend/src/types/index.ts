@@ -2,7 +2,7 @@ import { type Request, Response } from 'express';
 import { IRole } from '../db/schema/user';
 import { IPhq } from '../db/schema/phq'; // Make sure to import these types
 import { IGad } from '../db/schema/gad';
-import { IPss } from '../db/schema/pss'
+import { IPss } from '../db/schema/pss';
 
 export interface IApiResponse {
   success: boolean;
@@ -36,4 +36,15 @@ export interface ITestHistory {
   phq: ITestResult;
   gad: ITestResult;
   pss: ITestResult;
+}
+
+export interface JournalEntry {
+  entryId: number;
+  userId: string;
+  date: string;
+  entry: string;
+}
+
+export interface Scores {
+  [key: string]: number;
 }
