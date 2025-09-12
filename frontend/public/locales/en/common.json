@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact",
+    "blogs": "Blogs",
+    "getStarted": "Get Started",
+    "menu": "Menu"
+  },
+  "blog": {
+    "title": "Mental Health Resources",
+    "subtitle": "Stay updated with the latest insights, research, and practical tips for mental health and well-being. Discover evidence-based approaches to support your journey.",
+    "readMore": "Read More",
+    "shareText": "Share:",
+    "otherBlogs": "Other Blogs",
+    "backToBlogs": "← Back to All Blogs",
+    "category": {
+      "mentalHealth": "Mental Health",
+      "wellness": "Wellness",
+      "community": "Community",
+      "health": "Health",
+      "expression": "Expression",
+      "growth": "Growth",
+      "anxiety": "Anxiety",
+      "mindfulness": "Mindfulness",
+      "selfCare": "Self-Care"
+    }
+  },
+  "language": {
+    "select": "Select Language",
+    "english": "English",
+    "hindi": "हिंदी",
+    "bengali": "বাংলা",
+    "tamil": "தமிழ்",
+    "telugu": "తెలుగు",
+    "punjabi": "ਪੰਜਾਬੀ"
+  }
+}

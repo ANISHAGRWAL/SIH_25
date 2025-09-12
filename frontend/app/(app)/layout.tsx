@@ -12,6 +12,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] =
     React.useState(false);
+    if(!pathname) return null;
 
   const { user } = useAuth();
 

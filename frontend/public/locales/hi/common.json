@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "about": "हमारे बारे में",
+    "services": "सेवाएं",
+    "contact": "संपर्क",
+    "blogs": "ब्लॉग",
+    "getStarted": "शुरू करें",
+    "menu": "मेनू"
+  },
+  "blog": {
+    "title": "मानसिक स्वास्थ्य संसाधन",
+    "subtitle": "मानसिक स्वास्थ्य और कल्याण के लिए नवीनतम अंतर्दृष्टि, अनुसंधान और व्यावहारिक सुझावों के साथ अपडेट रहें।",
+    "readMore": "और पढ़ें",
+    "shareText": "साझा करें:",
+    "otherBlogs": "अन्य ब्लॉग",
+    "backToBlogs": "← सभी ब्लॉग पर वापस जाएं",
+    "category": {
+      "mentalHealth": "मानसिक स्वास्थ्य",
+      "wellness": "कल्याण",
+      "community": "समुदाय",
+      "health": "स्वास्थ्य",
+      "expression": "अभिव्यक्ति",
+      "growth": "विकास",
+      "anxiety": "चिंता",
+      "mindfulness": "सचेतता",
+      "selfCare": "स्व-देखभाल"
+    }
+  },
+  "language": {
+    "select": "भाषा चुनें",
+    "english": "English",
+    "hindi": "हिंदी",
+    "bengali": "বাংলা",
+    "tamil": "தமிழ்",
+    "telugu": "తెలుగు",
+    "punjabi": "ਪੰਜਾਬੀ"
+  }
+}

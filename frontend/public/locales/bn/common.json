@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "about": "আমাদের সম্পর্কে",
+    "services": "সেবাসমূহ",
+    "contact": "যোগাযোগ",
+    "blogs": "ব্লগ",
+    "getStarted": "শুরু করুন",
+    "menu": "মেনু"
+  },
+  "blog": {
+    "title": "মানসিক স্বাস্থ্য সম্পদ",
+    "subtitle": "মানসিক স্বাস্থ্য এবং সুস্থতার জন্য সর্বশেষ অন্তর্দৃষ্টি, গবেষণা এবং ব্যবহারিক টিপস দিয়ে আপডেট থাকুন।",
+    "readMore": "আরও পড়ুন",
+    "shareText": "শেয়ার করুন:",
+    "otherBlogs": "অন্যান্য ব্লগ",
+    "backToBlogs": "← সব ব্লগে ফিরে যান",
+    "category": {
+      "mentalHealth": "মানসিক স্বাস্থ্য",
+      "wellness": "সুস্থতা",
+      "community": "সম্প্রদায়",
+      "health": "স্বাস্থ্য",
+      "expression": "অভিব্যক্তি",
+      "growth": "বৃদ্ধি",
+      "anxiety": "উদ্বেগ",
+      "mindfulness": "সচেতনতা",
+      "selfCare": "স্ব-যত্ন"
+    }
+  },
+  "language": {
+    "select": "ভাষা নির্বাচন করুন",
+    "english": "English",
+    "hindi": "हिंदी",
+    "bengali": "বাংলা",
+    "tamil": "தமிழ்",
+    "telugu": "తెలుగు",
+    "punjabi": "ਪੰਜਾਬੀ"
+  }
+}
