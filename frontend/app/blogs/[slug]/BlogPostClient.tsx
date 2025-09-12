@@ -119,10 +119,10 @@ export default function BlogPostClient({ slug }: { slug: string }) {
                       </div>
                       <div className="p-3">
                         <p className="text-xs text-gray-500 mb-1">
-                          {blog.date}
+                          {t(`blog.titles.${blog.date}`)}
                         </p>
                         <h4 className="text-sm font-semibold text-slate-800 line-clamp-2">
-                          {blog.title}
+                          {t(`blog.titles.${blog.title}`)}
                         </h4>
                       </div>
                     </Link>
@@ -161,7 +161,8 @@ export default function BlogPostClient({ slug }: { slug: string }) {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-500 mb-1">{blog.date}</p>
                     <h4 className="text-sm font-semibold text-slate-800 line-clamp-2">
-                      {blog.title}
+                      {/* {t("blog.titles." + blog.title)} */}
+                      {t(`blog.titles.${blog.title}`)}
                     </h4>
                   </div>
                 </Link>
