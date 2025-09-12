@@ -26,42 +26,43 @@ function MusicPlayer() {
 
   // --- PLAYLIST DATA ---
   const playlist = [
-    {
-      id: 1,
-      title: "Forest Rain",
-      artist: "Nature Sounds",
-      src: "https://www.soundjay.com/misc/sounds/rain-03.wav",
-      duration: "5:23",
-    },
-    {
-      id: 2,
-      title: "Ocean Waves",
-      artist: "Peaceful Sounds",
-      src: "https://www.soundjay.com/nature/sounds/ocean-wave-1.wav",
-      duration: "8:15",
-    },
-    {
-      id: 3,
-      title: "Meditation Bell",
-      artist: "Zen Collection",
-      src: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      duration: "10:00",
-    },
-    {
-      id: 4,
-      title: "Wind Chimes",
-      artist: "Garden Sounds",
-      src: "https://www.soundjay.com/misc/sounds/wind-chimes-1.wav",
-      duration: "6:45",
-    },
-    {
-      id: 5,
-      title: "Birdsong Dawn",
-      artist: "Morning Sounds",
-      src: "https://www.soundjay.com/nature/sounds/birds-chirping-1.wav",
-      duration: "7:30",
-    },
-  ];
+  {
+    id: 1,
+    title: "Ambient Forest",
+    artist: "Alexander Nakarada",
+    src: "https://www.chosic.com/wp-content/uploads/2021/07/Alexander-Nakarada-Ambient-Forest-Music.mp3",
+    duration: "2:21",
+  },
+  {
+    id: 2,
+    title: "Morning Routine",
+    artist: "Ghostrifter Official",
+    src: "https://www.chosic.com/wp-content/uploads/2021/07/Morning-Routine-Lofi-Study-Music.mp3",
+    duration: "2:00",
+  },
+  {
+    id: 3,
+    title: "Acoustic Breeze",
+    artist: "Bensound",
+    src: "https://www.bensound.com/bensound-music/bensound-acousticbreeze.mp3",
+    duration: "2:35",
+  },
+  {
+    id: 4,
+    title: "Relaxing in Nature",
+    artist: "chilledmusic",
+    src: "https://cdn.pixabay.com/audio/2023/10/24/audio_341f238260.mp3",
+    duration: "2:30",
+  },
+  {
+    id: 5,
+    title: "Hopeful Cinematic",
+    artist: "Scott Buckley",
+    src: "https://www.scottbuckley.com.au/library/wp-content/uploads/Hopeful-Cinematic-Background-Music.mp3",
+    duration: "4:25",
+  },
+];
+
 
   const currentTrack = playlist[currentTrackIndex];
 
