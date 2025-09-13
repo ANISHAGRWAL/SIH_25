@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import React from 'react';
 
@@ -58,22 +59,13 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <a href="/" className={`flex items-center gap-2 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center transform hover:scale-110 transition-all duration-300 hover:rotate-12">
-              <svg
-                className="w-5 h-5 text-white transition-transform duration-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">Sahayog</span>
+            <Image 
+              className="mx-auto pb-2"  
+                src="/logoiconfull.png" // Path from the 'public' folder
+                alt="Campus Care Admin Logo"
+                width={142} // Corresponds to w-8
+                height={142} // Corresponds to h-8
+              />
           </a>
           <div className="hidden md:flex items-center gap-8">
             {[

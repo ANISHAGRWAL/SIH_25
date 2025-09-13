@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -114,27 +114,18 @@ export default function LoginPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 space-y-8">
             {/* Logo/Brand */}
             <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center shadow-lg">
-                  <svg
-                    className="w-7 h-7 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                </div>
-              </div>
+              <Image 
+              className="mx-auto pb-2"
+              
+                src="/logoicon.png" // Path from the 'public' folder
+                alt="Sahayog Admin Logo"
+                width={52} // Corresponds to w-8
+                height={52} // Corresponds to h-8
+              />
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Welcome Back
               </h1>
-              <p className="text-gray-600">Sign in to your Sahayog account</p>
+              <p className="text-gray-600">Sign in to your Campus Care account</p>
             </div>
 
             {/* Login Form */}
@@ -168,9 +159,8 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
-                    error ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${error ? "border-red-300" : "border-gray-300"
+                    }`}
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -185,9 +175,8 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
-                    error ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${error ? "border-red-300" : "border-gray-300"
+                    }`}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

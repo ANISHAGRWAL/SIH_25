@@ -8,10 +8,15 @@ import { I18nProvider } from "@/components/I18nProvider"
 const poppins = Poppins({ weight: ["400", "700"], subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Sahayog",
+  title: "Campus Care",
   description: "A Safe Space for Campus Minds",
   generator: "v0.app",
-}
+  icons: {
+    icon: "/logo-icon.png",
+    shortcut: "/logo-icon.png",
+    apple: "/logo-icon.png",
+  },
+};
 
 export default function RootLayout({
   children,

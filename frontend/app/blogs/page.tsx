@@ -146,28 +146,19 @@ export default function BlogsPage() {
 
       {/* Enhanced Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
-          ? 'bg-white/95 backdrop-blur-lg shadow-xl border-b border-gray-200/50'
-          : 'bg-white/80 backdrop-blur-sm border-b border-gray-200'
+        ? 'bg-white/95 backdrop-blur-lg shadow-xl border-b border-gray-200/50'
+        : 'bg-white/80 backdrop-blur-sm border-b border-gray-200'
         }`}>
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <Link href="/" className={`flex items-center gap-2 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center transform hover:scale-110 transition-all duration-300 hover:rotate-12">
-                <svg
-                  className="w-5 h-5 text-white transition-transform duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">Sahayog</span>
+              <Image
+                className="mx-auto pb-2"
+                src="/logoiconfull.png" // Path from the 'public' folder
+                alt="Sahayog Admin Logo"
+                width={142} // Corresponds to w-8
+                height={142} // Corresponds to h-8
+              />
             </Link>
             <div className="hidden md:flex items-center gap-8">
               {[
@@ -236,11 +227,11 @@ export default function BlogsPage() {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="aspect-video relative overflow-hidden">
-                <Image 
-                  src={blog.image || "/placeholder.svg"} 
-                  alt={blog.title} 
-                  fill 
-                  className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                <Image
+                  src={blog.image || "/placeholder.svg"}
+                  alt={blog.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 {blog.category && (

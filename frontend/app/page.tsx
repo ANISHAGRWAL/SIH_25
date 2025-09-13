@@ -2,10 +2,9 @@
 
 "use client"
 
-
+import Image from 'next/image';
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -248,28 +247,19 @@ export default function HomePage() {
 
       {/* Enhanced Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
-          ? 'bg-white/95 backdrop-blur-lg shadow-xl border-b border-gray-200/50'
-          : 'bg-white/80 backdrop-blur-sm border-b border-gray-200'
+        ? 'bg-white/95 backdrop-blur-lg shadow-xl border-b border-gray-200/50'
+        : 'bg-white/80 backdrop-blur-sm border-b border-gray-200'
         }`}>
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className={`flex items-center gap-2 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center transform hover:scale-110 transition-all duration-300 hover:rotate-12">
-                <svg
-                  className="w-5 h-5 text-white transition-transform duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors duration-300">Sahayog</span>
+              <Image
+                className="mx-auto pb-2"
+                src="/logoiconfull.png" // Path from the 'public' folder
+                alt="Sahayog Admin Logo"
+                width={122} // Corresponds to w-8
+                height={122} // Corresponds to h-8
+              />
             </div>
 
 
@@ -290,7 +280,7 @@ export default function HomePage() {
               ))}
               <Link href="/login">
                 <Button className={`rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-                    }`} style={{ transitionDelay: '400ms' }}>
+                  }`} style={{ transitionDelay: '400ms' }}>
                   Get Started
                 </Button>
               </Link>
@@ -412,7 +402,7 @@ export default function HomePage() {
       <section id="about" className="py-16 bg-white relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">About Sahayog</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">About Campus Care</h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto text-pretty">
               Breaking barriers to mental health support with innovative technology, cultural sensitivity, and
               stigma-free care for students.
@@ -491,7 +481,7 @@ export default function HomePage() {
               </p>
               <div className="space-y-4">
                 {[
-                  { icon: "📧", text: "support@Sahayog.edu" },
+                  { icon: "📧", text: "support@Campus Care.edu" },
                   { icon: "📞", text: "24/7 Crisis Helpline: 1-800-MINDMATE" },
                   { icon: "🏫", text: "Available at 500+ Educational Institutions" }
                 ].map((contact, index) => (
@@ -581,22 +571,13 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4 group">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                </div>
-                <span className="text-xl font-bold">Sahayog</span>
+                <Image
+                  className=" pb-2"
+                  src="/logoiconfull.png" // Path from the 'public' folder
+                  alt="Campus care Admin Logo"
+                  width={152} // Corresponds to w-8
+                  height={152} // Corresponds to h-8
+                />
               </div>
               <p className="text-slate-400 text-pretty">
                 Empowering students with accessible, stigma-free mental health support through innovative technology.
@@ -648,7 +629,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>&copy; 2024 Sahayog. All rights reserved. Developed with ❤️ for student mental health.</p>
+            <p>&copy; 2024 Campus Care. All rights reserved. Developed with ❤️ for student mental health.</p>
           </div>
         </div>
       </footer>

@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image';
 import type React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -170,28 +170,21 @@ export default function SignupPage() {
             {/* Logo/Brand */}
             <div className="text-center">
               <div className="flex justify-center mb-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center shadow-lg">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                </div>
+                <Image
+                  className="mx-auto pb-2"
+
+                  src="/logoicon.png" // Path from the 'public' folder
+                  alt="Sahayog Admin Logo"
+                  width={52} // Corresponds to w-8
+                  height={52} // Corresponds to h-8
+                />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-1">
                 {step === 1 ? "Create Account" : "Additional Details"}
               </h1>
               <p className="text-sm text-gray-600">
                 {step === 1
-                  ? "Sign up for your Sahayog account"
+                  ? "Sign up for your Campus Care account"
                   : "Complete your profile setup"}
               </p>
             </div>
@@ -202,22 +195,20 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setRole("student")}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    role === "student"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${role === "student"
                       ? "bg-white shadow-sm text-blue-600"
                       : "text-gray-600 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   Student
                 </button>
                 <button
                   type="button"
                   onClick={() => setRole("admin")}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    role === "admin"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${role === "admin"
                       ? "bg-white shadow-sm text-blue-600"
                       : "text-gray-600 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   Admin
                 </button>

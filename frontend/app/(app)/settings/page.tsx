@@ -61,23 +61,23 @@ export default function SettingsPage() {
 
   const handleLanguageChange = (languageCode: string) => {
     setSelectedLanguage(languageCode)
-    console.log("[Sahayog] Language changed to:", languageCode)
+    console.log("[Campus Care] Language changed to:", languageCode)
   }
 
 
   const handleThemeToggle = (checked: boolean) => {
     setIsDarkMode(checked)
-    console.log("[Sahayog] Dark mode:", checked)
+    console.log("[Campus Care] Dark mode:", checked)
   }
 
 
   const handleDeleteAccount = () => {
-    console.log("[Sahayog] Account deletion requested")
+    console.log("[Campus Care] Account deletion requested")
   }
 
 
   const handleExportData = () => {
-    console.log("[Sahayog] Data export requested")
+    console.log("[Campus Care] Data export requested")
   }
 
 
@@ -89,7 +89,7 @@ export default function SettingsPage() {
             Settings
           </h1>
           <p className={`mt-2 transition-colors ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-            Customize your Sahayog experience and manage your account preferences.
+            Customize your Campus Care experience and manage your account preferences.
           </p>
         </div>
 
@@ -108,7 +108,7 @@ export default function SettingsPage() {
               Appearance
             </CardTitle>
             <CardDescription className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
-              Customize how Sahayog looks and feels for you.
+              Customize how Campus Care looks and feels for you.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -154,7 +154,7 @@ export default function SettingsPage() {
               Language & Region
             </CardTitle>
             <CardDescription className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
-              Choose your preferred language for the Sahayog interface.
+              Choose your preferred language for the Campus Care interface.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                   <p className={`text-sm transition-colors ${
                     isDarkMode ? 'text-slate-300' : 'text-slate-600'
                   }`}>
-                    Help improve Sahayog by sharing anonymous usage data
+                    Help improve Campus Care by sharing anonymous usage data
                   </p>
                 </div>
               </div>
