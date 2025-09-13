@@ -44,24 +44,42 @@ export default function YogaPoseClient({ pose }: YogaPoseClientProps) {
   const [isCompleted, setIsCompleted] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
 
+  // Use an effect to check local storage when the component loads
   useEffect(() => {
-    // Commented out for artifact compatibility
-    // const saved = localStorage.getItem("completedYogaPoses")
-    // if (saved) {
-    //   const completedPoses = JSON.parse(saved)
-    //   setIsCompleted(completedPoses.includes(pose.id))
-    // }
+    try {
+      const saved = localStorage.getItem("completedYogaPoses")
+      if (saved) {
+        const completedPoses = JSON.parse(saved)
+        setIsCompleted(completedPoses.includes(pose.id))
+      }
+    } catch (e) {
+      console.error("Failed to access localStorage", e);
+    }
   }, [pose.id])
 
+  // Function to handle the "Mark as Finished" button click
   const handleFinished = () => {
-    // Commented out for artifact compatibility
-    // const saved = localStorage.getItem("completedYogaPoses")
-    // const completedPoses = saved ? JSON.parse(saved) : []
-    // if (!completedPoses.includes(pose.id)) {
-    //   completedPoses.push(pose.id)
-    //   localStorage.setItem("completedYogaPoses", JSON.stringify(completedPoses))
-    // }
-    router.push("/wellness/yoga")
+    try {
+      const saved = localStorage.getItem("completedYogaPoses")
+      const completedPoses = saved ? JSON.parse(saved) : []
+
+      // Only update local storage if the pose hasn't been completed yet
+      if (!completedPoses.includes(pose.id)) {
+        completedPoses.push(pose.id)
+        localStorage.setItem("completedYogaPoses", JSON.stringify(completedPoses))
+        // Update the state immediately to show the "completed" message
+        setIsCompleted(true)
+      }
+
+      // After updating the UI, redirect the user after a brief delay
+      setTimeout(() => {
+        router.push("/wellness/yoga")
+      }, 1500) // 1.5-second delay to show the completed state
+    } catch (e) {
+      console.error("Failed to update localStorage", e);
+      // Fallback to immediate redirection if localStorage fails
+      router.push("/wellness/yoga")
+    }
   }
 
   const getDifficultyColor = (difficulty: string): string => {
