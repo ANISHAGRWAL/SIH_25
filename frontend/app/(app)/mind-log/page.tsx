@@ -1,5 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import {
+  addOrUpdateJournalEntry,
+  getJournalEntryByDate,
+} from "@/actions/student";
+import React, { useState, useEffect, useInsertionEffect } from "react";
 import {
   LineChart,
   Line,
@@ -83,8 +87,7 @@ export default function MindLogPage() {
   const [currentEntry, setCurrentEntry] = useState<string>("");
   const [currentWeekOffset, setCurrentWeekOffset] = useState<number>(0);
   const [selectedMetric, setSelectedMetric] = useState<string>("average");
-
-  const [weeklyData, setWeeklyData] = useState<any[]>([]); // <- from backend
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [pieChartsData, setPieChartsData] = useState<any>({
     moodDisturbance: [],
     sleepDisruption: [],
@@ -92,12 +95,36 @@ export default function MindLogPage() {
     academicDisengagement: [],
     socialWithdrawal: [],
   });
+  const [isEntriesLoading, setIsEntriesLoading] = useState<boolean>(false);
 
   // Helper functions (keeping existing ones)
   const getDateKey = (date: Date): string => {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   };
 
+  const fetchWeeklyEntries = async (offset: number) => {
+    setIsEntriesLoading(true);
+    const weekDaysToFetch = getWeekDays(offset);
+    const token = localStorage.getItem("token") || "";
+    const newEntries: { [key: string]: string } = {}; // Loop through each day of the week and fetch its entry // NOTE: This is not the most performant approach (7 API calls) // An optimal solution would involve a new backend endpoint // that fetches all entries for a date range in one call.
+
+    await Promise.all(
+      weekDaysToFetch.map(async (date) => {
+        try {
+          const dateStr = date.toISOString().split("T")[0];
+          const res = await getJournalEntryByDate(token, dateStr);
+          if (res.ok && res.data?.content) {
+            newEntries[getDateKey(date)] = res.data.content;
+          }
+        } catch (err) {
+          console.error("Failed to fetch entry for date:", date, err);
+        }
+      })
+    );
+
+    setDiaryEntries(newEntries);
+    setIsEntriesLoading(false);
+  };
   const getStartOfWeek = (date: Date): Date => {
     const startOfWeek = new Date(date);
     const dayOfWeek = startOfWeek.getDay();
@@ -171,23 +198,17 @@ export default function MindLogPage() {
   const handleSaveEntry = async () => {
     if (!selectedDate || !currentEntry.trim()) return;
 
-    const dateStr = selectedDate.fullDate.toISOString().split("T")[0];
+    const dateStr: string = selectedDate.fullDate.toISOString().split("T")[0];
     const token = localStorage.getItem("token") || "";
 
     try {
       console.log(`💾 Saving entry for ${dateStr}:`, currentEntry);
       console.log("url", `${API_BASE}/api/journal/add_entry`);
-      const res = await fetch(`${API_BASE}/api/journal/add_entry`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          entryText: currentEntry,
-        }),
-      });
-      const data = await res.json();
+      const payload = {
+        date: dateStr,
+        entryText: currentEntry,
+      };
+      const res = await addOrUpdateJournalEntry(token, payload);
 
       // update local state too
       setDiaryEntries((prev) => ({
@@ -195,7 +216,7 @@ export default function MindLogPage() {
         [selectedDate.dateKey]: currentEntry,
       }));
 
-      alert("Entry saved ✅");
+      // alert("Entry saved ✅");
     } catch (err) {
       console.error("Save failed:", err);
     }
@@ -372,6 +393,38 @@ export default function MindLogPage() {
       fetchWeeklyReport();
     }
   }, [currentWeekOffset]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      const fetchEntry = async () => {
+        const token = localStorage.getItem("token") || "";
+        try {
+          const res = await getJournalEntryByDate(
+            token,
+            selectedDate.fullDate.toISOString().split("T")[0]
+          );
+          if (res.ok) {
+            setCurrentEntry(res.data?.content || "");
+            setDiaryEntries((prev) => ({
+              ...prev,
+              [selectedDate.dateKey]: res.data?.content || "",
+            }));
+          } else {
+            console.error("Failed to fetch entry:", res.error);
+          }
+        } catch (err) {
+          console.error("Error fetching entry:", err);
+        }
+      };
+      fetchEntry();
+    }
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (currentView === "calendar") {
+      fetchWeeklyEntries(currentWeekOffset);
+    }
+  }, [currentWeekOffset, currentView]);
 
   const getFormattedDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -896,17 +949,47 @@ export default function MindLogPage() {
         </div>
 
         {/* Days of week header */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3 sm:mb-4">
-          {days.map((day) => (
-            <div
-              key={day}
-              className="text-center font-medium text-slate-500 py-2 text-xs sm:text-sm"
+        {isEntriesLoading ? (
+          <div className="flex items-center justify-center h-48 sm:h-64 text-slate-500">
+                       {" "}
+            <svg
+              className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <span className="hidden sm:inline">{day}</span>
-              <span className="sm:hidden">{day.substring(0, 1)}</span>
-            </div>
-          ))}
-        </div>
+                           {" "}
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+                           {" "}
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+                         {" "}
+            </svg>
+                        <span>Loading entries...</span>         {" "}
+          </div>
+        ) : (
+          <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3 sm:mb-4">
+            {days.map((day) => (
+              <div
+                key={day}
+                className="text-center font-medium text-slate-500 py-2 text-xs sm:text-sm"
+              >
+                <span className="hidden sm:inline">{day}</span>
+                <span className="sm:hidden">{day.substring(0, 1)}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Week Grid */}
         <div className="grid grid-cols-7 gap-1 sm:gap-3">

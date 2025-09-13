@@ -74,15 +74,16 @@ export default function BookSessionPage() {
       setLoading(false);
 
       if (res.ok) {
-        alert("Booking submitted successfully!");
+        // alert("Booking submitted successfully!");
         setIsSubmitted(true);
         // reset form or navigate here if needed
       } else {
-        alert(`Booking failed: ${res.error || "Unknown error"}`);
+        // alert(`Booking failed: ${res.error || "Unknown error"}`);
+        console.log("Booking failed:", res);
       }
     } catch (err: any) {
       setLoading(false);
-      alert(`An error occurred: ${err.message || err}`);
+      // alert(`An error occurred: ${err.message || err}`);
     }
   };
 

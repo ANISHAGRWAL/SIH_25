@@ -190,3 +190,55 @@ export const submitBooking = async (token: string, bookingData: any) => {
     };
   }
 };
+
+export async function getJournalEntryByDate(
+  token: string,
+  date: string // YYYY-MM-DD
+) {
+  const res = await fetch(`${BASE_URL}/journal/entry/${date}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
+  return { ok: res.ok, data: data.data, error: data.error };
+}
+
+export async function addOrUpdateJournalEntry(
+  token: string,
+  payload: {
+    date: string; // should be "YYYY-MM-DD"
+    entryText: string;
+  }
+) {
+  const res = await fetch("http://localhost:5000/api/journal/add_entry", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      date: payload.date, // e.g. "2023-09-25"
+      entryText: payload.entryText, // e.g. "hello, I am feeling good"
+    }),
+  });
+
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    return {
+      ok: false,
+      data: null,
+      error: "Invalid JSON in response",
+    };
+  }
+
+  return {
+    ok: res.ok,
+    data: data?.data ?? null,
+    error: data?.error ?? (!res.ok ? data?.message : null),
+  };
+}
