@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,12 +38,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Desktop header */}
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
           {/* Left side: Logo */}
-          <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-slate-900">Sahayog Admin</span>
-          </div>
+          <Image
+      src="/logoiconfull.png" // Path from the 'public' folder
+      alt="Sahayog Admin Logo"
+      width={122} // Corresponds to w-8
+      height={122} // Corresponds to h-8
+    />
 
           {/* Center: Navigation Links */}
           <div className="flex-1 flex justify-center">
@@ -151,14 +152,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <header className="md:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-40">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold text-slate-900">
-                Sahayog Admin
-              </span>
-            </div>
+            <Image
+      src="/logoiconfull.png" // Path from the 'public' folder
+      alt="Sahayog Admin Logo"
+      width={102} // Corresponds to w-8
+      height={102} // Corresponds to h-8
+    />
 
             {/* Right side: Profile and Menu button */}
             <div className="flex items-center gap-2">

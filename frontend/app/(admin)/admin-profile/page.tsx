@@ -38,7 +38,7 @@ const getAdminDetails = async (adminId: string): Promise<{ ok: boolean, data?: A
     data: {
       id: "admin-001",
       name: "Alex Johnson",
-      email: "alex.j@sahayog.admin.com",
+      email: "alex.j@Campus Care.admin.com",
       contact: "+1 123-456-7890",
       role: "Super Admin",
       department: "System Operations",

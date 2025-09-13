@@ -207,7 +207,7 @@ export default function ChatbotPage() {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Sahayog AI</h1>
+            <h1 className="text-xl font-bold text-gray-800">Campus Care AI</h1>
             <div className="flex items-center gap-1 text-sm text-emerald-600">
               <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
               <span>Online</span>
