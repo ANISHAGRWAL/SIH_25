@@ -4,7 +4,14 @@ const BASE_URL =
   `${process.env.NEXT_PUBLIC_API_BASE_URL}/api` || "http://localhost:5000/api";
 
 // New function to fetch all students
-export const getAdminStudents = async (token: string): Promise<{ ok: boolean; status?: number; data?: IAuthUser[] | any; error?: string }> => {
+export const getAdminStudents = async (
+  token: string
+): Promise<{
+  ok: boolean;
+  status?: number;
+  data?: IAuthUser[] | any;
+  error?: string;
+}> => {
   try {
     const response = await fetch(`${BASE_URL}/admin/students`, {
       headers: {
@@ -37,7 +44,9 @@ export const getAdminStudents = async (token: string): Promise<{ ok: boolean; st
 // ... (other functions remain the same)
 // Note: We are not changing getStudentsCount as it returns a count, not the full list.
 
-export const getStudentsCount = async (token: string): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
+export const getStudentsCount = async (
+  token: string
+): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
   try {
     const response = await fetch(`${BASE_URL}/admin/students`, {
       headers: {
@@ -64,14 +73,15 @@ export const getStudentsCount = async (token: string): Promise<{ ok: boolean; st
     return {
       ok: false,
       status: 500,
-      error: error.message || "Failed to fetch student count. Please try again.",
+      error:
+        error.message || "Failed to fetch student count. Please try again.",
     };
   }
 };
 
-
-
-export const getTestAverages = async (token: string): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
+export const getTestAverages = async (
+  token: string
+): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
   try {
     const response = await fetch(`${BASE_URL}/admin/test`, {
       headers: {
@@ -98,12 +108,15 @@ export const getTestAverages = async (token: string): Promise<{ ok: boolean; sta
     return {
       ok: false,
       status: 500,
-      error: error.message || "Failed to fetch test averages. Please try again.",
+      error:
+        error.message || "Failed to fetch test averages. Please try again.",
     };
   }
 };
 
-export const getSessionsCount = async (token: string): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
+export const getSessionsCount = async (
+  token: string
+): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
   try {
     const response = await fetch(`${BASE_URL}/admin/sessions`, {
       headers: {
@@ -130,12 +143,15 @@ export const getSessionsCount = async (token: string): Promise<{ ok: boolean; st
     return {
       ok: false,
       status: 500,
-      error: error.message || "Failed to fetch session count. Please try again.",
+      error:
+        error.message || "Failed to fetch session count. Please try again.",
     };
   }
 };
 
-export const getAdminSessions = async (token: string): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
+export const getAdminSessions = async (
+  token: string
+): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
   try {
     const response = await fetch(`${BASE_URL}/admin/sessions`, {
       headers: {
@@ -161,6 +177,67 @@ export const getAdminSessions = async (token: string): Promise<{ ok: boolean; st
       ok: false,
       status: 500,
       error: error.message || "Failed to fetch sessions. Please try again.",
+    };
+  }
+};
+
+export const getUsers = async (token: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/students`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to fetch student count");
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data || [],
+    };
+  } catch (error: any) {
+    console.error("Error fetching students count:", error);
+    return {
+      ok: false,
+      status: 500,
+      error:
+        error.message || "Failed to fetch student count. Please try again.",
+    };
+  }
+};
+
+export const getUserById = async (token: string, id: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/user?userId=${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to fetch student");
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data || null,
+    };
+  } catch (error: any) {
+    console.error("Error fetching student:", error);
+    return {
+      ok: false,
+      status: 500,
+      error: error.message || "Failed to fetch student. Please try again.",
     };
   }
 };
