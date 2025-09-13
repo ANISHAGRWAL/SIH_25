@@ -213,7 +213,7 @@ export async function addOrUpdateJournalEntry(
     entryText: string;
   }
 ) {
-  const res = await fetch("http://localhost:5000/api/journal/add_entry", {
+  const res = await fetch(`${BASE_URL}/journal/add_entry`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
