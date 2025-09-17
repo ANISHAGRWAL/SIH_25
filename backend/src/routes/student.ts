@@ -6,6 +6,7 @@ import {
   userDetails,
 } from '../controllers/student';
 import { IApiRequest } from '../types';
+import uploadFile from '../middleware/multer_middleware';
 
 const router = express.Router();
 
@@ -60,13 +61,13 @@ router.get('/details', (req: IApiRequest, res: Response) => {
     });
 });
 
-router.post('/details', (req: IApiRequest, res: Response) => {
+router.post('/details', uploadFile, (req: IApiRequest, res: Response) => {
   if (!req.user) {
     return res
       .status(401)
       .json({ success: false, error: { message: 'Unauthorized' } });
   }
-  updateUserDetails(req.user, req.body)
+  updateUserDetails(req.user, req.body, req.file)
     .then((data) => {
       res.status(200).json({ success: true, data });
     })

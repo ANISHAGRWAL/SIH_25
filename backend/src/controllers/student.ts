@@ -8,6 +8,7 @@ import {
   user as userSchema,
 } from '../db/schema';
 import { IAuthUser } from '../types';
+import { uploadOnCloudinary } from '../utils/cloudinary';
 
 export const facialDetection = async (
   user: IAuthUser,
@@ -49,6 +50,7 @@ export const getMe = async (user: IAuthUser): Promise<Partial<IUser>> => {
       email: userDetails.email,
       role: userDetails.role,
       name: userDetails.name,
+      avatarUrl: userDetails.avatarUrl,
     };
     return returnData;
   } catch (error) {
@@ -75,6 +77,7 @@ export const userDetails = async (authUser: IAuthUser): Promise<IUser> => {
 export const updateUserDetails = async (
   authUser: IAuthUser,
   updateData: Partial<IUser>,
+  file: Express.Multer.File | undefined,
 ): Promise<IUser> => {
   try {
     delete updateData.email;
@@ -84,6 +87,11 @@ export const updateUserDetails = async (
     delete updateData.idProofUrl;
     delete updateData.name;
     delete updateData.password;
+
+    if (file && file.path) {
+      const avatar_url = await uploadOnCloudinary(file.path);
+      updateData.avatarUrl = avatar_url;
+    }
 
     const userDetails = await db
       .update(userSchema)

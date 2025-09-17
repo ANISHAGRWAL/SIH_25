@@ -31,6 +31,7 @@ export const user = pgTable(
     name: varchar('name', { length: 255 }).notNull(),
     contact: varchar('contact', { length: 20 }).notNull(),
     idProofUrl: varchar('id_proof_url', { length: 255 }).notNull(),
+    avatarUrl: varchar('avatar_url', { length: 255 }),
     city: varchar('city', { length: 100 }),
     age: varchar('age', { length: 3 }),
     gender: GenderEnum('gender'),
