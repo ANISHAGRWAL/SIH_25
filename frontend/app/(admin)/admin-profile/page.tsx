@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ChangePasswordModal from "@/components/changePassword";
 
 export default function AdminProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -26,6 +27,7 @@ export default function AdminProfilePage() {
   const [profileData, setProfileData] = useState<ICompleteUser | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -138,7 +140,9 @@ export default function AdminProfilePage() {
             <div className="relative flex-shrink-0">
               <Avatar className="w-24 h-24 text-2xl">
                 <AvatarImage
-                  src={profileData.avatarUrl}
+                  src={
+                    avatarPreview || profileData.avatarUrl || "/placeholder.svg"
+                  }
                   alt={profileData.name}
                 />
                 <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-800 text-white font-semibold">
@@ -149,9 +153,21 @@ export default function AdminProfilePage() {
                 </AvatarFallback>
               </Avatar>
               {isEditing && (
-                <button className="absolute -bottom-1 -right-1 p-2 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-full shadow-md hover:scale-110 transition-transform">
-                  <Camera className="w-4 h-4" />
-                </button>
+                <>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="avatar-upload"
+                    className="absolute -bottom-1 -right-1 p-2 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-full shadow-md hover:scale-110 transition-transform cursor-pointer"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </label>
+                </>
               )}
             </div>
             <div className="flex-1 text-center sm:text-left min-w-0">
@@ -237,19 +253,22 @@ export default function AdminProfilePage() {
       </Card>
 
       {/* Security Info */}
-      {/* <Card>
+      <Card>
         <CardHeader>
           <CardTitle>Account Security</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
+          {/* <div>
             <Label>Last Login</Label>
             <p className="text-sm text-slate-600">
               {new Date(profileData.lastLogin).toLocaleString()}
             </p>
-          </div>
+          </div> */}
           <div>
-            <Button className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-lg transition-colors duration-200">
+            <Button
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-lg transition-colors duration-200"
+              onClick={() => setShowChangePasswordModal(true)}
+            >
               Change Password
             </Button>
             <p className="text-xs text-slate-500 mt-2">
@@ -257,7 +276,12 @@ export default function AdminProfilePage() {
             </p>
           </div>
         </CardContent>
-      </Card> */}
+      </Card>
+      <ChangePasswordModal
+        email={profileData.email}
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+      />
     </div>
   );
 }

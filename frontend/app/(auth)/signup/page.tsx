@@ -1,11 +1,11 @@
 "use client";
-import Image from 'next/image';
+import Image from "next/image";
 import type React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { organizations, register } from "@/actions/auth";
+import { organizations, register, sendOtp, verifyOtp } from "@/actions/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -27,6 +27,12 @@ export default function SignupPage() {
     { id: string; name: string }[]
   >([]);
 
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
   // You can change this image URL to any image you want for the center
   const centerImage = step === 1 ? "/login.png" : "/login.png";
 
@@ -46,7 +52,14 @@ export default function SignupPage() {
     if (error) {
       setError("");
     }
-  }, [form.name, form.email, form.password, form.organizationId, form.contact]);
+  }, [
+    form.name,
+    form.email,
+    form.password,
+    form.organizationId,
+    form.contact,
+    otp,
+  ]);
 
   useEffect(() => {
     if (step === 2) {
@@ -68,17 +81,52 @@ export default function SignupPage() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  async function handleSignup(e: React.FormEvent) {
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.email) {
+      setError("Please enter email before sending OTP.");
+      return;
+    }
+    setIsSendingOtp(true);
+    setError("");
+    const res = await sendOtp(form.email);
+    if (res.ok) {
+      setOtpSent(true);
+    } else {
+      setError(res.data?.message || "Failed to send OTP.");
+    }
+    setIsSendingOtp(false);
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.email || !otp) {
+      setError("Please enter OTP.");
+      return;
+    }
+    setIsVerifyingOtp(true);
+    setError("");
+    const res = await verifyOtp(form.email, otp);
+    if (res.ok) {
+      setIsOtpVerified(true);
+      // optionally show message
+    } else {
+      setError(res.data?.message || "OTP verification failed.");
+    }
+    setIsVerifyingOtp(false);
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
 
+    if (!form.idFile) {
+      setError("Must upload the ID proof.");
+      setIsSubmitting(false);
+      return;
+    }
     try {
-      if (!form.idFile) {
-        setError("Must have to upload the id proof");
-        setIsSubmitting(false);
-        return;
-      }
       const body = {
         name: form.name,
         email: form.email,
@@ -89,22 +137,14 @@ export default function SignupPage() {
         idFile: form.idFile,
       };
       const res = await register(body);
-      console.log("response", res);
       const data = res?.data;
-      if (data.success && data.data) {
+      if (res.ok && data.success && data.data) {
         localStorage.setItem("token", data.data.token);
-        getTokens(); // Sync AuthContext with new token
+        getTokens();
       } else {
-        // Set specific error message based on response
-        if (data?.message) {
-          setError(data.message);
-        } else {
-          setError("Signup failed. Please try again.");
-        }
+        setError(data.message || "Signup failed. Please try again.");
       }
     } catch (err: any) {
-      console.error(err);
-      // Handle different types of errors
       if (err?.response?.data?.message) {
         setError(err.response.data.message);
       } else if (err?.message) {
@@ -115,16 +155,22 @@ export default function SignupPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
-  function handleNext(e: React.FormEvent) {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
+    // check name, password also? but at least name & password
     if (!form.name || !form.email || !form.password) {
-      setError("Please fill in all required fields.");
+      setError("Please fill in name, email, and password.");
+      return;
+    }
+    // Also ensure email is verified via OTP
+    if (!isOtpVerified) {
+      setError("Please verify your email via OTP before proceeding.");
       return;
     }
     setStep(2);
-  }
+  };
 
   if (loading || (isAuthenticated && token)) {
     return (
@@ -172,7 +218,6 @@ export default function SignupPage() {
               <div className="flex justify-center mb-3">
                 <Image
                   className="mx-auto pb-2"
-
                   src="/logoicon.png" // Path from the 'public' folder
                   alt="Sahayog Admin Logo"
                   width={52} // Corresponds to w-8
@@ -195,20 +240,22 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setRole("student")}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${role === "student"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    role === "student"
                       ? "bg-white shadow-sm text-blue-600"
                       : "text-gray-600 hover:text-gray-900"
-                    }`}
+                  }`}
                 >
                   Student
                 </button>
                 <button
                   type="button"
                   onClick={() => setRole("admin")}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${role === "admin"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    role === "admin"
                       ? "bg-white shadow-sm text-blue-600"
                       : "text-gray-600 hover:text-gray-900"
-                    }`}
+                  }`}
                 >
                   Admin
                 </button>
@@ -259,6 +306,46 @@ export default function SignupPage() {
                   disabled={isSubmitting}
                   required
                 />
+                <div className="flex space-x-2">
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={isSendingOtp || !form.email}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-400 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-500 disabled:opacity-50"
+                  >
+                    {isSendingOtp
+                      ? "Sending OTP..."
+                      : otpSent
+                      ? "Resend OTP"
+                      : "Send OTP"}
+                  </button>
+                </div>
+                {otpSent && (
+                  <div className="space-y-2">
+                    <LabeledInput
+                      label="Enter OTP"
+                      type="text"
+                      placeholder="OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      disabled={isVerifyingOtp}
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={isVerifyingOtp || !otp}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-lg font-medium hover:from-green-600 hover:to-green-700 disabled:opacity-50"
+                    >
+                      {isVerifyingOtp
+                        ? "Verifying..."
+                        : isOtpVerified
+                        ? "Verified"
+                        : "Verify OTP"}
+                    </button>
+                  </div>
+                )}
                 <LabeledInput
                   label="Password"
                   type="password"
@@ -271,7 +358,13 @@ export default function SignupPage() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={
+                    isSubmitting ||
+                    !form.name ||
+                    !form.email ||
+                    !form.password ||
+                    !isOtpVerified
+                  }
                   className="w-full bg-gradient-to-r from-blue-500 to-indigo-400 text-white py-2.5 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg text-sm"
                 >
                   Next Step
