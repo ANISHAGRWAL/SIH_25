@@ -1,7 +1,8 @@
 "use client";
 
-import { chat } from "@/actions/chat";
 import { useState, useRef, useEffect } from "react";
+import { chat } from "@/actions/chat";
+
 
 type Message = {
   id: string;
@@ -56,6 +57,7 @@ export default function ChatbotPage() {
   const [loading, setLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [provider, setProvider] = useState<"Gemini" | "Groq">("Gemini");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -67,7 +69,6 @@ export default function ChatbotPage() {
     scrollToBottom();
   }, [messages]);
 
-  // Close settings when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -88,10 +89,13 @@ export default function ChatbotPage() {
   async function send() {
     if (!input.trim() || loading) return;
 
+    const currentInput = input.trim();
+    setInput("");
+
     const userMessage: Message = {
       id: generateId(),
       role: "user",
-      text: input.trim(),
+      text: currentInput,
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -99,10 +103,10 @@ export default function ChatbotPage() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    const currentInput = input.trim();
-    setInput("");
+
     setLoading(true);
 
+    // Show "typing..." message
     const typingMessage: Message = {
       id: "typing",
       role: "bot",
@@ -113,35 +117,58 @@ export default function ChatbotPage() {
     setMessages((prev) => [...prev, typingMessage]);
 
     try {
-      const token = localStorage.getItem("token") || "";
-      const data = await chat(token, "frontend-user", currentInput);
+      // ✅ Build chat history with roles
+      const history = [...messages, userMessage].map((m) => ({
+        role: m.role,
+        content: m.text,
+      }));
+
+      const res = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model_provider: provider, // ✅ must be "Gemini" or "Groq"
+          messages: [...messages.map((m) => m.text), currentInput], // ✅ plain strings
+          allow_search: true,
+          crisis_detection: true,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+      const data = await res.json();
+
+      const botMessage: Message = {
+        id: generateId(),
+        role: "bot",
+        text: data.response || "⚠️ No response from server",
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
 
       setMessages((prev) => {
+        // remove typing message before adding bot reply
         const filtered = prev.filter((msg) => msg.id !== "typing");
-        const botMessage: Message = {
-          id: generateId(),
-          role: "bot",
-          text: data.response || "I'm here to help. Could you tell me more?",
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
         return [...filtered, botMessage];
       });
     } catch (error) {
+      console.error(error);
       setMessages((prev) => {
         const filtered = prev.filter((msg) => msg.id !== "typing");
-        const errorMessage: Message = {
-          id: generateId(),
-          role: "bot",
-          text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-        return [...filtered, errorMessage];
+        return [
+          ...filtered,
+          {
+            id: generateId(),
+            role: "bot",
+            text: "⚠️ Could not connect to backend. Please check server.",
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ];
       });
     } finally {
       setLoading(false);
@@ -149,6 +176,7 @@ export default function ChatbotPage() {
     }
   }
 
+  // ⌨️ Enter key to send
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -156,6 +184,7 @@ export default function ChatbotPage() {
     }
   };
 
+  // Quick action shortcuts
   const quickActions = [
     "I need someone to talk to",
     "I'm feeling anxious",
@@ -169,6 +198,7 @@ export default function ChatbotPage() {
     inputRef.current?.focus();
   };
 
+  // Auto-resize textarea
   const adjustTextareaHeight = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto";
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
@@ -182,14 +212,8 @@ export default function ChatbotPage() {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Subtle animated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-20 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
       {/* Header */}
-      <div className="flex items-center justify-between p-1 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
             <svg
@@ -215,49 +239,65 @@ export default function ChatbotPage() {
           </div>
         </div>
 
-        <div className="relative settings-container">
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        <div className="flex items-center gap-4">
+          {/* Model selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Model:</label>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value as "Gemini" | "Groq")}
+              className="px-2 py-1 border rounded-lg text-sm bg-white"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-              />
-            </svg>
-          </button>
+              <option value="Gemini">Gemini</option>
+              <option value="Groq">Groq</option>
+            </select>
+          </div>
 
-          {showSettings && (
-            <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-[50]">
-              <button
-                onClick={() => setShowClearConfirm(true)}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+          {/* Settings */}
+          <div className="relative settings-container">
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                />
+              </svg>
+            </button>
+
+            {showSettings && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
+                <button
+                  onClick={() => setShowClearConfirm(true)}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Clear Chat
-              </button>
-            </div>
-          )}
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  Clear Chat
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -360,39 +400,35 @@ export default function ChatbotPage() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`max-w-[80%] flex gap-3 ${
-                      message.role === "user" ? "flex-row-reverse" : "flex-row"
-                    }`}
+                    className={`max-w-[80%] flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
+                      }`}
                   >
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.role === "user"
-                          ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                          : "bg-gradient-to-br from-emerald-500 to-teal-600"
-                      }`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                        : "bg-gradient-to-br from-emerald-500 to-teal-600"
+                        }`}
                     >
                       {message.role === "user" ? userAvatar : botAvatar}
                     </div>
 
                     <div className="flex flex-col">
                       <div
-                        className={`px-4 py-3 rounded-2xl ${
-                          message.role === "user"
-                            ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
-                            : "bg-gray-100 text-gray-800 rounded-tl-md"
-                        }`}
+                        className={`px-4 py-3 rounded-2xl ${message.role === "user"
+                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
+                          : "bg-gray-100 text-gray-800 rounded-tl-md"
+                          }`}
                       >
                         {message.isTyping ? (
                           <div className="flex items-center gap-1">
                             <div className="flex gap-1">
                               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                             </div>
                           </div>
                         ) : (
@@ -403,9 +439,8 @@ export default function ChatbotPage() {
                       </div>
                       {message.time && !message.isTyping && (
                         <p
-                          className={`text-xs mt-1 ${
-                            message.role === "user" ? "text-right" : "text-left"
-                          } text-gray-500`}
+                          className={`text-xs mt-1 ${message.role === "user" ? "text-right" : "text-left"
+                            } text-gray-500`}
                         >
                           {message.time}
                         </p>
@@ -418,7 +453,6 @@ export default function ChatbotPage() {
             </div>
           )}
 
-          {/* The quick action buttons are no longer a separate section but part of the main display when the chat is empty */}
           {/* Input Area */}
           <div className="p-4 border-t border-gray-200/60 bg-white/90">
             <div className="flex items-end gap-3">
@@ -459,11 +493,10 @@ export default function ChatbotPage() {
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
-                className={`p-3 rounded-xl transition-all duration-200 ${
-                  loading || !input.trim()
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
-                }`}
+                className={`p-3 rounded-xl transition-all duration-200 ${loading || !input.trim()
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
+                  }`}
               >
                 {loading ? (
                   <svg
