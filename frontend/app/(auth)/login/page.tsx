@@ -1,10 +1,11 @@
 "use client";
-import Image from 'next/image';
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { login } from "@/actions/auth";
+import ForgotPasswordModal from "@/components/forgetPassword";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
 
   // You can change this image URL to any image you want for the center
   const centerImage = "/login.png";
@@ -114,9 +116,8 @@ export default function LoginPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 space-y-8">
             {/* Logo/Brand */}
             <div className="text-center">
-              <Image 
-              className="mx-auto pb-2"
-              
+              <Image
+                className="mx-auto pb-2"
                 src="/logoicon.png" // Path from the 'public' folder
                 alt="Sahayog Admin Logo"
                 width={52} // Corresponds to w-8
@@ -125,7 +126,9 @@ export default function LoginPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Welcome Back
               </h1>
-              <p className="text-gray-600">Sign in to your Campus Care account</p>
+              <p className="text-gray-600">
+                Sign in to your Campus Care account
+              </p>
             </div>
 
             {/* Login Form */}
@@ -159,8 +162,9 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${error ? "border-red-300" : "border-gray-300"
-                    }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
+                    error ? "border-red-300" : "border-gray-300"
+                  }`}
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -175,8 +179,9 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${error ? "border-red-300" : "border-gray-300"
-                    }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
+                    error ? "border-red-300" : "border-gray-300"
+                  }`}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -201,6 +206,7 @@ export default function LoginPage() {
                 <div className="text-sm">
                   <button
                     type="button"
+                    onClick={() => setShowForgotModal(true)}
                     className="font-medium text-blue-600 hover:text-blue-500 disabled:opacity-50 transition-colors"
                     disabled={isSubmitting}
                   >
@@ -239,6 +245,10 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+        <ForgotPasswordModal
+          isOpen={showForgotModal}
+          onClose={() => setShowForgotModal(false)}
+        />
       </div>
     </div>
   );

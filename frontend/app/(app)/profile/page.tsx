@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Save, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import { getUserDetails, updateUserDetails } from "@/actions/student";
+import ChangePasswordModal from "@/components/changePassword";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -24,6 +25,7 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState<ICompleteUser | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -322,6 +324,36 @@ export default function ProfilePage() {
           />
         </CardContent>
       </Card>
+      {/* Security Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Security</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* <div>
+            <Label>Last Login</Label>
+            <p className="text-sm text-slate-600">
+              {new Date(profileData.lastLogin).toLocaleString()}
+            </p>
+          </div> */}
+          <div>
+            <Button
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-lg transition-colors duration-200"
+              onClick={() => setShowChangePasswordModal(true)}
+            >
+              Change Password
+            </Button>
+            <p className="text-xs text-slate-500 mt-2">
+              For security, you will be logged out after changing your password.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+      <ChangePasswordModal
+        email={profileData.email}
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+      />
     </div>
   );
 }

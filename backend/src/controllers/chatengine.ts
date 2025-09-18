@@ -94,7 +94,7 @@ export async function getAgentResponse({
     });
     // 2. Email options
     const mailOptions = {
-      from: 'your-email@gmail.com',
+      from: process.env.EMAIL_ID,
       to,
       subject,
       text,

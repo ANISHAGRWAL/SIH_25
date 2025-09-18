@@ -86,3 +86,49 @@ export const organizations = async () => {
     };
   }
 };
+
+export async function sendOtp(email: string) {
+  try {
+    const res = await fetch(`${API_ENDPOINTS.AUTH}/send-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data };
+  } catch (error) {
+    return { ok: false, status: 500, error: "Failed to send OTP." };
+  }
+}
+
+export async function verifyOtp(email: string, code: string) {
+  try {
+    const res = await fetch(`${API_ENDPOINTS.AUTH}/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data };
+  } catch (error) {
+    return { ok: false, status: 500, error: "Failed to verify OTP." };
+  }
+}
+
+export async function resetPassword(
+  email: string,
+  code: string,
+  newPassword: string
+) {
+  try {
+    const res = await fetch(`${API_ENDPOINTS.AUTH}/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code, newPassword }),
+    });
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data };
+  } catch (error) {
+    return { ok: false, status: 500, error: "Failed to reset password." };
+  }
+}

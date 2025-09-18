@@ -6,3 +6,4 @@ export * from './pss';
 export * from './organization';
 export * from './journalEntries';
 export * from './sessionBooking';
+export * from './otp';
