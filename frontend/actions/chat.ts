@@ -13,10 +13,8 @@ export async function chat(
         model_provider: provider,
         system_prompt:
           "friendly ai chat motivator who helps his/her friend in enhancing their mental health",
-        messages: messages.map((m) => ({
-          role: m.role,
-          content: m.text,
-        })),
+        messages: messages.map((m) => m.text),
+
         allow_search: true,
         crisis_detection: true,
       }),
