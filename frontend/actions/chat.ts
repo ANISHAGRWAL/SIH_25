@@ -1,36 +1,31 @@
-const BASE_URL =
-  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api` || "http://localhost:5000/api";
-
-type ChatResponse = {
-  response: string;
-};
+// actions/chat.ts
 
 export async function chat(
-  token: string,
-  sessionId: string,
-  query: string
-): Promise<ChatResponse> {
+  provider: "Gemini" | "Groq",
+  messages: { role: "user" | "bot"; text: string }[]
+) {
   try {
-    const res = await fetch(`${BASE_URL}/chat`, {
+    const res = await fetch("http://127.0.0.1:8000/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        session_id: sessionId,
-        query,
+        model_name: provider === "Gemini" ? "gemini-2.5-flash" : "llama3-70b-8192",
+        model_provider: provider,
+        system_prompt:
+          "friendly ai chat motivator who helps his/her friend in enhancing their mental health",
+        messages: messages.map((m) => ({
+          role: m.role,
+          content: m.text,
+        })),
+        allow_search: true,
+        crisis_detection: true,
       }),
     });
 
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-
-    const data: ChatResponse = await res.json();
-    return data;
+    if (!res.ok) throw new Error("Server error");
+    return await res.json();
   } catch (error) {
-    console.error("Chat API error:", error);
-    throw error;
+    console.error("Chat API Error:", error);
+    return { response: null, error: "⚠️ Could not connect to backend" };
   }
 }
