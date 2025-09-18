@@ -22,6 +22,8 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<ICompleteUser | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -51,6 +53,15 @@ export default function ProfilePage() {
     setProfileData((prev) => ({ ...prev!, [field]: value }));
   };
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
+    }
+  };
+
   const handleSave = async () => {
     if (!token || !profileData) return;
 
@@ -70,7 +81,11 @@ export default function ProfilePage() {
       degree: profileData.degree,
     };
 
-    const res = await updateUserDetails(token, updatePayload);
+    const res = await updateUserDetails(
+      token,
+      updatePayload,
+      avatarFile || undefined
+    );
 
     if (res.ok) {
       toast.success("Profile updated!");
@@ -125,7 +140,12 @@ export default function ProfilePage() {
           <div className="flex items-center gap-6">
             <div className="relative">
               <Avatar className="w-24 h-24">
-                <AvatarImage src="/placeholder.svg" alt="Dummy Avatar" />
+                <AvatarImage
+                  src={
+                    avatarPreview || profileData.avatarUrl || "/placeholder.svg"
+                  }
+                  alt="Avatar"
+                />
                 <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
                   {profileData.name
                     .split(" ")
@@ -134,9 +154,17 @@ export default function ProfilePage() {
                 </AvatarFallback>
               </Avatar>
               {isEditing && (
-                <div className="absolute -bottom-2 -right-2 p-2 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-full">
-                  <Camera className="w-4 h-4" />
-                </div>
+                <>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="absolute -bottom-2 -right-2 p-2 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-full z-0">
+                    <Camera className="w-4 h-4" />
+                  </div>
+                </>
               )}
             </div>
             <div>
