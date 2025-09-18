@@ -87,95 +87,70 @@ export default function ChatbotPage() {
   };
 
   async function send() {
-    if (!input.trim() || loading) return;
+  if (!input.trim() || loading) return;
 
-    const currentInput = input.trim();
-    setInput("");
+  const userMessage: Message = {
+    id: generateId(),
+    role: "user",
+    text: input.trim(),
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
 
-    const userMessage: Message = {
+  setMessages((prev) => [...prev, userMessage]);
+  const currentInput = input.trim();
+  setInput("");
+  setLoading(true);
+
+  const typingMessage: Message = {
+    id: "typing",
+    role: "bot",
+    text: "",
+    time: "",
+    isTyping: true,
+  };
+  setMessages((prev) => [...prev, typingMessage]);
+
+  try {
+    // ✅ Use centralized chat() function
+    const data = await chat(provider, [...messages, userMessage]);
+
+    const botMessage: Message = {
       id: generateId(),
-      role: "user",
-      text: currentInput,
+      role: "bot",
+      text: data.response || "No response from server",
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-
-    setLoading(true);
-
-    // Show "typing..." message
-    const typingMessage: Message = {
-      id: "typing",
-      role: "bot",
-      text: "",
-      time: "",
-      isTyping: true,
-    };
-    setMessages((prev) => [...prev, typingMessage]);
-
-    try {
-      // ✅ Build chat history with roles
-      const history = [...messages, userMessage].map((m) => ({
-        role: m.role,
-        content: m.text,
-      }));
-
-      const res = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model_provider: provider, // ✅ must be "Gemini" or "Groq"
-          messages: [...messages.map((m) => m.text), currentInput], // ✅ plain strings
-          allow_search: true,
-          crisis_detection: true,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-
-      const data = await res.json();
-
-      const botMessage: Message = {
+    setMessages((prev) => {
+      const filtered = prev.filter((msg) => msg.id !== "typing");
+      return [...filtered, botMessage];
+    });
+  } catch (error) {
+    console.error(error);
+    setMessages((prev) => {
+      const filtered = prev.filter((msg) => msg.id !== "typing");
+      const errorMessage: Message = {
         id: generateId(),
         role: "bot",
-        text: data.response || "⚠️ No response from server",
+        text: "⚠️ Could not connect to backend. Please check server.",
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
       };
-
-      setMessages((prev) => {
-        // remove typing message before adding bot reply
-        const filtered = prev.filter((msg) => msg.id !== "typing");
-        return [...filtered, botMessage];
-      });
-    } catch (error) {
-      console.error(error);
-      setMessages((prev) => {
-        const filtered = prev.filter((msg) => msg.id !== "typing");
-        return [
-          ...filtered,
-          {
-            id: generateId(),
-            role: "bot",
-            text: "⚠️ Could not connect to backend. Please check server.",
-            time: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ];
-      });
-    } finally {
-      setLoading(false);
-      inputRef.current?.focus();
-    }
+      return [...filtered, errorMessage];
+    });
+  } finally {
+    setLoading(false);
+    inputRef.current?.focus();
   }
-
+}
   // ⌨️ Enter key to send
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
