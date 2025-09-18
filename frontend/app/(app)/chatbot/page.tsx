@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { chat } from "@/actions/chat";
 
-
 type Message = {
   id: string;
   role: "user" | "bot";
@@ -87,70 +86,71 @@ export default function ChatbotPage() {
   };
 
   async function send() {
-  if (!input.trim() || loading) return;
+    if (!input.trim() || loading) return;
 
-  const userMessage: Message = {
-    id: generateId(),
-    role: "user",
-    text: input.trim(),
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-  };
-
-  setMessages((prev) => [...prev, userMessage]);
-  const currentInput = input.trim();
-  setInput("");
-  setLoading(true);
-
-  const typingMessage: Message = {
-    id: "typing",
-    role: "bot",
-    text: "",
-    time: "",
-    isTyping: true,
-  };
-  setMessages((prev) => [...prev, typingMessage]);
-
-  try {
-    // ✅ Use centralized chat() function
-    const data = await chat(provider, [...messages, userMessage]);
-
-    const botMessage: Message = {
+    const userMessage: Message = {
       id: generateId(),
-      role: "bot",
-      text: data.response || "No response from server",
+      role: "user",
+      text: input.trim(),
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
     };
 
-    setMessages((prev) => {
-      const filtered = prev.filter((msg) => msg.id !== "typing");
-      return [...filtered, botMessage];
-    });
-  } catch (error) {
-    console.error(error);
-    setMessages((prev) => {
-      const filtered = prev.filter((msg) => msg.id !== "typing");
-      const errorMessage: Message = {
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input.trim();
+    setInput("");
+    setLoading(true);
+
+    const typingMessage: Message = {
+      id: "typing",
+      role: "bot",
+      text: "",
+      time: "",
+      isTyping: true,
+    };
+    setMessages((prev) => [...prev, typingMessage]);
+
+    try {
+      // ✅ Use centralized chat() function
+      const token = localStorage.getItem("token") || "";
+      const data = await chat(token, provider, [...messages, userMessage]);
+
+      const botMessage: Message = {
         id: generateId(),
         role: "bot",
-        text: "⚠️ Could not connect to backend. Please check server.",
+        text: data.response || "No response from server",
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
       };
-      return [...filtered, errorMessage];
-    });
-  } finally {
-    setLoading(false);
-    inputRef.current?.focus();
+
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "typing");
+        return [...filtered, botMessage];
+      });
+    } catch (error) {
+      console.error(error);
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "typing");
+        const errorMessage: Message = {
+          id: generateId(),
+          role: "bot",
+          text: "⚠️ Could not connect to backend. Please check server.",
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        return [...filtered, errorMessage];
+      });
+    } finally {
+      setLoading(false);
+      inputRef.current?.focus();
+    }
   }
-}
   // ⌨️ Enter key to send
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -375,35 +375,45 @@ export default function ChatbotPage() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
-                    className={`max-w-[80%] flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
-                      }`}
+                    className={`max-w-[80%] flex gap-3 ${
+                      message.role === "user" ? "flex-row-reverse" : "flex-row"
+                    }`}
                   >
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
-                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                        : "bg-gradient-to-br from-emerald-500 to-teal-600"
-                        }`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        message.role === "user"
+                          ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                          : "bg-gradient-to-br from-emerald-500 to-teal-600"
+                      }`}
                     >
                       {message.role === "user" ? userAvatar : botAvatar}
                     </div>
 
                     <div className="flex flex-col">
                       <div
-                        className={`px-4 py-3 rounded-2xl ${message.role === "user"
-                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
-                          : "bg-gray-100 text-gray-800 rounded-tl-md"
-                          }`}
+                        className={`px-4 py-3 rounded-2xl ${
+                          message.role === "user"
+                            ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
+                            : "bg-gray-100 text-gray-800 rounded-tl-md"
+                        }`}
                       >
                         {message.isTyping ? (
                           <div className="flex items-center gap-1">
                             <div className="flex gap-1">
                               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              <div
+                                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.1s" }}
+                              ></div>
+                              <div
+                                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.2s" }}
+                              ></div>
                             </div>
                           </div>
                         ) : (
@@ -414,8 +424,9 @@ export default function ChatbotPage() {
                       </div>
                       {message.time && !message.isTyping && (
                         <p
-                          className={`text-xs mt-1 ${message.role === "user" ? "text-right" : "text-left"
-                            } text-gray-500`}
+                          className={`text-xs mt-1 ${
+                            message.role === "user" ? "text-right" : "text-left"
+                          } text-gray-500`}
                         >
                           {message.time}
                         </p>
@@ -468,10 +479,11 @@ export default function ChatbotPage() {
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
-                className={`p-3 rounded-xl transition-all duration-200 ${loading || !input.trim()
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
-                  }`}
+                className={`p-3 rounded-xl transition-all duration-200 ${
+                  loading || !input.trim()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
+                }`}
               >
                 {loading ? (
                   <svg

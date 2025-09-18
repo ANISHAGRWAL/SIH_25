@@ -23,8 +23,10 @@ export interface IApiRequest extends Request {
 }
 
 export interface ChatRequest {
-  session_id: string;
-  query: string;
+  model_provider: 'Gemini' | 'Groq';
+  messages: string[];
+  allow_search: boolean;
+  crisis_detection: boolean;
 }
 
 export interface ITestResult {
