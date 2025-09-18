@@ -6,13 +6,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] =
     React.useState(false);
-    if(!pathname) return null;
+  if (!pathname) return null;
 
   const { user } = useAuth();
 
@@ -25,11 +26,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
           {/* Left side: Logo */}
           <Image
-      src="/logoiconfull.png" // Path from the 'public' folder
-      alt="Sahayog Admin Logo"
-      width={122} // Corresponds to w-8
-      height={122} // Corresponds to h-8
-    />
+            src="/logoiconfull.png" // Path from the 'public' folder
+            alt="Sahayog Admin Logo"
+            width={122} // Corresponds to w-8
+            height={122} // Corresponds to h-8
+          />
 
           {/* Center: Navigation Links */}
           <div className="flex-1 flex justify-center">
@@ -67,19 +68,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
               className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              <Avatar className="w-10 h-10">
+                <AvatarImage
+                  src={user?.avatarUrl || "/placeholder.svg"}
+                  alt="Avatar"
                 />
-              </svg>
+                <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
+                  {user?.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
             </button>
 
             {isProfileDropdownOpen && (
@@ -170,11 +170,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
             <Image
-      src="/logoiconfull.png" // Path from the 'public' folder
-      alt="Sahayog Admin Logo"
-      width={102} // Corresponds to w-8
-      height={102} // Corresponds to h-8
-    />
+              src="/logoiconfull.png" // Path from the 'public' folder
+              alt="Sahayog Admin Logo"
+              width={102} // Corresponds to w-8
+              height={102} // Corresponds to h-8
+            />
 
             {/* Right side: Profile and Menu button */}
             <div className="flex items-center gap-2">
@@ -185,19 +185,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   }
                   className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage
+                      src={user?.avatarUrl || "/placeholder.svg"}
+                      alt="Avatar"
                     />
-                  </svg>
+                    <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
+                      {user?.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
                 </button>
 
                 {isProfileDropdownOpen && (
@@ -359,9 +358,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Sidebar */}
           <aside className="hidden md:block bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl h-screen overflow-y-auto sticky top-0">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center text-white text-xl font-bold">
-                A
-              </div>
+              <Avatar className="w-16 h-16">
+                <AvatarImage
+                  src={user?.avatarUrl || "/placeholder.svg"}
+                  alt="Avatar"
+                />
+                <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
+                  {user?.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <p className="font-bold text-lg">{user?.name}</p>
                 <p className="text-slate-500 text-sm">{user?.email}</p>

@@ -127,16 +127,25 @@ export const getUserDetails = async (token: string) => {
 
 export const updateUserDetails = async (
   token: string,
-  updateData: Partial<ICompleteUser>
+  updateData: Partial<ICompleteUser>,
+  avatarFile?: File
 ) => {
   try {
+    const formData = new FormData();
+    if (avatarFile) {
+      formData.append("file", avatarFile);
+    }
+    Object.entries(updateData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value.toString());
+      }
+    });
     const response = await fetch(`${BASE_URL}/student/details`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
       },
-      body: JSON.stringify(updateData),
+      body: formData,
     });
 
     const result = await response.json();
