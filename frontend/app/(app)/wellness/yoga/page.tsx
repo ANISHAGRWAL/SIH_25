@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, CheckCircle, ArrowLeft, Brain, Heart } from "lucide-react"
+import { Clock, CheckCircle, ArrowLeft, Brain, Heart, RotateCcw, Trash2, Star, PlayCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const yogaPoses = [
   {
@@ -25,7 +26,9 @@ const yogaPoses = [
       "Stay for 30 seconds to several minutes as needed",
       "To come out, slowly lift your torso and return to kneeling position"
     ],
-    color: "from-green-100 to-emerald-100",
+    color: "bg-gradient-to-br from-emerald-50 to-teal-100",
+    borderColor: "border-emerald-200",
+    icon: "🧘‍♀️"
   },
   {
     id: 2,
@@ -44,7 +47,9 @@ const yogaPoses = [
       "Stay for 5-15 minutes, breathing naturally",
       "To come out, bend your knees and roll to one side before sitting up slowly"
     ],
-    color: "from-blue-100 to-sky-100",
+    color: "bg-gradient-to-br from-sky-50 to-blue-100",
+    borderColor: "border-sky-200",
+    icon: "🌊"
   },
   {
     id: 3,
@@ -63,7 +68,9 @@ const yogaPoses = [
       "Repeat 5-10 rounds, focusing on spinal mobility",
       "Return to neutral tabletop position to finish"
     ],
-    color: "from-purple-100 to-violet-100",
+    color: "bg-gradient-to-br from-violet-50 to-purple-100",
+    borderColor: "border-violet-200",
+    icon: "🐱"
   },
   {
     id: 4,
@@ -82,7 +89,9 @@ const yogaPoses = [
       "Breathe deeply and sway gently if it feels good",
       "To come up, place hands on hips and slowly roll up vertebra by vertebra"
     ],
-    color: "from-orange-100 to-amber-100",
+    color: "bg-gradient-to-br from-amber-50 to-orange-100",
+    borderColor: "border-amber-200",
+    icon: "🌅"
   },
   {
     id: 5,
@@ -102,7 +111,9 @@ const yogaPoses = [
       "Rest in complete stillness for 5-20 minutes",
       "To come out, wiggle fingers and toes, then slowly roll to one side"
     ],
-    color: "from-indigo-100 to-purple-100",
+    color: "bg-gradient-to-br from-indigo-50 to-slate-100",
+    borderColor: "border-indigo-200",
+    icon: "💤"
   },
   {
     id: 6,
@@ -122,7 +133,9 @@ const yogaPoses = [
       "Hold for 30 seconds to 1 minute",
       "Slowly lower down vertebra by vertebra"
     ],
-    color: "from-teal-100 to-cyan-100",
+    color: "bg-gradient-to-br from-teal-50 to-cyan-100",
+    borderColor: "border-teal-200",
+    icon: "🌉"
   },
   {
     id: 7,
@@ -142,7 +155,9 @@ const yogaPoses = [
       "Breathe deeply and hold, releasing deeper with each exhale",
       "Slowly roll up to seated position"
     ],
-    color: "from-pink-100 to-rose-100",
+    color: "bg-gradient-to-br from-rose-50 to-pink-100",
+    borderColor: "border-rose-200",
+    icon: "🌸"
   },
   {
     id: 8,
@@ -162,7 +177,9 @@ const yogaPoses = [
       "Breathe deeply and surrender into the pose",
       "Slowly walk your hands back and return to seated"
     ],
-    color: "from-emerald-100 to-green-100",
+    color: "bg-gradient-to-br from-green-50 to-emerald-100",
+    borderColor: "border-green-200",
+    icon: "🍃"
   },
   {
     id: 9,
@@ -182,7 +199,9 @@ const yogaPoses = [
       "Return to center and repeat on the other side",
       "Hug both knees to chest when finished"
     ],
-    color: "from-amber-100 to-yellow-100",
+    color: "bg-gradient-to-br from-yellow-50 to-amber-100",
+    borderColor: "border-yellow-200",
+    icon: "🌀"
   },
   {
     id: 10,
@@ -203,150 +222,307 @@ const yogaPoses = [
       "This completes one round - repeat 5-10 rounds",
       "End by breathing normally through both nostrils"
     ],
-    color: "from-slate-100 to-gray-100",
+    color: "bg-gradient-to-br from-slate-50 to-gray-100",
+    borderColor: "border-slate-200",
+    icon: "🌬️"
   },
 ]
 
 export default function YogaPage() {
   const [completedPoses, setCompletedPoses] = useState<number[]>([])
+  const [showAutoResetConfirm, setShowAutoResetConfirm] = useState(false)
+  const [isResetting, setIsResetting] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(20)
+  const autoResetTimerRef = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
 
   useEffect(() => {
-    // Load completed poses from localStorage
-    const saved = localStorage.getItem("completedYogaPoses")
-    if (saved) {
-      setCompletedPoses(JSON.parse(saved))
+    try {
+      const saved = localStorage.getItem("completedYogaPoses")
+      if (saved) {
+        setCompletedPoses(JSON.parse(saved))
+      }
+    } catch (error) {
+      console.error("Error loading completed poses:", error)
+      setCompletedPoses([])
     }
   }, [])
+
+  useEffect(() => {
+    if (showAutoResetConfirm && timeLeft > 0) {
+      autoResetTimerRef.current = setTimeout(() => {
+        setTimeLeft(prevTime => prevTime - 1)
+      }, 1000)
+    } else if (showAutoResetConfirm && timeLeft === 0) {
+      performReset()
+    }
+
+    return () => {
+      if (autoResetTimerRef.current) {
+        clearTimeout(autoResetTimerRef.current)
+        autoResetTimerRef.current = null
+      }
+    }
+  }, [showAutoResetConfirm, timeLeft])
+
+  useEffect(() => {
+    if (!showAutoResetConfirm && autoResetTimerRef.current) {
+      clearTimeout(autoResetTimerRef.current);
+      autoResetTimerRef.current = null;
+      setTimeLeft(20);
+    }
+  }, [showAutoResetConfirm]);
 
   const handlePoseClick = (poseId: number) => {
     router.push(`/wellness/yoga/${poseId}`)
   }
 
+  const performReset = () => {
+    setIsResetting(true)
+    setShowAutoResetConfirm(false)
+
+    if (autoResetTimerRef.current) {
+      clearTimeout(autoResetTimerRef.current)
+      autoResetTimerRef.current = null
+    }
+
+    setTimeout(() => {
+      try {
+        localStorage.removeItem("completedYogaPoses")
+        setCompletedPoses([])
+        setIsResetting(false)
+        setTimeLeft(20)
+      } catch (error) {
+        console.error("Error resetting progress:", error)
+        setIsResetting(false)
+      }
+    }, 500)
+  }
+
+  const handleResetProgress = () => {
+    performReset()
+  }
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
-        return "bg-green-100 text-green-800"
+        return "bg-emerald-50 text-emerald-700 border border-emerald-300"
       case "Intermediate":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-amber-50 text-amber-700 border border-amber-300"
       case "Advanced":
-        return "bg-red-100 text-red-800"
+        return "bg-rose-50 text-rose-700 border border-rose-300"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-slate-50 text-slate-700 border border-slate-300"
     }
   }
 
+  const completionPercentage = Math.round((completedPoses.length / yogaPoses.length) * 100)
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="max-w-6xl mx-auto p-6">
+    <div
+      className="min-h-screen font-sans text-slate-900"
+      style={{
+        background: "linear-gradient(to bottom, #f0f4f8, #e0e8f0)",
+        backgroundAttachment: "fixed"
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         {/* Header Section */}
-        <div className="flex items-center mb-8">
-          <Button variant="ghost" onClick={() => router.push('/wellness')} className="mr-4 text-slate-600 hover:text-slate-900">
+        <div className="flex items-center justify-between mb-12">
+          {/* Back button for mobile */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/wellness')}
+            className="text-slate-500 hover:text-slate-700 px-4 py-2 rounded-full transition-colors font-medium md:hidden"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+
+          {/* Floating Back button for desktop */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/wellness')}
+            className="text-slate-500 hover:text-slate-700 px-4 py-2 rounded-full transition-colors font-medium hidden md:flex"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Wellness
           </Button>
+
+          {/* Reset Button */}
+          {completedPoses.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => setShowAutoResetConfirm(true)}
+              className="text-slate-500 hover:text-rose-600 border-slate-300 hover:border-rose-400 bg-white/50 hover:bg-rose-50 transition-colors rounded-full backdrop-blur-sm"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset Progress
+            </Button>
+          )}
         </div>
 
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">🧘 Stress-Relief Yoga & Breathing</h1>
-          <p className="text-xl text-slate-600 mb-2">Find your inner peace through mindful movement and breath</p>
-          <p className="text-slate-500 max-w-3xl mx-auto">
-            These carefully selected poses and breathing techniques are specifically designed to help you manage stress, 
-            calm your mind, and restore emotional balance in your daily life.
+        {/* Title Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+            Stress-Relief Yoga
+          </h1>
+          <div className="w-24 h-2 bg-gradient-to-r from-blue-400 to-teal-500 mx-auto rounded-full mb-6"></div>
+          <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed font-light">
+            Find your inner peace through mindful movement and breath. These practices are designed to help you manage stress, calm your mind, and restore emotional balance.
           </p>
         </div>
 
         {/* Progress Section */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <span className="text-slate-700 font-medium">
-              {completedPoses.length} of {yogaPoses.length} practices completed
-            </span>
-          </div>
+        <div className="mb-12">
+          <Card className="max-w-md mx-auto bg-white/70 border border-slate-200 rounded-2xl shadow-lg p-6 backdrop-blur-lg transition-all duration-500 hover:shadow-xl">
+            <CardContent className="p-0 text-center">
+              <h3 className="text-xl font-semibold text-slate-800 mb-1">Your Yoga Journey</h3>
+              <p className="text-sm text-slate-500 mb-4">
+                {completedPoses.length === 0 ? "Let's begin your mindful journey." :
+                  completedPoses.length < yogaPoses.length / 2 ? "You're making great progress! Keep it up." :
+                    completedPoses.length < yogaPoses.length ? "You're almost there! Just a few more to go." :
+                      "You have completed all practices! ⭐ A true yogi!"}
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-slate-600 mb-4 font-medium">
+                {completionPercentage === 100 ? (
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                ) : (
+                  <span className="text-sm font-bold text-slate-700">{completionPercentage}%</span>
+                )}
+                <span className="text-sm">
+                  {completedPoses.length} of {yogaPoses.length} practices completed
+                </span>
+                {completionPercentage === 100 && (
+                  <Star className="h-5 w-5 text-amber-400 fill-current animate-pulse ml-1" />
+                )}
+              </div>
+
+              <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-emerald-400 to-teal-500 h-2.5 rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${completionPercentage}%` }}
+                ></div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Yoga Poses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {yogaPoses.map((pose) => {
+          {yogaPoses.map((pose, index) => {
             const isCompleted = completedPoses.includes(pose.id)
             return (
               <Card
                 key={pose.id}
-                className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-br ${pose.color} border-0 relative ${
-                  isCompleted ? "ring-2 ring-green-400" : ""
-                }`}
+                className={`cursor-pointer transition-all duration-300 hover:shadow-xl relative group rounded-3xl ${pose.color} border-2 ${pose.borderColor}`}
                 onClick={() => handlePoseClick(pose.id)}
               >
-                {isCompleted && (
-                  <div className="absolute top-3 right-3 bg-green-500 text-white rounded-full p-1">
-                    <CheckCircle className="h-4 w-4" />
-                  </div>
-                )}
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-800 mb-1">{pose.name}</h3>
-                      <p className="text-sm text-slate-600 italic">{pose.sanskritName}</p>
+                {/* Combined Content & Icon */}
+                <CardContent className="p-3 flex flex-col justify-between h-full">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="flex-shrink-0 flex items-center gap-2">
+                        <div className="text-2xl font-bold text-slate-400">{index + 1}.</div>
+                        <div className="text-4xl">{pose.icon}</div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="items-center gap-2 mb-1">
+                          <h3 className="text-xl font-semibold text-slate-800 leading-tight">
+                            {pose.name}
+                          </h3>
+                          <p className="text-xm text-slate-600 italic font-medium">{pose.sanskritName}</p>
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className={`${getDifficultyColor(pose.difficulty)} text-[10px] font-medium px-1.5 py-0.5 rounded-full`}>
+                            {pose.difficulty}
+                          </Badge>
+                          <div className="flex items-center gap-1 text-slate-600 text-xs font-medium">
+                            <Clock className="h-3 w-3" />
+                            <span>{pose.duration}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <Badge className={getDifficultyColor(pose.difficulty)}>{pose.difficulty}</Badge>
-                  </div>
-                  <div className="flex items-center gap-1 text-slate-600 mb-3">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">{pose.duration}</span>
-                  </div>
-                  <div className="mb-3">
-                    <div className="flex items-start gap-1 mb-2">
-                      <Heart className="h-4 w-4 text-rose-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-slate-600 text-sm">{pose.benefits}</p>
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="flex items-start gap-1">
-                      <Brain className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-slate-600 text-sm font-medium">Best for: {pose.bestFor}</p>
+                    <div className="space-y-1">
+                      <div className="flex items-start gap-1.5">
+                        <Heart className="h-3 w-3 text-rose-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-slate-600 text-xs leading-snug">{pose.benefits}</p>
+                      </div>
+                      <div className="flex items-start gap-1.5">
+                        <Brain className="h-3 w-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-slate-600 text-xs font-semibold">Best for: {pose.bestFor}</p>
+                      </div>
                     </div>
                   </div>
                   <Button
                     size="sm"
-                    className={`w-full rounded-full ${
-                      isCompleted
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-white/80 hover:bg-white text-slate-700"
-                    }`}
+                    className={`mt-6 flex-shrink-0 w-full transition-all duration-300 font-semibold text-sm h-10 rounded-full group-hover:bg-slate-50 ${isCompleted
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white border-0 shadow-md"
+                      : "bg-white/80 backdrop-blur-sm hover:bg-white text-slate-800 border border-slate-300 shadow-sm hover:shadow-lg"
+                      }`}
                   >
-                    {isCompleted ? "Completed ✓" : "Start Practice"}
+                    {isCompleted ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Completed
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="h-5 w-5 mr-2 group-hover:hidden" />
+                        <span className="hidden group-hover:inline">Start Practice</span>
+                      </>
+                    )}
                   </Button>
                 </CardContent>
+                {isCompleted && (
+                  <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full p-1.5 shadow-md">
+                    <CheckCircle className="h-3 w-3" />
+                  </div>
+                )}
               </Card>
             )
           })}
         </div>
 
-        {/* Call to Action */}
-        {/* <div className="mt-12 text-center bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-          <h2 className="text-2xl font-semibold text-slate-800 mb-3">Ready to Start Your Stress-Relief Journey?</h2>
-          <p className="text-slate-600 mb-6 max-w-lg mx-auto">
-            Begin with gentle poses and breathing techniques. Remember, consistency is more important than perfection.
+        {/* Fixed Automatic Reset Confirmation Dialog */}
+        <Dialog open={showAutoResetConfirm} onOpenChange={setShowAutoResetConfirm}>
+          <DialogContent className="sm:max-w-md p-10 bg-white rounded-2xl fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <DialogHeader className="text-center">
+              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-rose-100 mb-4">
+                <Trash2 className="h-10 w-10 text-rose-600" />
+              </div>
+              <DialogTitle className="text-3xl font-bold text-slate-900 mb-2">Reset Progress?</DialogTitle>
+              <DialogDescription className="text-slate-600 leading-relaxed text-base">
+                Your progress will be reset in {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col sm:flex-row gap-4 mt-8">
+              <Button
+                variant="outline"
+                onClick={() => setShowAutoResetConfirm(false)}
+                className="flex-1 h-12 rounded-full border-slate-300 hover:bg-slate-50 font-semibold"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleResetProgress}
+                disabled={isResetting}
+                className="flex-1 h-12 rounded-full bg-rose-600 hover:bg-rose-700 text-white border-0 font-semibold"
+              >
+                {isResetting ? "Resetting..." : "Reset Now"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Footer */}
+        <div className="text-center mt-16 pt-8 border-t border-slate-200">
+          <p className="text-slate-500 text-sm">
+            Take your time with each practice. Listen to your body and breathe mindfully.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button
-              className="bg-gradient-to-r from-green-400 to-emerald-600 hover:from-green-500 hover:to-emerald-700 text-white px-6 py-2 rounded-full"
-              onClick={() => handlePoseClick(1)}
-            >
-              Start with Child's Pose
-            </Button>
-            <Button
-              className="bg-gradient-to-r from-blue-400 to-indigo-600 hover:from-blue-500 hover:to-indigo-700 text-white px-6 py-2 rounded-full"
-              onClick={() => handlePoseClick(10)}
-            >
-              Try Breathing Practice
-            </Button>
-            <Button variant="outline" className="px-6 py-2 rounded-full bg-transparent" onClick={() => router.back()}>
-              Back to Wellness
-            </Button>
-          </div>
-        </div> */}
+        </div>
       </div>
     </div>
   )
