@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Heart, Brain, ArrowLeft, CheckCircle, Target } from "lucide-react"
+import { Clock, Heart, Brain, ArrowLeft, ArrowRight, CheckCircle, Target } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 // Define the type for the Yoga Pose object
@@ -42,9 +42,12 @@ const yogaPoseImages: { [key: number]: string } = {
 export default function YogaPoseClient({ pose }: YogaPoseClientProps) {
   const router = useRouter()
   const [isCompleted, setIsCompleted] = useState(false)
-  const [imageLoaded, setImageLoaded] = useState(false)
 
-  // Use an effect to check local storage when the component loads
+  const allYogaPoseIds = Object.keys(yogaPoseImages).map(Number).sort((a, b) => a - b);
+  const currentPoseIndex = allYogaPoseIds.indexOf(pose.id);
+  const nextPoseId = allYogaPoseIds[currentPoseIndex + 1];
+  const isLastPose = currentPoseIndex === allYogaPoseIds.length - 1;
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem("completedYogaPoses")
@@ -57,159 +60,191 @@ export default function YogaPoseClient({ pose }: YogaPoseClientProps) {
     }
   }, [pose.id])
 
-  // Function to handle the "Mark as Finished" button click
   const handleFinished = () => {
     try {
       const saved = localStorage.getItem("completedYogaPoses")
       const completedPoses = saved ? JSON.parse(saved) : []
 
-      // Only update local storage if the pose hasn't been completed yet
       if (!completedPoses.includes(pose.id)) {
         completedPoses.push(pose.id)
         localStorage.setItem("completedYogaPoses", JSON.stringify(completedPoses))
-        // Update the state immediately to show the "completed" message
         setIsCompleted(true)
       }
 
-      // After updating the UI, redirect the user after a brief delay
       setTimeout(() => {
-        router.push("/wellness/yoga")
-      }, 1500) // 1.5-second delay to show the completed state
+        if (isLastPose) {
+          router.push("/wellness/yoga")
+        } else {
+          router.push(`/wellness/yoga/${nextPoseId}`)
+        }
+      }, 1500)
     } catch (e) {
       console.error("Failed to update localStorage", e);
-      // Fallback to immediate redirection if localStorage fails
-      router.push("/wellness/yoga")
+      if (isLastPose) {
+        router.push("/wellness/yoga")
+      } else {
+        router.push(`/wellness/yoga/${nextPoseId}`)
+      }
     }
   }
 
   const getDifficultyColor = (difficulty: string): string => {
     switch (difficulty) {
       case "Beginner":
-        return "bg-green-100 text-green-800 border border-green-200"
+        return "bg-green-50 text-green-700 border-green-200"
       case "Intermediate":
-        return "bg-amber-100 text-amber-800 border border-amber-200"
+        return "bg-amber-50 text-amber-700 border-amber-200"
       case "Advanced":
-        return "bg-red-100 text-red-800 border border-red-200"
+        return "bg-red-50 text-red-700 border-red-200"
       default:
-        return "bg-slate-100 text-slate-800 border border-slate-200"
+        return "bg-slate-50 text-slate-700 border-slate-200"
     }
   }
 
-  // Special handling for breathing practice (not a physical pose)
   const isBreathingPractice = pose.id === 10
 
   return (
-    <div className="min-h-screen bg-blue-50 font-sans text-slate-800">
-      <div className="max-w-5xl mx-auto p-4 md:p-6">
-        <Button
-          variant="ghost"
-          onClick={() => router.push("/wellness/yoga")}
-          className="mb-6 text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 rounded-xl"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Yoga Poses
-        </Button>
+    <div className="min-h-screen bg-gray-50 font-sans text-slate-900">
+      <div className="max-w-4xl mx-auto p-4 md:p-8">
 
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8">
-          {/* Image Section */}
-          <div className="order-2 md:order-1">
-            <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl overflow-hidden">
-              <div className="relative">
-                {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 animate-pulse flex items-center justify-center min-h-[300px]">
-                    <div className="text-4xl md:text-6xl opacity-50">
-                      {isBreathingPractice ? '🌬️' : '🧘'}
-                    </div>
-                  </div>
-                )}
-                <img
-                  src={yogaPoseImages[pose.id]}
-                  alt={`${pose.name} (${pose.sanskritName}) demonstration`}
-                  className={`w-full h-auto object-contain transition-opacity duration-300 ${
-                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  onLoad={() => setImageLoaded(true)}
-                  onError={() => setImageLoaded(false)}
-                />
-                {isCompleted && (
-                  <div className="absolute top-4 right-4 bg-green-500 text-white rounded-full p-2 shadow-lg">
-                    <CheckCircle className="h-5 w-5" />
-                  </div>
-                )}
-              </div>
-            </Card>
-          </div>
-
-          {/* Content Section */}
-          <div className="order-1 md:order-2 flex flex-col justify-center">
-            <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl p-6 md:p-8">
-              <div className="text-center md:text-left">
-                <div className="text-3xl mb-4">{isBreathingPractice ? '🌬️' : '🧘'}</div>
-                <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">{pose.name}</h1>
-                <p className="text-base md:text-lg text-slate-500 italic mb-4">{pose.sanskritName}</p>
-                
-                <div className="flex items-center justify-center md:justify-start gap-3 md:gap-4 text-slate-600 mb-6 flex-wrap">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">{pose.duration}</span>
-                  </div>
-                  <Badge className={getDifficultyColor(pose.difficulty)}>{pose.difficulty}</Badge>
-                  <div className="flex items-center gap-1">
-                    <Heart className="h-4 w-4" />
-                    <span className="text-sm">{isBreathingPractice ? 'Pranayama' : 'Yoga'}</span>
-                  </div>
-                </div>
-                
-                {/* Benefits Section */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-start gap-2">
-                    <Heart className="h-4 w-4 text-rose-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-bold text-slate-700 mb-1 text-sm">How it helps:</h3>
-                      <p className="text-slate-600 text-sm">{pose.benefits}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-2">
-                    <Target className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-bold text-slate-700 mb-1 text-sm">Best for:</h3>
-                      <p className="text-slate-600 text-sm">{pose.bestFor}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                {isCompleted && (
-                  <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-2 rounded-xl mb-4 border border-green-200">
-                    <CheckCircle className="h-4 w-4" />
-                    <span className="font-medium text-sm">Already completed!</span>
-                  </div>
-                )}
-              </div>
-            </Card>
-          </div>
+        {/* Back Button - Top of Content on Mobile */}
+        <div className="mb-4 md:hidden">
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/wellness/yoga")}
+            className="text-slate-600 hover:text-slate-800"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
         </div>
 
-        <Card className="mb-8 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl">
-          <CardContent className="p-6 md:p-8">
-            <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-2">
-              <Brain className="h-5 md:h-6 w-5 md:w-6" />
-              {isBreathingPractice ? 'Step-by-Step Breathing Technique' : 'Step-by-Step Instructions'}
-            </h3>
+        {/* Floating Back Button for Desktop */}
+        <div className="hidden md:block fixed top-8 left-8 z-50">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/wellness/yoga")}
+            className="text-slate-600 hover:text-slate-800 border-slate-300 bg-white hover:bg-gray-50 shadow-md"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Yoga Poses
+          </Button>
+        </div>
+
+        {/* Header Section */}
+        <div className="text-center mb-8 mt-4 md:mt-0">
+          <div className="text-5xl mb-2">{isBreathingPractice ? '🌬️' : '🧘'}</div>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 leading-tight">{pose.name}</h1>
+          <p className="text-md text-slate-500 italic mb-4">{pose.sanskritName}</p>
+          
+          <div className="flex items-center justify-center gap-3 text-slate-600 flex-wrap text-sm">
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              <span className="font-medium">{pose.duration}</span>
+            </div>
+            <Badge variant="outline" className={`${getDifficultyColor(pose.difficulty)} border font-medium px-2 py-0.5`}>
+              {pose.difficulty}
+            </Badge>
+            <div className="flex items-center gap-1">
+              <Heart className="h-4 w-4 text-rose-500" />
+              <span className="font-medium">{isBreathingPractice ? 'Pranayama' : 'Yoga'}</span>
+            </div>
+          </div>
+
+          {isCompleted && (
+            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full mt-4 border border-green-200 text-sm font-medium">
+              <CheckCircle className="h-4 w-4" />
+              <span>Completed</span>
+            </div>
+          )}
+        </div>
+
+        {/* Image Section (Updated for YouTube-like size and no background) */}
+        <div className="relative mb-6 md:mb-8 w-full aspect-video rounded-lg overflow-hidden shadow-lg">
+          <img
+            src={yogaPoseImages[pose.id]}
+            alt={`${pose.name} (${pose.sanskritName}) demonstration`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <hr className="my-8 border-gray-200" />
+
+        {/* Dynamic Benefits & Best For Section */}
+        {/* Shows as a single combined card on mobile, and a two-column grid on desktop */}
+        <div className="hidden md:grid md:grid-cols-2 gap-8 mb-8">
+          <Card className="bg-white border-slate-200 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3">
+                <Heart className="h-5 w-5 text-rose-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-1">Benefits</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{pose.benefits}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white border-slate-200 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3">
+                <Target className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-1">Best For</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{pose.bestFor}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Single unified card for mobile view */}
+        <div className="md:hidden">
+          <Card className="bg-white border-slate-200 shadow-lg mb-6">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <Heart className="h-5 w-5 text-rose-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-1">Benefits</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{pose.benefits}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Target className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-1">Best For</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{pose.bestFor}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <hr className="my-8 border-gray-200" />
+
+        {/* Instructions Section */}
+        <Card className="mb-8 bg-white border-slate-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Brain className="h-6 w-6 text-indigo-600" />
+              <h2 className="text-xl font-semibold text-slate-800">
+                {isBreathingPractice ? 'Breathing Technique' : 'Instructions'}
+              </h2>
+            </div>
+            
             <ol className="space-y-4">
               {pose.instructions.map((instruction: string, index: number) => (
-                <li key={index} className="flex gap-3 md:gap-4">
-                  <span className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                <li key={index} className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
                     {index + 1}
-                  </span>
-                  <span className="text-slate-700 text-sm md:text-base leading-relaxed pt-1">{instruction}</span>
+                  </div>
+                  <p className="text-slate-700 leading-relaxed text-sm pt-0.5">{instruction}</p>
                 </li>
               ))}
             </ol>
             
             {isBreathingPractice && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <p className="text-blue-800 text-sm">
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-blue-800 text-sm leading-relaxed">
                   <strong>Note:</strong> This is a breathing technique (pranayama), not a physical pose. 
                   Find a comfortable seated position and focus on your breath pattern.
                 </p>
@@ -218,20 +253,26 @@ export default function YogaPoseClient({ pose }: YogaPoseClientProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl">
-          <CardContent className="p-6 md:p-8 text-center space-y-4">
-            <Button
-              onClick={handleFinished}
-              className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white px-8 py-3 rounded-xl text-base font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
-            >
-              <CheckCircle className="h-5 w-5 mr-2" />
-              Mark as Finished
-            </Button>
-            <p className="text-slate-600 max-w-md mx-auto text-sm">
-              Take your time and listen to your body. Click "Mark as Finished" when you complete the {isBreathingPractice ? 'breathing practice' : 'pose'}.
-            </p>
-          </CardContent>
-        </Card>
+        {/* Action Section */}
+        <div className="flex justify-center w-full">
+          <Button
+            onClick={handleFinished}
+            size="lg"
+            className="w-full max-w-sm bg-indigo-600 hover:bg-indigo-700 text-white text-base font-medium shadow-md hover:shadow-lg transition-all duration-200"
+          >
+            {isLastPose ? (
+              <>
+                <CheckCircle className="h-5 w-5 mr-2" />
+                Finish Session
+              </>
+            ) : (
+              <>
+                <ArrowRight className="h-5 w-5 mr-2" />
+                Next Pose
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   )

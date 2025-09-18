@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Clock, Heart, Brain, ArrowLeft, CheckCircle } from "lucide-react"
 import YogaPoseClient from "./YogaPoseClient"
 
+
+
 const yogaPoses = [
   {
     id: 1,
