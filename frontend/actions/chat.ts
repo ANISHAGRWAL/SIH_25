@@ -1,15 +1,21 @@
-// actions/chat.ts
+const BASE_URL =
+  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api` || "http://localhost:5000/api";
 
 export async function chat(
+  token: string,
   provider: "Gemini" | "Groq",
   messages: { role: "user" | "bot"; text: string }[]
 ) {
   try {
-    const res = await fetch("http://127.0.0.1:8000/chat", {
+    const res = await fetch(`${BASE_URL}/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify({
-        model_name: provider === "Gemini" ? "gemini-2.5-flash" : "llama3-70b-8192",
+        model_name:
+          provider === "Gemini" ? "gemini-2.5-flash" : "llama3-70b-8192",
         model_provider: provider,
         system_prompt:
           "friendly ai chat motivator who helps his/her friend in enhancing their mental health",
