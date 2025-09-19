@@ -21,7 +21,7 @@ const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
     origin: [
-      /^https?:\/\/([a-zA-Z0-9-]+\.)*campuscare\.com$/,
+      /^https?:\/\/([a-zA-Z0-9-]+\.)*campuscare\.live$/,
       'http://localhost:3000',
     ],
     credentials: true,
