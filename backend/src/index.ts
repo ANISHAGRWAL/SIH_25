@@ -20,13 +20,21 @@ const server = http.createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: [
-      /^https?:\/\/([a-zA-Z0-9-]+\.)*campuscare\.live$/,
-      'http://localhost:3000',
-    ],
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        origin === 'http://localhost:3000' ||
+        /^https?:\/\/([a-zA-Z0-9-]+\.)*campuscare\.live$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   },
 });
+
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
