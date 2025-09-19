@@ -4,6 +4,7 @@ interface User {
   email: string;
   avatarUrl?: string;
   role: "admin" | "student";
+  volunteer?: boolean;
 }
 
 interface ICompleteUser extends User {

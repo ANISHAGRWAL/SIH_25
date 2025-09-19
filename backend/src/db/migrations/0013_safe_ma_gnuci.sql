@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "volunteer" SET NOT NULL;

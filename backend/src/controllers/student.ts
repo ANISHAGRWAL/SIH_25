@@ -51,6 +51,7 @@ export const getMe = async (user: IAuthUser): Promise<Partial<IUser>> => {
       role: userDetails.role,
       name: userDetails.name,
       avatarUrl: userDetails.avatarUrl,
+      volunteer: userDetails.volunteer,
     };
     return returnData;
   } catch (error) {

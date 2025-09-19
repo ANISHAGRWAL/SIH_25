@@ -3,7 +3,7 @@ import { db } from '../db';
 import { IApiRequest } from '../types';
 import jwt from 'jsonwebtoken';
 
-const verifyToken = async (token: string) => {
+export const verifyToken = async (token: string) => {
   try {
     const decodedToken = jwt.verify(
       token,

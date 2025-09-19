@@ -1,4 +1,6 @@
 import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 import cors from 'cors';
 import 'dotenv/config';
 import authRoutes from './routes/auth';
@@ -12,7 +14,19 @@ import adminRoutes from './routes/admin';
 import docChatRouter from './routes/doc_chat';
 import journalRoutes from './routes/journal';
 import bookingRoutes from './routes/booking';
+import { initializeSocketIo } from './socket';
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: [
+      /^https?:\/\/([a-zA-Z0-9-]+\.)*campuscare\.com$/,
+      'http://localhost:3000',
+    ],
+    credentials: true,
+  },
+});
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
@@ -34,7 +48,7 @@ app.use((req, res, next) => {
 
 const BASE_PATH = '/api';
 app.use(`${BASE_PATH}/health`, (req, res) => {
-  res.status(200).send('OK2');
+  res.status(200).send('OK');
 });
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
@@ -54,6 +68,8 @@ app.use(`${BASE_PATH}/booking`, bookingRoutes);
 app.use(adminMiddleware);
 app.use(`${BASE_PATH}/admin`, adminRoutes);
 
-app.listen(port, () => {
+initializeSocketIo(io);
+
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
