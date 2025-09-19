@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { chat } from "@/actions/chat";
+import { useAuth } from "../../../contexts/AuthContext"
+
 
 type Message = {
   id: string;
@@ -59,6 +61,7 @@ export default function ChatbotPage() {
   const [provider, setProvider] = useState<"Gemini" | "Groq">("Gemini");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { user } = useAuth();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -250,7 +253,7 @@ export default function ChatbotPage() {
             </button>
 
             {showSettings && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
+              <div className="absolute bottom-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
                 <button
                   onClick={() => setShowClearConfirm(true)}
                   className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -375,32 +378,44 @@ export default function ChatbotPage() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`max-w-[80%] flex gap-3 ${
-                      message.role === "user" ? "flex-row-reverse" : "flex-row"
-                    }`}
+                    className={`max-w-[80%] flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
+                      }`}
                   >
+                
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.role === "user"
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
                           ? "bg-gradient-to-br from-blue-500 to-indigo-600"
                           : "bg-gradient-to-br from-emerald-500 to-teal-600"
-                      }`}
+                        }`}
                     >
-                      {message.role === "user" ? userAvatar : botAvatar}
+                      {message.role === "user" ? (
+                        // Check if user has a profile picture
+                        user?.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt={`${user.name}'s profile picture`}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          // Fallback to the default user avatar if no picture exists
+                          userAvatar
+                        )
+                      ) : (
+                        // Always show the bot's avatar for bot messages
+                        botAvatar
+                      )}
                     </div>
 
                     <div className="flex flex-col">
                       <div
-                        className={`px-4 py-3 rounded-2xl ${
-                          message.role === "user"
+                        className={`px-4 py-3 rounded-2xl ${message.role === "user"
                             ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
                             : "bg-gray-100 text-gray-800 rounded-tl-md"
-                        }`}
+                          }`}
                       >
                         {message.isTyping ? (
                           <div className="flex items-center gap-1">
@@ -424,9 +439,8 @@ export default function ChatbotPage() {
                       </div>
                       {message.time && !message.isTyping && (
                         <p
-                          className={`text-xs mt-1 ${
-                            message.role === "user" ? "text-right" : "text-left"
-                          } text-gray-500`}
+                          className={`text-xs mt-1 ${message.role === "user" ? "text-right" : "text-left"
+                            } text-gray-500`}
                         >
                           {message.time}
                         </p>
@@ -479,11 +493,10 @@ export default function ChatbotPage() {
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
-                className={`p-3 rounded-xl transition-all duration-200 ${
-                  loading || !input.trim()
+                className={`p-3 rounded-xl transition-all duration-200 ${loading || !input.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
-                }`}
+                  }`}
               >
                 {loading ? (
                   <svg
