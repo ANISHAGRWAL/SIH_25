@@ -19,6 +19,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const auth = useAuth();
 
+const userAvatar = (
+  <svg
+    className="w-5 h-5 text-white"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+    />
+  </svg>
+);
+
+
   return (
     <ProtectedRoute requiredRole="student">
       <div className="min-h-screen bg-blue-50 font-sans text-slate-800">
@@ -70,7 +87,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <Avatar className="w-10 h-10">
                 <AvatarImage
-                  src={user?.avatarUrl || "/placeholder.svg"}
+                  src={user?.avatarUrl || "/default-avatar.png"}
                   alt="Avatar"
                 />
                 <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
@@ -360,7 +377,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-4 mb-8">
               <Avatar className="w-16 h-16">
                 <AvatarImage
-                  src={user?.avatarUrl || "/placeholder.svg"}
+                  src={user?.avatarUrl ? user?.avatarUrl : undefined}
                   alt="Avatar"
                 />
                 <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
@@ -382,24 +399,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 isActive={pathname === "/dashboard"}
                 icon="dashboard"
               />
-              <SideLink
-                href="/chatbot"
-                label="Chat Bot"
-                isActive={pathname === "/chatbot"}
-                icon="chat"
-              />
-              <SideLink
-                href="/mind-log"
-                label="Daily Mind Log"
-                isActive={pathname === "/mind-log"}
-                icon="journal"
-              />
+
               <SideLink
                 href="/psych-tests"
                 label="Psych Test"
                 isActive={pathname === "/psych-tests"}
                 icon="test"
               />
+              
+              <SideLink
+                href="/mind-log"
+                label="Daily Mind Log"
+                isActive={pathname === "/mind-log"}
+                icon="journal"
+              />
+
+              <SideLink
+                href="/chatbot"
+                label="MotiveAI"
+                isActive={pathname === "/chatbot"}
+                icon="chat"
+              />
+
+              
               <SideLink
                 href="/book-session"
                 label="Book Session"
