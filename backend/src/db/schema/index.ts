@@ -7,3 +7,6 @@ export * from './organization';
 export * from './journalEntries';
 export * from './sessionBooking';
 export * from './otp';
+export * from './chatMessages';
+export * from './chatRequests';
+export * from './chatSessions';

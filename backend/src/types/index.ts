@@ -3,6 +3,7 @@ import { IRole } from '../db/schema/user';
 import { IPhq } from '../db/schema/phq'; // Make sure to import these types
 import { IGad } from '../db/schema/gad';
 import { IPss } from '../db/schema/pss';
+import { Socket } from 'socket.io';
 
 export interface IApiResponse {
   success: boolean;
@@ -17,8 +18,13 @@ export interface IAuthUser {
   email: string;
   organizationId: string;
   role?: IRole;
+  volunteer?: boolean;
 }
 export interface IApiRequest extends Request {
+  user?: IAuthUser;
+}
+
+export interface IApiSocket extends Socket {
   user?: IAuthUser;
 }
 

@@ -1,4 +1,5 @@
 import {
+  boolean,
   foreignKey,
   pgEnum,
   pgTable,
@@ -43,6 +44,7 @@ export const user = pgTable(
     }),
     bio: varchar('bio', { length: 500 }),
     degree: varchar('degree', { length: 100 }),
+    volunteer: boolean('volunteer').default(false).notNull(),
     createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
     updatedAt: timestamp('updated_at')
       .defaultNow()
