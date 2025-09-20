@@ -141,7 +141,6 @@ export default function SignupPage() {
       if (res.ok && data.success && data.data) {
         localStorage.setItem("token", data.data.token);
         getTokens();
-        router.push("/dashboard?newUser=true"); // 👈 Redirect with param
       } else {
         setError(data.message || "Signup failed. Please try again.");
       }

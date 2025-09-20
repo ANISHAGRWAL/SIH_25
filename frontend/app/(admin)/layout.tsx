@@ -16,7 +16,7 @@ import {
   LogOut,
   Menu,
   X,
-  Shield,
+  Shield, // Icon for Volunteers
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
@@ -45,10 +45,10 @@ export default function AdminLayout({
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
           {/* Left side: Logo */}
           <Image
-            src="/logoiconfull.png" // Path from the 'public' folder
+            src="/logoiconfull.png"
             alt="Sahayog Admin Logo"
-            width={122} // Corresponds to w-8
-            height={122} // Corresponds to h-8
+            width={122}
+            height={122}
           />
 
           {/* Center: Navigation Links */}
@@ -65,6 +65,13 @@ export default function AdminLayout({
                 className="font-medium hover:text-slate-900 transition-colors"
               >
                 Users
+              </Link>
+              {/* ✨ NEW VOLUNTEERS LINK ADDED HERE */}
+              <Link
+                href="/volunteers"
+                className="font-medium hover:text-slate-900 transition-colors"
+              >
+                Volunteers
               </Link>
               <Link
                 href="/appointments"
@@ -94,7 +101,7 @@ export default function AdminLayout({
                 />
                 <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
                   {user?.name
-                    .split(" ")
+                    ?.split(" ")
                     .map((n) => n[0])
                     .join("")}
                 </AvatarFallback>
@@ -158,10 +165,10 @@ export default function AdminLayout({
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
             <Image
-              src="/logoiconfull.png" // Path from the 'public' folder
+              src="/logoiconfull.png"
               alt="Sahayog Admin Logo"
-              width={102} // Corresponds to w-8
-              height={102} // Corresponds to h-8
+              width={102}
+              height={102}
             />
 
             {/* Right side: Profile and Menu button */}
@@ -180,7 +187,7 @@ export default function AdminLayout({
                     />
                     <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
                       {user?.name
-                        .split(" ")
+                        ?.split(" ")
                         .map((n) => n[0])
                         .join("")}
                     </AvatarFallback>
@@ -304,6 +311,14 @@ export default function AdminLayout({
                   >
                     Users
                   </Link>
+                  {/* ✨ NEW VOLUNTEERS LINK ADDED HERE */}
+                  <Link
+                    href="/volunteers"
+                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Volunteers
+                  </Link>
                   <Link
                     href="/appointments"
                     className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
@@ -339,7 +354,7 @@ export default function AdminLayout({
             <MobileLink
               href="/admin-dashboard"
               label="Dashboard"
-              isActive={pathname === "/dashboard"}
+              isActive={pathname === "/admin-dashboard"} // Corrected path
               icon={LayoutDashboard}
             />
             <MobileLink
@@ -347,6 +362,13 @@ export default function AdminLayout({
               label="Users"
               isActive={pathname === "/users"}
               icon={Users}
+            />
+            {/* ✨ NEW VOLUNTEERS LINK ADDED HERE */}
+            <MobileLink
+              href="/volunteers"
+              label="Volunteers"
+              isActive={pathname === "/volunteers"}
+              icon={Shield}
             />
             <MobileLink
               href="/appointments"
@@ -360,8 +382,7 @@ export default function AdminLayout({
               isActive={pathname === "/forums"}
               icon={MessageSquare}
             />
-            {/* Fix applied here: Use nullish coalescing to ensure pathname is a string */}
-            <MobileMoreMenu pathname={pathname ?? ""} />
+            {/* The "More" menu is removed to make space, but you can add it back if needed */}
           </nav>
         </footer>
       </div>
@@ -369,6 +390,7 @@ export default function AdminLayout({
   );
 }
 
+// SideLink component remains unchanged as it is not used in the layout
 function SideLink({
   href,
   label,
@@ -400,6 +422,7 @@ function SideLink({
   );
 }
 
+// MobileLink component remains unchanged
 function MobileLink({
   href,
   label,
@@ -429,6 +452,8 @@ function MobileLink({
   );
 }
 
+// Note: MobileMoreMenu component is no longer used in the layout,
+// but is kept here in case you want to re-add it.
 function MobileMoreMenu({ pathname }: { pathname: string }) {
   const [isOpen, setIsOpen] = React.useState(false);
 

@@ -241,3 +241,39 @@ export const getUserById = async (token: string, id: string) => {
     };
   }
 };
+
+
+// Fetch volunteer requests
+export async function getVolunteerRequests(token: string) {
+  const res = await fetch(`${BASE_URL}/admin/wants-to-volunteer`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  return { ok: res.ok, data: data.data, error: data.error?.message };
+}
+
+// New function to approve a volunteer
+export const makeVolunteer = async (
+  token: string,
+  studentId: string
+): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/volunteer`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify({ studentId }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to approve volunteer");
+    }
+    return { ok: true, status: response.status, data: result.data };
+  } catch (error: any) {
+    return { ok: false, status: 500, error: error.message };
+  }
+};

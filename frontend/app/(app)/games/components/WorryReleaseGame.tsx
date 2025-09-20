@@ -1,279 +1,264 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-interface GameProps {}
+interface Star {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  speed: number;
+}
 
-// Worry Release Game - Write worries that fade away
-export default function WorryReleaseGame({}: GameProps) {
-  const [worryText, setWorryText] = useState('');
-  const [isReleasing, setIsReleasing] = useState(false);
-  const [circleSize, setCircleSize] = useState(250);
-  const [showPopup, setShowPopup] = useState(false);
-  const [releasedWorries, setReleasedWorries] = useState<string[]>([]);
+export default function PixelThoughtsGame() {
+  const [thought, setThought] = useState("");
+  const [submittedThought, setSubmittedThought] = useState("");
+  const [showSun, setShowSun] = useState(true);
+  const [sunSize, setSunSize] = useState(160);
+  const [isTransforming, setIsTransforming] = useState(false);
+  const [backgroundStars, setBackgroundStars] = useState<Star[]>([]);
+  const [thoughtStars, setThoughtStars] = useState<Star[]>([]);
 
-  const startRelease = () => {
-    if (worryText.trim() === '') return;
+  // Generate initial background stars
+  useEffect(() => {
+    const stars: Star[] = Array.from({ length: 80 }).map((_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100 + 100, // Start below screen
+      size: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.8 + 0.2,
+      speed: Math.random() * 0.5 + 0.2,
+    }));
+    setBackgroundStars(stars);
+  }, []);
+
+  // Animate background stars continuously moving upward
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBackgroundStars(prev => 
+        prev.map(star => {
+          let newY = star.y - star.speed;
+          // Reset star to bottom when it goes off screen
+          if (newY < -10) {
+            newY = 110;
+          }
+          return { ...star, y: newY };
+        })
+      );
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Animate thought stars
+  useEffect(() => {
+    if (thoughtStars.length > 0) {
+      const interval = setInterval(() => {
+        setThoughtStars(prev => 
+          prev.map(star => ({
+            ...star,
+            y: star.y - star.speed,
+            opacity: star.opacity * 0.995, // Gradually fade
+          })).filter(star => star.y > -50 && star.opacity > 0.1)
+        );
+      }, 50);
+
+      return () => clearInterval(interval);
+    }
+  }, [thoughtStars]);
+
+  const handleSubmit = () => {
+    if (thought.trim() === "") return;
     
-    setIsReleasing(true);
+    setSubmittedThought(thought);
+    setIsTransforming(true);
     
+    // Start shrinking the sun faster for quicker stress release
     const shrinkInterval = setInterval(() => {
-      setCircleSize(prev => {
-        const newSize = prev - 1;
-        if (newSize <= 0) {
+      setSunSize(prev => {
+        const newSize = prev - 12;
+        if (newSize <= 8) {
           clearInterval(shrinkInterval);
-          setShowPopup(true);
-          setReleasedWorries(prev => [...prev, worryText]);
-          setWorryText('');
-          setIsReleasing(false);
-          
-          // Reset circle after popup
-          setTimeout(() => {
-            setShowPopup(false);
-            setCircleSize(250);
-          }, 3000);
-          
-          return 0;
+          // Transform sun into multiple stars
+          transformSunToStars();
+          return 8;
         }
         return newSize;
       });
-    }, 80);
+    }, 480);
+
+    setThought("");
   };
 
-  const resetGame = () => {
-    setWorryText('');
-    setIsReleasing(false);
-    setCircleSize(250);
-    setShowPopup(false);
+  const transformSunToStars = () => {
+    // Create multiple stars from the sun's position
+    const newStars: Star[] = Array.from({ length: 12 }).map((_, i) => ({
+      id: Date.now() + i,
+      x: 50 + (Math.random() - 0.5) * 20, // Center around sun position
+      y: 50 + (Math.random() - 0.5) * 20,
+      size: Math.random() * 3 + 2,
+      opacity: 1,
+      speed: Math.random() * 1 + 0.5,
+    }));
+
+    setThoughtStars(prev => [...prev, ...newStars]);
+
+    // Reset after animation - shorter time for faster release
+    setTimeout(() => {
+      setShowSun(true);
+      setSunSize(160);
+      setIsTransforming(false);
+      setSubmittedThought("");
+    }, 4000);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
   };
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-gray-900">
-      {/* Galaxy Background */}
-      <div className="absolute inset-0 bg-gradient-radial from-purple-900/30 via-blue-900/50 to-black">
-        {/* Stars */}
-        {[...Array(150)].map((_, i) => (
+    <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-b from-indigo-900 via-purple-900 to-black overflow-hidden">
+      {/* Background stars moving upward */}
+      <div className="absolute inset-0">
+        {backgroundStars.map((star) => (
           <div
-            key={i}
-            className="absolute bg-white rounded-full opacity-0 animate-star-drift"
+            key={star.id}
+            className="absolute bg-white rounded-full transition-all duration-100 ease-linear"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 2 + 1}px`,
-              height: `${Math.random() * 2 + 1}px`,
-              animationDuration: `${Math.random() * 60 + 20}s`,
-              animationDelay: `${Math.random() * 20}s`,
-              opacity: Math.random() * 0.8 + 0.2
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              top: `${star.y}%`,
+              left: `${star.x}%`,
+              opacity: star.opacity,
+              boxShadow: `0 0 ${star.size * 2}px rgba(255,255,255,0.3)`,
             }}
           />
         ))}
-        
-        {/* Nebula clouds */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
-        <div className="absolute bottom-1/4 right-1/4 w-56 h-56 sm:w-80 sm:h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDuration: '15s', animationDelay: '5s'}}></div>
-        <div className="absolute top-1/3 right-1/3 w-48 h-48 sm:w-64 sm:h-64 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{animationDuration: '12s', animationDelay: '2s'}}></div>
-        
-        {/* Spiral Galaxy Arms */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full h-full max-w-2xl sm:max-w-4xl max-h-2xl sm:max-h-4xl">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute inset-0 border-2 border-blue-300/20 rounded-full animate-spin-slow"
-                style={{
-                  animation: `spin-slow ${60 + i * 20}s linear infinite`,
-                  transform: `rotate(${i * 45}deg)`,
-                  borderRadius: '50%',
-                  width: `${150 + i * 75}px`,
-                  height: `${150 + i * 75}px`,
-                  left: '50%',
-                  top: '50%',
-                  marginLeft: `-${75 + i * 37.5}px`,
-                  marginTop: `-${75 + i * 37.5}px`
-                }}
-              />
-            ))}
-          </div>
-        </div>
       </div>
 
-      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 sm:p-8">
-        {/* Cosmic Header */}
-        <div className="text-center mb-6 sm:mb-8">
-          <div className="text-3xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-2 sm:mb-4 animate-pulse">
-            🌌 Cosmic Worry Release 🌌
-          </div>
-          <div className="text-sm sm:text-xl text-blue-200 font-light mb-2 sm:mb-4">
-            Cast your worries into the infinite cosmos
-          </div>
-        </div>
+      {/* Thought stars (from transformed sun) */}
+      <div className="absolute inset-0">
+        {thoughtStars.map((star) => (
+          <div
+            key={star.id}
+            className="absolute bg-yellow-200 rounded-full transition-all duration-100 ease-linear"
+            style={{
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              top: `${star.y}%`,
+              left: `${star.x}%`,
+              opacity: star.opacity,
+              boxShadow: `0 0 ${star.size * 3}px rgba(255,255,0,0.5)`,
+            }}
+          />
+        ))}
+      </div>
 
-        {/* Central Galaxy Focus */}
-        <div className="flex-1 flex items-center justify-center relative">
-          {/* Galaxy Center - The destination */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-radial from-white via-yellow-300 to-orange-500 rounded-full animate-pulse-slow shadow-2xl" 
-                style={{
-                  boxShadow: '0 0 100px rgba(255, 255, 255, 0.5), 0 0 200px rgba(255, 255, 255, 0.3)',
-                  animationDuration: '4s'
-                }}>
-              <div className="absolute inset-2 bg-gradient-radial from-yellow-100 to-transparent rounded-full animate-spin-slow" 
-                  style={{animationDuration: '20s'}}></div>
-            </div>
-          </div>
-
-          {/* Worry Circle */}
-          <div className="relative flex items-center justify-center">
-            {/* Orbit rings around the worry circle */}
-            {!isReleasing && (
-              <>
-                <div className="absolute inset-0 border border-blue-400/30 rounded-full animate-spin-medium" 
-                      style={{ width: `${circleSize + 40}px`, height: `${circleSize + 40}px`, animationDuration: '40s' }}></div>
-                <div className="absolute inset-0 border border-purple-400/20 rounded-full animate-spin-medium" 
-                      style={{ width: `${circleSize + 60}px`, height: `${circleSize + 60}px`, animationDuration: '60s' }}></div>
-              </>
-            )}
-            
-            {/* Main Worry Sphere */}
+      {/* Central Sun with thought reflection */}
+      {showSun && !isTransforming && (
+        <div className="flex flex-col items-center relative z-10">
+          <div className="relative">
             <div 
-              className={`rounded-full flex items-center justify-center transition-all duration-200 relative ${
-                isReleasing 
-                  ? 'bg-gradient-radial from-blue-400/80 via-purple-400/60 to-transparent' 
-                  : 'bg-gradient-radial from-red-400/90 via-orange-400/70 to-yellow-400/50'
-              }`}
-              style={{ 
-                width: `${circleSize}px`, 
-                height: `${circleSize}px`,
-                opacity: circleSize > 0 ? 1 : 0,
-                boxShadow: isReleasing 
-                  ? `0 0 ${circleSize/3}px rgba(59, 130, 246, 0.6), inset 0 0 ${circleSize/6}px rgba(255,255,255,0.2)` 
-                  : `0 0 ${circleSize/4}px rgba(239, 68, 68, 0.8), inset 0 0 ${circleSize/8}px rgba(255,255,255,0.3)`,
-                border: isReleasing ? '2px solid rgba(59, 130, 246, 0.5)' : '2px solid rgba(239, 68, 68, 0.6)'
+              className="rounded-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 animate-pulseGlow transition-all duration-300 ease-out flex items-center justify-center"
+              style={{
+                width: `${sunSize}px`,
+                height: `${sunSize}px`,
+                boxShadow: '0 0 60px rgba(255,165,0,0.8), 0 0 100px rgba(255,165,0,0.4)',
               }}
             >
-              {!isReleasing && (
-                <textarea
-                  value={worryText}
-                  onChange={(e) => setWorryText(e.target.value)}
-                  placeholder="Release your burdens to the cosmos..."
-                  className="bg-transparent border-none outline-none resize-none text-center text-white font-medium placeholder-blue-200 leading-tight relative z-10"
-                  style={{ 
-                    fontSize: `${Math.max(12, circleSize / 15)}px`,
-                    width: `${circleSize * 0.75}px`,
-                    height: `${circleSize * 0.75}px`,
-                    padding: `${Math.max(8, circleSize / 25)}px`,
-                    textShadow: '0 0 10px rgba(0,0,0,0.8)'
-                  }}
-                  maxLength={Math.floor(circleSize / 6)}
-                />
+              {/* Thought reflection in the sun */}
+              {thought && (
+                <div className="absolute inset-0 flex items-center justify-center px-4">
+                  <span 
+                    className="text-orange-900 font-semibold text-center leading-tight opacity-70"
+                    style={{
+                      fontSize: `${Math.max(10, Math.min(16, sunSize / 12))}px`,
+                      maxWidth: `${sunSize * 0.8}px`,
+                    }}
+                  >
+                    {thought.length > 50 ? thought.substring(0, 50) + "..." : thought}
+                  </span>
+                </div>
               )}
-              
-              {isReleasing && (
-                <div 
-                  className="text-center text-white font-semibold break-words leading-tight overflow-hidden flex items-center justify-center relative z-10"
-                  style={{ 
-                    fontSize: `${Math.max(12, circleSize / 18)}px`,
-                    width: `${circleSize * 0.8}px`,
-                    height: `${circleSize * 0.8}px`,
-                    padding: `${Math.max(6, circleSize / 30)}px`,
-                    textShadow: '0 0 15px rgba(0,0,0,0.9)',
-                    display: '-webkit-box',
-                    WebkitLineClamp: Math.max(2, Math.floor(circleSize / 50)),
-                    WebkitBoxOrient: 'vertical' as const
-                  }}
-                >
-                  {worryText}
+            </div>
+          </div>
+          <input
+            type="text"
+            placeholder="What's on your mind?..."
+            value={thought}
+            onChange={(e) => setThought(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="mt-8 w-72 sm:w-80 p-4 rounded-full text-gray-800 text-center outline-none shadow-2xl bg-white/90 backdrop-blur-sm placeholder-gray-500 text-lg"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={!thought.trim()}
+            className="mt-6 px-8 py-3 rounded-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            RELEASE
+          </button>
+        </div>
+      )}
+
+      {/* Shrinking Sun Animation with thought reflection */}
+      {isTransforming && (
+        <div className="flex flex-col items-center relative z-10">
+          <div className="relative">
+            <div 
+              className="rounded-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 transition-all duration-200 ease-out flex items-center justify-center"
+              style={{
+                width: `${sunSize}px`,
+                height: `${sunSize}px`,
+                boxShadow: `0 0 ${sunSize}px rgba(255,165,0,0.8)`,
+              }}
+            >
+              {/* Thought reflection during transformation */}
+              {submittedThought && sunSize > 20 && (
+                <div className="absolute inset-0 flex items-center justify-center px-2">
+                  <span 
+                    className="text-orange-900 font-semibold text-center leading-tight opacity-60"
+                    style={{
+                      fontSize: `${Math.max(8, Math.min(14, sunSize / 14))}px`,
+                      maxWidth: `${sunSize * 0.9}px`,
+                    }}
+                  >
+                    {submittedThought.length > 40 ? submittedThought.substring(0, 40) + "..." : submittedThought}
+                  </span>
                 </div>
               )}
             </div>
           </div>
         </div>
+      )}
 
-        {/* Cosmic Action Buttons */}
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-4 sm:mb-8">
-          <button
-            onClick={startRelease}
-            disabled={worryText.trim() === '' || isReleasing}
-            className="px-6 py-3 sm:px-10 sm:py-4 bg-gradient-to-r from-blue-600/80 via-purple-600/80 to-pink-600/80 text-white rounded-2xl font-bold text-sm sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-blue-500/80 hover:via-purple-500/80 hover:to-pink-500/80 transition-all shadow-2xl border border-blue-400/30 backdrop-blur-sm"
-            style={{
-              boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)'
-            }}
-          >
-            {isReleasing ? '🌠 Traveling...' : '🚀 Launch'}
-          </button>
-          
-          <button
-            onClick={resetGame}
-            className="px-6 py-3 sm:px-10 sm:py-4 bg-gradient-to-r from-gray-600/80 to-gray-700/80 text-white rounded-2xl font-bold text-sm sm:text-lg hover:from-gray-500/80 hover:to-gray-600/80 transition-all shadow-2xl border border-gray-400/30 backdrop-blur-sm"
-          >
-            🔄 New Journey
-          </button>
-        </div>
 
-        {/* Enhanced Cosmic Success Popup */}
-        {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/80 backdrop-blur-sm">
-            <div className="bg-gradient-to-br from-indigo-900/90 via-purple-900/90 to-pink-900/90 rounded-3xl p-6 sm:p-12 text-center shadow-2xl max-w-sm sm:max-w-2xl mx-4 border border-blue-400/30 backdrop-blur-md relative overflow-hidden">
-              {/* Animated stars in popup */}
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute bg-white rounded-full animate-star-drift"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    width: `${Math.random() * 3 + 1}px`,
-                    height: `${Math.random() * 3 + 1}px`,
-                    animationDuration: `${Math.random() * 2 + 1}s`,
-                    opacity: Math.random() * 0.7 + 0.3
-                  }}
-                />
-              ))}
-              
-              <div className="relative z-10">
-                <div className="text-5xl sm:text-8xl mb-4 sm:mb-6 animate-bounce">⭐</div>
-                <div className="text-2xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-pink-300 mb-4 sm:mb-6">
-                  Worry Absorbed by the Universe!
-                </div>
-                <div className="text-blue-100 mb-4 sm:mb-8 text-sm sm:text-xl leading-relaxed">
-                  Your burden has become stardust, scattered across infinite space. 
-                  Feel the cosmic peace flowing through you as your worry transforms into light.
-                </div>
-                <div className="text-xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">
-                  ✨ You are one with the cosmos ✨
-                </div>
-                <div className="mt-4 text-xs sm:text-lg text-purple-200">
-                  🌟 Inner universe restored 🌟
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
 
       <style jsx>{`
-        @keyframes moveToCenter {
-          0% { transform: translate(0, 0) scale(1); opacity: 1; }
-          100% { transform: translate(-200px, -200px) scale(0); opacity: 0; }
+        @keyframes pulseGlow {
+          0%, 100% { 
+            box-shadow: 0 0 60px rgba(255,165,0,0.8), 0 0 100px rgba(255,165,0,0.4);
+            transform: scale(1);
+          }
+          50% { 
+            box-shadow: 0 0 80px rgba(255,165,0,1), 0 0 120px rgba(255,165,0,0.6);
+            transform: scale(1.02);
+          }
         }
-        .bg-gradient-radial {
-          background: radial-gradient(circle, var(--tw-gradient-stops));
+
+        .animate-pulseGlow {
+          animation: pulseGlow 3s infinite ease-in-out;
         }
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+
+        @keyframes fadeOut {
+          0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -40px) scale(0.8); }
         }
-        @keyframes spin-medium {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-        @keyframes star-drift {
-          from { transform: translate(0, 0); opacity: 0.5; }
-          to { transform: translate(20px, 20px); opacity: 0; }
+
+        .animate-fadeOut {
+          animation: fadeOut 2s ease-out forwards;
         }
       `}</style>
     </div>
