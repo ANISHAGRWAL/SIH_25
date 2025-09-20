@@ -6,6 +6,8 @@ import {
   getSessions,
   getStudents,
   getUserDetails,
+  makeVolunteer,
+  wantToVolunteer,
 } from '../controllers/admin';
 const router = express.Router();
 
@@ -94,6 +96,41 @@ router.get('/user', (req: IApiRequest, res: Response) => {
       .json({ success: false, error: { message: 'Forbidden' } });
   }
   getUserDetails(req.user, req.query.userId as string)
+    .then((data) => {
+      res.status(200).json({ success: true, data });
+    })
+    .catch((error) => {
+      res
+        .status(400)
+        .json({ success: false, error: { message: error.message } });
+    });
+});
+
+router.get('/wants-to-volunteer', (req: IApiRequest, res: Response) => {
+  if (req.user?.role !== 'admin') {
+    return res
+      .status(403)
+      .json({ success: false, error: { message: 'Forbidden' } });
+  }
+  wantToVolunteer(req.user)
+    .then((data) => {
+      res.status(200).json({ success: true, data });
+    })
+    .catch((error) => {
+      res
+        .status(400)
+        .json({ success: false, error: { message: error.message } });
+    });
+});
+
+router.post('/volunteer', (req: IApiRequest, res: Response) => {
+  if (req.user?.role !== 'admin') {
+    return res
+      .status(403)
+      .json({ success: false, error: { message: 'Forbidden' } });
+  }
+  const { studentId } = req.body;
+  makeVolunteer(req.user, studentId)
     .then((data) => {
       res.status(200).json({ success: true, data });
     })

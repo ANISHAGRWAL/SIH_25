@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ChatEventEnum } from "@/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { connectSocket, disconnectSocket } from "@/sockets/socket";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Message = {
   senderId: string;
@@ -21,15 +21,24 @@ export default function ChatPage() {
     { studentId: string; studentEmail: string }[]
   >([]);
   if (!user) return <div>Loading...</div>;
+  const socketRef = useRef<any>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const socket = connectSocket(token!);
+    socketRef.current = socket;
     setSocket(socket);
 
     socket.on(ChatEventEnum.CONNECTED_EVENT, () => {
       console.log("Socket connected");
     });
+
+    const savedRoomId = localStorage.getItem("roomId");
+    if (savedRoomId) {
+      setRoomId(savedRoomId);
+      socket.emit(ChatEventEnum.JOIN_ROOM, savedRoomId);
+      socket.emit(ChatEventEnum.GET_MESSAGES, savedRoomId);
+    }
 
     // STUDENT: chat started
     socket.on(ChatEventEnum.START_CHAT, ({ roomId, volunteer, studentId }) => {
@@ -38,12 +47,25 @@ export default function ChatPage() {
         socket.emit(ChatEventEnum.JOIN_ROOM, roomId);
       }
       setRoomId(roomId);
+      localStorage.setItem("roomId", roomId);
+      socket.emit(ChatEventEnum.GET_MESSAGES, roomId);
       setMessages([]);
     });
 
     // VOLUNTEER: see new chat request
     socket.on(ChatEventEnum.NEW_CHAT_REQUEST, (data) => {
-      setChatRequests((prev) => [...prev, data]);
+      if (data.organizationId !== user.organizationId) return; // only for same org
+      if (user.volunteer) {
+        setChatRequests((prev) => [...prev, data]);
+      }
+      // if (data.studentId !== user.id) return; // not for self
+    });
+
+    // VOLUNTEER: request accepted by another volunteer
+    socket.on(ChatEventEnum.REQUEST_ACCEPTED, ({ studentId }) => {
+      setChatRequests((prev) =>
+        prev.filter((req) => req.studentId !== studentId)
+      );
     });
 
     // Both: receive message
@@ -56,7 +78,35 @@ export default function ChatPage() {
       alert(msg);
     });
 
+    socket.on(ChatEventEnum.GET_MESSAGES, (msgs: Message[]) => {
+      setMessages(msgs);
+    });
+    socket.emit(ChatEventEnum.GET_REQUESTS);
+    socket.on(
+      ChatEventEnum.GET_REQUESTS,
+      (requests: { studentId: string; studentEmail: string }[]) => {
+        setChatRequests(requests);
+      }
+    );
+    socket.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) => {
+      setChatRequests((prev) =>
+        prev.filter((req) => req.studentId !== studentId)
+      );
+    });
+
+    socket.on(ChatEventEnum.LEAVE_ROOM, ({ leftRoomId }) => {
+      const roomId = localStorage.getItem("roomId");
+      console.log("Left room:", leftRoomId, roomId);
+      if (leftRoomId === roomId) {
+        setRoomId(null);
+        setMessages([]);
+        localStorage.removeItem("roomId");
+        socket.emit(ChatEventEnum.GET_REQUESTS);
+      }
+    });
+
     return () => {
+      socket.removeAllListeners(); //be cautious—it removes even listeners added by other components.
       disconnectSocket();
     };
   }, []);
@@ -64,12 +114,32 @@ export default function ChatPage() {
   const handleRequestChat = () => {
     console.log("Requesting chat...");
     socket.emit(ChatEventEnum.STUDENT_REQUEST_CHAT);
+    alert("Chat request sent. Please wait for a volunteer to accept.");
+    const request = {
+      studentId: user.id,
+      studentEmail: user.email,
+    };
+    setChatRequests([request]);
   };
 
   const handleAcceptChat = (studentId: string) => {
     socket.emit(ChatEventEnum.VOLUNTEER_ACCEPT_REQUEST, studentId);
   };
 
+  const handleLeaveRoom = () => {
+    if (!roomId) return;
+    socket.emit(ChatEventEnum.LEAVE_ROOM, roomId);
+    localStorage.removeItem("roomId");
+    setRoomId(null);
+    setMessages([]);
+    socket.emit(ChatEventEnum.GET_REQUESTS);
+  };
+
+  const handleCancelRequest = () => {
+    socket.emit(ChatEventEnum.CANCEL_REQUEST);
+    setChatRequests([]);
+    alert("Chat request cancelled.");
+  };
   const handleSendMessage = () => {
     if (!messageInput.trim() || !roomId) return;
 
@@ -90,9 +160,14 @@ export default function ChatPage() {
       <h1>Chat Page ({user?.role})</h1>
 
       {/* STUDENT */}
-      {user.role === "student" && !user.volunteer && !roomId && (
-        <Button onClick={handleRequestChat}>Request Chat</Button>
-      )}
+      {user.role === "student" &&
+        !user.volunteer &&
+        !roomId &&
+        (chatRequests.length > 0 ? (
+          <Button onClick={() => handleCancelRequest()}>Cancel Request</Button>
+        ) : (
+          <Button onClick={handleRequestChat}>Request Chat</Button>
+        ))}
 
       {/* VOLUNTEER: See incoming requests */}
       {user.role === "student" && user.volunteer && !roomId && (
@@ -145,6 +220,7 @@ export default function ChatPage() {
             style={{ width: "80%", marginRight: 8 }}
           />
           <button onClick={handleSendMessage}>Send</button>
+          <Button onClick={handleLeaveRoom}>Leave chat</Button>
         </div>
       )}
     </div>

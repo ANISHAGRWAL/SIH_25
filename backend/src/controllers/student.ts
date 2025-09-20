@@ -9,6 +9,7 @@ import {
 } from '../db/schema';
 import { IAuthUser } from '../types';
 import { uploadOnCloudinary } from '../utils/cloudinary';
+import { volunteerRequests as volunteerRequestsSchema } from '../db/schema/volunteerRequests';
 
 export const facialDetection = async (
   user: IAuthUser,
@@ -52,6 +53,7 @@ export const getMe = async (user: IAuthUser): Promise<Partial<IUser>> => {
       name: userDetails.name,
       avatarUrl: userDetails.avatarUrl,
       volunteer: userDetails.volunteer,
+      organizationId: userDetails.organizationId,
     };
     return returnData;
   } catch (error) {
@@ -103,6 +105,28 @@ export const updateUserDetails = async (
       throw new Error('User not found or not updated');
     }
     return userDetails[0];
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const becomeVolunteer = async (authUser: IAuthUser) => {
+  try {
+    if (authUser.role !== 'student') {
+      throw new Error('Only students can become volunteers');
+    }
+    const volunteer = await db
+      .insert(volunteerRequestsSchema)
+      .values({
+        studentId: authUser.id,
+        organizationId: authUser.organizationId,
+      })
+      .returning();
+    if (!volunteer || volunteer.length === 0) {
+      throw new Error('Volunteer request not created');
+    }
+    return volunteer[0];
   } catch (error) {
     console.log(error);
     throw error;

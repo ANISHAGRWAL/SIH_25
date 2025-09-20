@@ -10,3 +10,4 @@ export * from './otp';
 export * from './chatMessages';
 export * from './chatRequests';
 export * from './chatSessions';
+export * from './volunteerRequests';

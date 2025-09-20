@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from 'drizzle-orm';
 import { db } from '../db';
-import { IUser, journalEntries } from '../db/schema';
+import { IUser, journalEntries, user, volunteerRequests } from '../db/schema';
 import { IAuthUser } from '../types';
 import { JournalData } from './reportService';
 import { PARAMS } from '../utils/labelParser';
@@ -234,6 +234,49 @@ export const getUserDetails = async (authUser: IAuthUser, userId: string) => {
     }
     const journalReport = await generateAdminWeeklyReport(authUser, userId);
     return { user, journalReport };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const wantToVolunteer = async (authUser: IAuthUser) => {
+  try {
+    const volunteers = await db.query.volunteerRequests.findMany({
+      where: (vr, { eq }) => eq(vr.organizationId, authUser.organizationId),
+    });
+    if (!volunteers) {
+      throw new Error('No volunteer requests found');
+    }
+    return volunteers;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const makeVolunteer = async (authUser: IAuthUser, studentId: string) => {
+  try {
+    await db.transaction(async (tx) => {
+      // make volunteer
+      await tx
+        .update(user)
+        .set({
+          volunteer: true,
+        })
+        .where(
+          and(
+            eq(user.id, studentId),
+            eq(user.role, 'student'),
+            eq(user.organizationId, authUser.organizationId),
+          ),
+        );
+      // delete from volunteer table
+      await tx
+        .delete(volunteerRequests)
+        .where(eq(volunteerRequests.studentId, studentId));
+    });
+    return { success: true };
   } catch (error) {
     console.log(error);
     throw error;

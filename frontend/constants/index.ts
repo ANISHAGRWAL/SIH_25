@@ -8,4 +8,9 @@ export enum ChatEventEnum {
   RECEIVE_MESSAGE = "receive_message",
   ERROR_EVENT = "error_event",
   JOIN_ROOM = "join_room",
+  GET_MESSAGES = "get_messages",
+  LEAVE_ROOM = "leave_room",
+  GET_REQUESTS = "get_requests",
+  CANCEL_REQUEST = "cancel_request",
+  REQUEST_ACCEPTED = "request_accepted",
 }

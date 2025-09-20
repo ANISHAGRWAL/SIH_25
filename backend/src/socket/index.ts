@@ -8,12 +8,13 @@ import {
   chatRequests as chatRequestsSchema,
   chatSessions as chatSessionsSchema,
 } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 const mountChatEvent = (socket: IApiSocket) => {
   const user = socket.user;
   if (!user) return;
 
+  //student
   if (!user.volunteer) {
     socket.on(ChatEventEnum.STUDENT_REQUEST_CHAT, async () => {
       //check if already pending
@@ -27,11 +28,46 @@ const mountChatEvent = (socket: IApiSocket) => {
         .values({
           studentId: user.id,
           status: 'pending',
+          organizationId: user.organizationId,
         })
         .returning();
       socket.broadcast.emit(ChatEventEnum.NEW_CHAT_REQUEST, {
         studentId: user.id,
         studentEmail: user.email,
+        organizationId: user.organizationId,
+      });
+    });
+
+    socket.on(ChatEventEnum.GET_REQUESTS, async () => {
+      const requests = await db.query.chatRequests.findMany({
+        where: (cr, { and, eq }) =>
+          and(eq(cr.studentId, user.id), eq(cr.status, 'pending')),
+        orderBy: (cr, { desc }) => [desc(cr.createdAt)],
+        columns: {
+          studentId: true,
+        },
+        with: {
+          student: {
+            columns: {
+              email: true,
+            },
+          },
+        },
+      });
+      const response = requests.map((r) => ({
+        studentId: r.studentId,
+        studentEmail: r.student.email,
+      }));
+      socket.emit(ChatEventEnum.GET_REQUESTS, response);
+    });
+
+    socket.on(ChatEventEnum.CANCEL_REQUEST, async () => {
+      await db
+        .delete(chatRequestsSchema)
+        .where(and(eq(chatRequestsSchema.studentId, user.id)));
+      //inform the volunteer that one cancelled the request
+      socket.broadcast.emit(ChatEventEnum.CANCEL_REQUEST, {
+        studentId: user.id,
       });
     });
   }
@@ -81,8 +117,39 @@ const mountChatEvent = (socket: IApiSocket) => {
           sessionId: session.id,
           studentId,
         });
+        //notify all volunteers to remove the request from their list
+        socket.broadcast.emit(ChatEventEnum.REQUEST_ACCEPTED, {
+          studentId,
+          organizationId: user.organizationId,
+        });
       },
     );
+
+    socket.on(ChatEventEnum.GET_REQUESTS, async () => {
+      const requests = await db.query.chatRequests.findMany({
+        where: (cr, { and, eq }) =>
+          and(
+            eq(cr.status, 'pending'),
+            eq(cr.organizationId, user.organizationId),
+          ),
+        orderBy: (cr, { desc }) => [desc(cr.createdAt)],
+        columns: {
+          studentId: true,
+        },
+        with: {
+          student: {
+            columns: {
+              email: true,
+            },
+          },
+        },
+      });
+      const response = requests.map((r) => ({
+        studentId: r.studentId,
+        studentEmail: r.student.email,
+      }));
+      socket.emit(ChatEventEnum.GET_REQUESTS, response);
+    });
   }
 
   // send message
@@ -103,11 +170,44 @@ const mountChatEvent = (socket: IApiSocket) => {
       senderId,
     });
   });
+
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${user.email}`);
   });
+
   socket.on(ChatEventEnum.JOIN_ROOM, (roomId: string) => {
     socket.join(roomId);
+  });
+
+  socket.on(ChatEventEnum.GET_MESSAGES, async (roomId: string) => {
+    const messages = await db.query.chatMessages.findMany({
+      where: eq(chatMessagesSchema.chatSessionId, roomId),
+      orderBy: (cm, { asc }) => [asc(cm.sentAt)],
+      columns: {
+        senderId: true,
+        message: true,
+      },
+    });
+    socket.emit(ChatEventEnum.GET_MESSAGES, messages);
+  });
+
+  socket.on(ChatEventEnum.LEAVE_ROOM, async (roomId: string) => {
+    //delete all the chatSessions and messages and also the chatRequest
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(chatMessagesSchema)
+        .where(eq(chatMessagesSchema.chatSessionId, roomId));
+      await tx
+        .delete(chatSessionsSchema)
+        .where(eq(chatSessionsSchema.id, roomId));
+      await tx
+        .delete(chatRequestsSchema)
+        .where(eq(chatRequestsSchema.studentId, user.id));
+    });
+    socket.leave(roomId);
+    // Notify ALL sockets in the room (including the one who left)
+    socket.to(roomId).emit(ChatEventEnum.LEAVE_ROOM, { leftRoomId: roomId });
+    socket.emit(ChatEventEnum.LEAVE_ROOM, { leftRoomId: roomId });
   });
 };
 
