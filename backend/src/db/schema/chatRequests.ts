@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
   foreignKey,
   pgEnum,
@@ -22,6 +22,7 @@ export const chatRequests = pgTable(
       .default(sql`gen_random_uuid()`),
     studentId: uuid('student_id').notNull(),
     status: ChatStatusEnum('status').default('pending').notNull(),
+    organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => [
@@ -34,6 +35,13 @@ export const chatRequests = pgTable(
       .onUpdate('cascade'),
   ],
 );
+
+export const chatRequestRelations = relations(chatRequests, ({ one }) => ({
+  student: one(user, {
+    fields: [chatRequests.studentId],
+    references: [user.id],
+  }),
+}));
 
 export type IChatRequestStatus = (typeof ChatStatusEnum.enumValues)[number];
 export type IChatRequests = typeof chatRequests.$inferSelect;

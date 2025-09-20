@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import {
+  becomeVolunteer,
   facialDetection,
   getMe,
   updateUserDetails,
@@ -68,6 +69,23 @@ router.post('/details', uploadFile, (req: IApiRequest, res: Response) => {
       .json({ success: false, error: { message: 'Unauthorized' } });
   }
   updateUserDetails(req.user, req.body, req.file)
+    .then((data) => {
+      res.status(200).json({ success: true, data });
+    })
+    .catch((error) => {
+      res
+        .status(400)
+        .json({ success: false, error: { message: error.message } });
+    });
+});
+
+router.post('/volunteer', (req: IApiRequest, res: Response) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ success: false, error: { message: 'Unauthorized' } });
+  }
+  becomeVolunteer(req.user)
     .then((data) => {
       res.status(200).json({ success: true, data });
     })

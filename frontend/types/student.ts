@@ -5,6 +5,7 @@ interface User {
   avatarUrl?: string;
   role: "admin" | "student";
   volunteer?: boolean;
+  organizationId?: string;
 }
 
 interface ICompleteUser extends User {
