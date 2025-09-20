@@ -1,8 +1,8 @@
 // db/index.ts
 
-import { Pool } from '@neondatabase/serverless';
+import { Pool } from 'pg';
 
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from '../db/schema';
 import { config } from 'dotenv';
 

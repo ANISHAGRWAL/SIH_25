@@ -1,189 +1,236 @@
 "use client";
+
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChatEventEnum } from "@/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { connectSocket, disconnectSocket } from "@/sockets/socket";
-import React, { useEffect, useRef, useState } from "react";
 
 type Message = {
   senderId: string;
   message: string;
 };
 
+type ChatRequest = {
+  studentId: string;
+  studentEmail: string;
+  organizationId?: string; // if needed
+};
+
 export default function ChatPage() {
-  const auth = useAuth(); // { id, email, role, etc. }
+  const auth = useAuth();
   const { user } = auth;
+
   const [socket, setSocket] = useState<any>(null);
-  const [roomId, setRoomId] = useState<string | null>(null);
-  const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [chatRequests, setChatRequests] = useState<
-    { studentId: string; studentEmail: string }[]
-  >([]);
-  if (!user) return <div>Loading...</div>;
   const socketRef = useRef<any>(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const socket = connectSocket(token!);
-    socketRef.current = socket;
-    setSocket(socket);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [chatRequests, setChatRequests] = useState<ChatRequest[]>([]);
+  const [messageInput, setMessageInput] = useState("");
 
-    socket.on(ChatEventEnum.CONNECTED_EVENT, () => {
+  // Initialize socket once user is present
+  useEffect(() => {
+    if (!user) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found!");
+      return;
+    }
+
+    const sock = connectSocket(token);
+    socketRef.current = sock;
+    setSocket(sock);
+
+    // Setup socket listeners
+    sock.on(ChatEventEnum.CONNECTED_EVENT, () => {
       console.log("Socket connected");
     });
 
-    const savedRoomId = localStorage.getItem("roomId");
-    if (savedRoomId) {
-      setRoomId(savedRoomId);
-      socket.emit(ChatEventEnum.JOIN_ROOM, savedRoomId);
-      socket.emit(ChatEventEnum.GET_MESSAGES, savedRoomId);
-    }
-
-    // STUDENT: chat started
-    socket.on(ChatEventEnum.START_CHAT, ({ roomId, volunteer, studentId }) => {
-      console.log("Chat started in room:", roomId, volunteer, studentId);
-      if (volunteer) {
-        socket.emit(ChatEventEnum.JOIN_ROOM, roomId);
+    // Active room logic
+    sock.emit(ChatEventEnum.GET_ACTIVE_ROOM);
+    sock.on(ChatEventEnum.GET_ACTIVE_ROOM, ({ savedRoomId }) => {
+      console.log("Active room:", savedRoomId);
+      if (savedRoomId) {
+        setRoomId(savedRoomId);
+        sock.emit(ChatEventEnum.JOIN_ROOM, savedRoomId);
+        sock.emit(ChatEventEnum.GET_MESSAGES, savedRoomId);
       }
-      setRoomId(roomId);
-      localStorage.setItem("roomId", roomId);
-      socket.emit(ChatEventEnum.GET_MESSAGES, roomId);
-      setMessages([]);
     });
 
-    // VOLUNTEER: see new chat request
-    socket.on(ChatEventEnum.NEW_CHAT_REQUEST, (data) => {
-      if (data.organizationId !== user.organizationId) return; // only for same org
-      if (user.volunteer) {
-        setChatRequests((prev) => [...prev, data]);
+    // START_CHAT: fired when a session has been started/accepted
+    sock.on(
+      ChatEventEnum.START_CHAT,
+      ({ roomId: newRoomId, volunteer, studentId }) => {
+        console.log("Chat started:", newRoomId, volunteer, studentId);
+        setRoomId(newRoomId);
+        setMessages([]); // clear old messages
+        sock.emit(ChatEventEnum.GET_MESSAGES, newRoomId);
       }
-      // if (data.studentId !== user.id) return; // not for self
+    );
+
+    // NEW_CHAT_REQUEST: for volunteers
+    sock.on(
+      ChatEventEnum.NEW_CHAT_REQUEST,
+      (req: ChatRequest & { organizationId?: string }) => {
+        // Only for same organization
+        if (
+          req.organizationId &&
+          user.organizationId &&
+          req.organizationId !== user.organizationId
+        ) {
+          return;
+        }
+        if (user.volunteer) {
+          setChatRequests((prev) => {
+            // avoid duplicates
+            const exists = prev.some((r) => r.studentId === req.studentId);
+            if (exists) return prev;
+            return [...prev, req];
+          });
+        }
+      }
+    );
+
+    // REQUEST_ACCEPTED: remove request if accepted elsewhere
+    sock.on(ChatEventEnum.REQUEST_ACCEPTED, ({ studentId }) => {
+      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
     });
 
-    // VOLUNTEER: request accepted by another volunteer
-    socket.on(ChatEventEnum.REQUEST_ACCEPTED, ({ studentId }) => {
-      setChatRequests((prev) =>
-        prev.filter((req) => req.studentId !== studentId)
-      );
-    });
-
-    // Both: receive message
-    socket.on(ChatEventEnum.RECEIVE_MESSAGE, ({ senderId, message }) => {
-      console.log("New message from", senderId, ":", message);
+    // RECEIVE_MESSAGE
+    sock.on(ChatEventEnum.RECEIVE_MESSAGE, ({ senderId, message }) => {
       setMessages((prev) => [...prev, { senderId, message }]);
     });
 
-    socket.on(ChatEventEnum.ERROR_EVENT, (msg) => {
-      alert(msg);
-    });
-
-    socket.on(ChatEventEnum.GET_MESSAGES, (msgs: Message[]) => {
+    // GET_MESSAGES
+    sock.on(ChatEventEnum.GET_MESSAGES, (msgs: Message[]) => {
       setMessages(msgs);
     });
-    socket.emit(ChatEventEnum.GET_REQUESTS);
-    socket.on(
-      ChatEventEnum.GET_REQUESTS,
-      (requests: { studentId: string; studentEmail: string }[]) => {
-        setChatRequests(requests);
-      }
-    );
-    socket.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) => {
-      setChatRequests((prev) =>
-        prev.filter((req) => req.studentId !== studentId)
-      );
+
+    // GET_REQUESTS
+    sock.emit(ChatEventEnum.GET_REQUESTS);
+    sock.on(ChatEventEnum.GET_REQUESTS, (requests: ChatRequest[]) => {
+      setChatRequests(requests);
     });
 
-    socket.on(ChatEventEnum.LEAVE_ROOM, ({ leftRoomId }) => {
-      const roomId = localStorage.getItem("roomId");
+    // CANCEL_REQUEST
+    sock.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) => {
+      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
+    });
+
+    // LEAVE_ROOM
+    sock.on(ChatEventEnum.LEAVE_ROOM, ({ leftRoomId }) => {
       console.log("Left room:", leftRoomId, roomId);
-      if (leftRoomId === roomId) {
-        setRoomId(null);
-        setMessages([]);
-        localStorage.removeItem("roomId");
-        socket.emit(ChatEventEnum.GET_REQUESTS);
-      }
+      // if (leftRoomId === roomId) {
+      setRoomId(null);
+      setMessages([]);
+      sock.emit(ChatEventEnum.GET_REQUESTS);
+      // }
     });
 
+    // Cleanup
     return () => {
-      socket.removeAllListeners(); //be cautious—it removes even listeners added by other components.
+      // Remove listeners
+      sock.removeAllListeners();
       disconnectSocket();
     };
-  }, []);
+  }, [user]); // Re-run when user changes
 
+  if (!user) {
+    return <div>Loading user...</div>;
+  }
+
+  // Utility booleans
+  const isStudent = user.role === "student";
+  const isVolunteer = Boolean(user.volunteer);
+  const isAdmin = user.role === "admin";
+
+  // Handlers
   const handleRequestChat = () => {
-    console.log("Requesting chat...");
+    if (!socket) {
+      console.warn("Socket is not ready");
+      return;
+    }
     socket.emit(ChatEventEnum.STUDENT_REQUEST_CHAT);
     alert("Chat request sent. Please wait for a volunteer to accept.");
-    const request = {
+    const req: ChatRequest = {
       studentId: user.id,
       studentEmail: user.email,
+      organizationId: user.organizationId,
     };
-    setChatRequests([request]);
+    setChatRequests([req]);
   };
 
   const handleAcceptChat = (studentId: string) => {
+    if (!socket) return;
     socket.emit(ChatEventEnum.VOLUNTEER_ACCEPT_REQUEST, studentId);
+    // Optionally remove the request from UI immediately
+    setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
   };
 
   const handleLeaveRoom = () => {
-    if (!roomId) return;
+    if (!roomId || !socket) return;
     socket.emit(ChatEventEnum.LEAVE_ROOM, roomId);
-    localStorage.removeItem("roomId");
     setRoomId(null);
     setMessages([]);
     socket.emit(ChatEventEnum.GET_REQUESTS);
   };
 
   const handleCancelRequest = () => {
+    if (!socket) return;
     socket.emit(ChatEventEnum.CANCEL_REQUEST);
     setChatRequests([]);
     alert("Chat request cancelled.");
   };
+
   const handleSendMessage = () => {
-    if (!messageInput.trim() || !roomId) return;
-
-    socket.emit(ChatEventEnum.SEND_MESSAGE, {
-      roomId,
-      message: messageInput,
-    });
-
+    if (!socket) return;
+    if (!roomId || messageInput.trim() === "") return;
+    socket.emit(ChatEventEnum.SEND_MESSAGE, { roomId, message: messageInput });
     setMessages((prev) => [
       ...prev,
-      { senderId: user?.id, message: messageInput },
+      { senderId: user.id, message: messageInput },
     ]);
     setMessageInput("");
   };
 
+  // Render UI based on states
   return (
     <div style={{ padding: 24 }}>
-      <h1>Chat Page ({user?.role})</h1>
+      <h1>
+        Chat Page — Role: {user.role} {isVolunteer && "(Volunteer)"}
+      </h1>
 
-      {/* STUDENT */}
-      {user.role === "student" &&
-        !user.volunteer &&
-        !roomId &&
-        (chatRequests.length > 0 ? (
-          <Button onClick={() => handleCancelRequest()}>Cancel Request</Button>
-        ) : (
-          <Button onClick={handleRequestChat}>Request Chat</Button>
-        ))}
+      {/* If user is a student and not volunteer */}
+      {isStudent && !isVolunteer && !roomId && (
+        <div>
+          {chatRequests.length > 0 ? (
+            <Button onClick={handleCancelRequest}>Cancel Request</Button>
+          ) : (
+            <Button onClick={handleRequestChat}>Request Chat</Button>
+          )}
+        </div>
+      )}
 
-      {/* VOLUNTEER: See incoming requests */}
-      {user.role === "student" && user.volunteer && !roomId && (
+      {/* If user is volunteer (regardless of admin/student) and not in a room */}
+      {isVolunteer && !roomId && (
         <div>
           <h3>Incoming Requests</h3>
-          {chatRequests.length === 0 && <p>No requests yet</p>}
-          <ul>
-            {chatRequests.map((req) => (
-              <li key={req.studentId}>
-                {req.studentEmail}{" "}
-                <Button onClick={() => handleAcceptChat(req.studentId)}>
-                  Accept
-                </Button>
-              </li>
-            ))}
-          </ul>
+          {chatRequests.length === 0 ? (
+            <p>No requests yet</p>
+          ) : (
+            <ul>
+              {chatRequests.map((req) => (
+                <li key={req.studentId}>
+                  {req.studentEmail}{" "}
+                  <Button onClick={() => handleAcceptChat(req.studentId)}>
+                    Accept
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -196,7 +243,7 @@ export default function ChatPage() {
               border: "1px solid #ccc",
               padding: 12,
               height: 300,
-              overflowY: "scroll",
+              overflowY: "auto",
             }}
           >
             {messages.map((msg, index) => (
@@ -211,16 +258,22 @@ export default function ChatPage() {
               </div>
             ))}
           </div>
-          <input
-            type="text"
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Type your message"
-            style={{ width: "80%", marginRight: 8 }}
-          />
-          <button onClick={handleSendMessage}>Send</button>
-          <Button onClick={handleLeaveRoom}>Leave chat</Button>
+          <div style={{ marginTop: 8 }}>
+            <input
+              type="text"
+              placeholder="Type your message"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSendMessage();
+              }}
+              style={{ width: "80%", marginRight: 8 }}
+            />
+            <Button onClick={handleSendMessage}>Send</Button>
+            <Button onClick={handleLeaveRoom} style={{ marginLeft: 8 }}>
+              Leave Chat
+            </Button>
+          </div>
         </div>
       )}
     </div>

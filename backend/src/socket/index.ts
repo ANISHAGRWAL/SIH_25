@@ -8,7 +8,7 @@ import {
   chatRequests as chatRequestsSchema,
   chatSessions as chatSessionsSchema,
 } from '../db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 
 const mountChatEvent = (socket: IApiSocket) => {
   const user = socket.user;
@@ -192,7 +192,11 @@ const mountChatEvent = (socket: IApiSocket) => {
   });
 
   socket.on(ChatEventEnum.LEAVE_ROOM, async (roomId: string) => {
-    //delete all the chatSessions and messages and also the chatRequest
+    // Get the session info to know both users
+    const session = await db.query.chatSessions.findFirst({
+      where: eq(chatSessionsSchema.id, roomId),
+    });
+
     await db.transaction(async (tx) => {
       await tx
         .delete(chatMessagesSchema)
@@ -204,10 +208,38 @@ const mountChatEvent = (socket: IApiSocket) => {
         .delete(chatRequestsSchema)
         .where(eq(chatRequestsSchema.studentId, user.id));
     });
+
     socket.leave(roomId);
-    // Notify ALL sockets in the room (including the one who left)
-    socket.to(roomId).emit(ChatEventEnum.LEAVE_ROOM, { leftRoomId: roomId });
-    socket.emit(ChatEventEnum.LEAVE_ROOM, { leftRoomId: roomId });
+
+    // Notify both users: current and the other party
+    if (session) {
+      const otherUserId =
+        user.id === session.studentId ? session.volunteerId : session.studentId;
+
+      // Send to the other user
+      socket.to(otherUserId.toString()).emit(ChatEventEnum.LEAVE_ROOM, {
+        leftRoomId: roomId,
+      });
+    }
+
+    // Send to self
+    socket.emit(ChatEventEnum.LEAVE_ROOM, {
+      leftRoomId: roomId,
+    });
+  });
+
+  socket.on(ChatEventEnum.GET_ACTIVE_ROOM, async () => {
+    const session = await db.query.chatSessions.findFirst({
+      where: or(
+        eq(chatSessionsSchema.studentId, user.id),
+        eq(chatSessionsSchema.volunteerId, user.id),
+      ),
+    });
+    if (session) {
+      socket.emit(ChatEventEnum.GET_ACTIVE_ROOM, { savedRoomId: session.id });
+    } else {
+      socket.emit(ChatEventEnum.GET_ACTIVE_ROOM, { savedRoomId: null });
+    }
   });
 };
 

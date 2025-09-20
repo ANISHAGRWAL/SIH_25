@@ -14,4 +14,5 @@ export enum ChatEventEnum {
   GET_REQUESTS = 'get_requests',
   CANCEL_REQUEST = 'cancel_request',
   REQUEST_ACCEPTED = 'request_accepted',
+  GET_ACTIVE_ROOM = 'get_active_room',
 }
