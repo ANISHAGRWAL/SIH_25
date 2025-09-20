@@ -166,7 +166,6 @@ export default function ChatbotPage() {
   const quickActions = [
     "I need someone to talk to",
     "I'm feeling anxious",
-    "I had a good day",
     "Help me relax",
     "I'm stressed about work",
   ];
@@ -191,11 +190,11 @@ export default function ChatbotPage() {
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg flex-shrink-0">
             <svg
-              className="w-6 h-6 text-white"
+              className="w-4 h-4 sm:w-6 sm:h-6 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -208,23 +207,23 @@ export default function ChatbotPage() {
               />
             </svg>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Campus Care AI</h1>
-            <div className="flex items-center gap-1 text-sm text-emerald-600">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">Campus Care AI</h1>
+            <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-600">
+              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
               <span>Online</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Model selector */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">Model:</label>
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          {/* Model selector - Simplified for mobile */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            <label className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Model:</label>
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value as "Gemini" | "Groq")}
-              className="px-2 py-1 border rounded-lg text-sm bg-white"
+              className="px-2 py-1 border rounded text-xs sm:text-sm bg-white min-w-0"
             >
               <option value="Gemini">Gemini</option>
               <option value="Groq">Groq</option>
@@ -235,10 +234,10 @@ export default function ChatbotPage() {
           <div className="relative settings-container">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
             >
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4 sm:w-5 sm:h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -253,13 +252,13 @@ export default function ChatbotPage() {
             </button>
 
             {showSettings && (
-              <div className="absolute bottom-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
+              <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
                 <button
                   onClick={() => setShowClearConfirm(true)}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="w-3 h-3 sm:w-4 sm:h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -282,11 +281,11 @@ export default function ChatbotPage() {
       {/* Clear Confirmation Modal */}
       {showClearConfirm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm">
             <div className="text-center">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="w-6 h-6 text-red-600"
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -299,23 +298,23 @@ export default function ChatbotPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                 Clear Chat History
               </h3>
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
                 This will permanently delete all your messages. This action
                 cannot be undone.
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="flex-1 px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={clearChat}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  className="flex-1 px-3 py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                 >
                   Clear Chat
                 </button>
@@ -326,16 +325,16 @@ export default function ChatbotPage() {
       )}
 
       {/* Chat Container */}
-      <div className="flex-1 flex flex-col min-h-0 p-4 relative z-10">
-        <div className="flex-1 flex flex-col min-h-0 rounded-2xl bg-white/80 backdrop-blur-lg border border-gray-200/60 shadow-xl overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 p-0 sm:p-4 relative z-10">
+        <div className="flex-1 flex flex-col min-h-0 rounded-none sm:rounded-2xl bg-white/80 backdrop-blur-lg border-0 sm:border sm:border-gray-200/60 shadow-none sm:shadow-xl overflow-hidden">
           {/* Messages Area */}
           {messages.length === 0 ? (
             // Centered quick responses when chat is empty
-            <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-              <div className="max-w-md">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-4">
+            <div className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 text-center">
+              <div className="max-w-sm sm:max-w-md">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                   <svg
-                    className="w-8 h-8 text-white"
+                    className="w-6 h-6 sm:w-8 sm:h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -348,23 +347,23 @@ export default function ChatbotPage() {
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-gray-800 mb-2">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
                   Hello! I'm your mental health companion.
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                   I'm here to listen and support you. Feel free to share what's
                   on your mind - whether it's something that's bothering you, a
                   win you'd like to celebrate, or just how your day is going.
                 </p>
-                <p className="text-sm text-gray-700 mb-3 font-medium">
+                <p className="text-xs sm:text-sm text-gray-700 mb-2 sm:mb-3 font-medium">
                   Quick responses:
                 </p>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="grid grid-cols-1 sm:flex sm:flex-wrap sm:justify-center gap-2">
                   {quickActions.map((action, index) => (
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action)}
-                      className="px-3 py-1.5 text-sm text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-700 border border-gray-200 hover:border-blue-300 rounded-full transition-all duration-200"
+                      className="px-3 py-2 text-xs sm:text-sm text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-700 border border-gray-200 hover:border-blue-300 rounded-lg sm:rounded-full transition-all duration-200 text-left sm:text-center"
                     >
                       {action}
                     </button>
@@ -374,7 +373,7 @@ export default function ChatbotPage() {
             </div>
           ) : (
             // Display chat messages when history exists
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
+            <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -382,14 +381,14 @@ export default function ChatbotPage() {
                     }`}
                 >
                   <div
-                    className={`max-w-[80%] flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
+                    className={`max-w-[90%] sm:max-w-[80%] flex gap-2 sm:gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
                       }`}
                   >
-                
+
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
-                          ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                          : "bg-gradient-to-br from-emerald-500 to-teal-600"
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                        : "bg-gradient-to-br from-emerald-500 to-teal-600"
                         }`}
                     >
                       {message.role === "user" ? (
@@ -402,37 +401,61 @@ export default function ChatbotPage() {
                           />
                         ) : (
                           // Fallback to the default user avatar if no picture exists
-                          userAvatar
+                          <svg
+                            className="w-3 h-3 sm:w-5 sm:h-5 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
                         )
                       ) : (
                         // Always show the bot's avatar for bot messages
-                        botAvatar
+                        <svg
+                          className="w-3 h-3 sm:w-5 sm:h-5 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                          />
+                        </svg>
                       )}
                     </div>
 
                     <div className="flex flex-col">
                       <div
-                        className={`px-4 py-3 rounded-2xl ${message.role === "user"
-                            ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
-                            : "bg-gray-100 text-gray-800 rounded-tl-md"
+                        className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${message.role === "user"
+                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
+                          : "bg-gray-100 text-gray-800 rounded-tl-md"
                           }`}
                       >
                         {message.isTyping ? (
                           <div className="flex items-center gap-1">
                             <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"></div>
                               <div
-                                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"
                                 style={{ animationDelay: "0.1s" }}
                               ></div>
                               <div
-                                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"
                                 style={{ animationDelay: "0.2s" }}
                               ></div>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-sm leading-relaxed">
+                          <p className="text-xs sm:text-sm leading-relaxed">
                             {message.text}
                           </p>
                         )}
@@ -454,8 +477,8 @@ export default function ChatbotPage() {
           )}
 
           {/* Input Area */}
-          <div className="p-4 border-t border-gray-200/60 bg-white/90">
-            <div className="flex items-end gap-3">
+          <div className="p-3 sm:p-4 border-t border-gray-200/60 bg-white/90">
+            <div className="flex items-end gap-2 sm:gap-3">
               <div className="flex-1 relative">
                 <textarea
                   ref={inputRef}
@@ -465,16 +488,16 @@ export default function ChatbotPage() {
                   placeholder="Share your thoughts, feelings, or ask for support..."
                   disabled={loading}
                   rows={1}
-                  className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200 placeholder-gray-500 text-sm resize-none bg-white"
-                  style={{ minHeight: "48px", maxHeight: "120px" }}
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 pr-8 sm:pr-12 rounded-lg sm:rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200 placeholder-gray-500 text-sm resize-none bg-white"
+                  style={{ minHeight: "40px", maxHeight: "120px" }}
                 />
                 {input && (
                   <button
                     onClick={() => setInput("")}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-2 top-2 sm:right-3 sm:top-3 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     <svg
-                      className="w-4 h-4"
+                      className="w-3 h-3 sm:w-4 sm:h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -490,17 +513,18 @@ export default function ChatbotPage() {
                 )}
               </div>
 
+              {/* The Send Button - The Fix */}
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
-                className={`p-3 rounded-xl transition-all duration-200 ${loading || !input.trim()
+                className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${loading || !input.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
-                  }`}
+                  } flex items-center justify-center h-[40px] sm:h-[52px]`}
               >
                 {loading ? (
                   <svg
-                    className="w-5 h-5 animate-spin"
+                    className="w-4 h-4 sm:w-5 sm:h-5 animate-spin"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -520,7 +544,7 @@ export default function ChatbotPage() {
                   </svg>
                 ) : (
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

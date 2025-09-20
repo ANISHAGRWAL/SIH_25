@@ -12,6 +12,11 @@ import {
   ListMusic,
 } from "lucide-react";
 
+import { useRouter } from "next/router"; // 👈 Add this
+import introJs from "intro.js"; // 👈 Add this
+import "intro.js/introjs.css"; // 👈 Add this
+import { useSearchParams } from 'next/navigation';
+
 // MusicPlayer Component
 function MusicPlayer() {
   // --- STATE MANAGEMENT ---
@@ -109,7 +114,7 @@ function MusicPlayer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Track Info */}
           <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg flex-shrink-0 transition-all duration-300 group-hover:scale-105">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg flex-shrink-0 transition-all duration-300 group-hover:scale-105">
               🎶
             </div>
             <div className="min-w-0">
@@ -123,7 +128,7 @@ function MusicPlayer() {
             <button onClick={prevTrack} className="p-3 text-gray-600 hover:bg-gray-100/70 rounded-full transition-all duration-200 active:scale-90" aria-label="Previous track">
               <SkipBack className="w-6 h-6" />
             </button>
-            <button onClick={togglePlay} className="p-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-white" aria-label={isPlaying ? "Pause" : "Play"}>
+            <button onClick={togglePlay} className="p-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-white" aria-label={isPlaying ? "Pause" : "Play"}>
               {isPlaying ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-1" />}
             </button>
             <button onClick={nextTrack} className="p-3 text-gray-600 hover:bg-gray-100/70 rounded-full transition-all duration-200 active:scale-90" aria-label="Next track">
@@ -154,7 +159,7 @@ function MusicPlayer() {
         {/* Progress Bar */}
         <div className="w-full">
           <div className="w-full bg-gray-200 rounded-full h-2 cursor-pointer group" onClick={handleProgressClick}>
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full relative transition-all duration-100" style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}>
+            <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full relative transition-all duration-100" style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}>
               <div className="absolute right-0 top-1/2 -mt-2 w-4 h-4 rounded-full bg-white shadow-md border border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </div>
@@ -189,6 +194,27 @@ function MusicPlayer() {
 // Main Dashboard Page Component
 export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+ const searchParams = useSearchParams();
+ 
+ useEffect(() => {
+   const newUser = searchParams?.get('newUser');
+  if (newUser === "true") {
+    introJs()
+      .setOptions({
+        nextLabel: "Next →",
+        prevLabel: "← Back",
+        doneLabel: "Finish",
+        showProgress: true,
+        // tooltipPosition: "auto",
+      })
+      .start();
+
+    // Clean the URL after the guide
+    // const { newUser, ...rest } = query;
+    // router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
+  }
+}, [searchParams]);
+
   const [currentMessage, setCurrentMessage] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { user } = useAuth();
@@ -249,7 +275,13 @@ export default function DashboardPage() {
         <div className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.05),0_0_20px_rgba(0,0,0,0.02)] transition-all duration-500 ease-out hover:shadow-[0_15px_40px_rgba(0,0,0,0.08),0_0_25px_rgba(0,0,0,0.04)] backdrop-blur-sm">
           {!selectedMood ? (
             <div className={`transition-all duration-500 ${isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
-              <p className="text-center font-semibold text-slate-700 mb-8 text-lg animate-fadeIn">How are you feeling right now?</p>
+              <p
+  className="text-center font-semibold text-slate-700 mb-8 text-lg animate-fadeIn"
+  data-intro="Start by choosing how you’re feeling today."
+  data-step="1"
+>
+  How are you feeling right now?
+</p>
               <div className="flex items-center justify-center gap-2 md:gap-3 flex-wrap md:flex-nowrap">
                 {moods.map((mood, index) => (
                   <button key={mood.key} onClick={() => handleMoodClick(mood.key)} aria-label={mood.label} className={`flex flex-col items-center gap-2 p-4 md:p-5 rounded-xl hover:bg-slate-50/80 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out border border-transparent hover:border-gray-200 group animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
@@ -280,7 +312,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Face Check-In Card - UNIFIED */}
-          <div onClick={() => (location.href = "/facial-mood-detection")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-blue-50/30" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/facial-mood-detection"; } }}>
+          <div onClick={() => (location.href = "/facial-mood-detection")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-blue-50/30" data-intro="Use our facial emotion check-in to analyze your mood." data-step="2" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/facial-mood-detection"; } }}>
             <div className="flex flex-col text-center items-center gap-4 h-full">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-all duration-300 group-hover:shadow-lg">
                 <img src="/faceicon.png" alt="Face scan" className="group-hover:scale-110 transition-transform duration-300" />
@@ -316,7 +348,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Mental Detox Card - UNIFIED */}
-          <div onClick={() => (location.href = "/wellness")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-green-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-green-50/30" style={{ animationDelay: "200ms" }} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/wellness"; } }}>
+          <div onClick={() => (location.href = "/wellness")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-green-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-green-50/30" data-intro="This section offers quick mental detox activities to reduce stress." data-step="3" style={{ animationDelay: "200ms" }} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/wellness"; } }}>
             <div className="flex flex-col text-center items-center gap-4 h-full">
               <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-all duration-300 group-hover:shadow-lg">
                 <img src="/yoga.png" alt="Mental wellness" className="group-hover:scale-110 transition-transform duration-300" />
@@ -352,7 +384,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <MusicPlayer />
+        <div
+  data-intro="Listen to relaxing music to calm your mind."
+  data-step="4"
+>
+  <MusicPlayer />
+</div>
+
       </section>
 
       {/* Styles */}

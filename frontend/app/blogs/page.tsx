@@ -50,7 +50,7 @@ const blogs = [
       "Journaling helps untangle your thoughts and create space for healing, growth, and emotional awareness.",
     date: "March 23, 2024",
     image: "/chatjournal.jpeg",
-    category: "Expression",
+    category: "Self Care",
   },
   {
     id: "creativity-mental-health-link",
@@ -58,7 +58,9 @@ const blogs = [
     excerpt:
       "Explore how creative activities like art and writing can relieve stress, boost mood, and strengthen resilience.",
     date: "March 26, 2024",
-    image: "/Creativity.jpeg"
+    image: "/Creativity.jpeg",
+    category: "Expression",
+
   },
   {
     id: "resilience-building",

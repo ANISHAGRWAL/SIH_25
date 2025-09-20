@@ -425,7 +425,7 @@ export default function YogaPage() {
                     <div className="flex items-center gap-4 mb-4">
                       <div className="flex-shrink-0 flex items-center gap-2">
                         <div className="text-2xl font-bold text-slate-400">{index + 1}.</div>
-                        <div className="text-4xl">{pose.icon}</div>
+                        {/* <div className="text-4xl">{pose.icon}</div> */}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="items-center gap-2 mb-1">
