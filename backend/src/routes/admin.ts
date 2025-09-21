@@ -6,6 +6,7 @@ import {
   getSessions,
   getStudents,
   getUserDetails,
+  getVolunteers,
   makeVolunteer,
   wantToVolunteer,
 } from '../controllers/admin';
@@ -131,6 +132,23 @@ router.post('/volunteer', (req: IApiRequest, res: Response) => {
   }
   const { studentId } = req.body;
   makeVolunteer(req.user, studentId)
+    .then((data) => {
+      res.status(200).json({ success: true, data });
+    })
+    .catch((error) => {
+      res
+        .status(400)
+        .json({ success: false, error: { message: error.message } });
+    });
+});
+
+router.get('/volunteers', (req: IApiRequest, res: Response) => {
+  if (req.user?.role !== 'admin') {
+    return res
+      .status(403)
+      .json({ success: false, error: { message: 'Forbidden' } });
+  }
+  getVolunteers(req.user)
     .then((data) => {
       res.status(200).json({ success: true, data });
     })

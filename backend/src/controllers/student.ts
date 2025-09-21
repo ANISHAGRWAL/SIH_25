@@ -132,3 +132,18 @@ export const becomeVolunteer = async (authUser: IAuthUser) => {
     throw error;
   }
 };
+
+export const appliedForVolunteer = async (authUser: IAuthUser) => {
+  try {
+    if (authUser.role !== 'student') {
+      throw new Error('Only students can apply for volunteer');
+    }
+    const volunteerRequest = await db.query.volunteerRequests.findFirst({
+      where: (vr, { eq }) => eq(vr.studentId, authUser.id),
+    });
+    return { applied: !!volunteerRequest };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

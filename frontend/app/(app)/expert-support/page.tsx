@@ -2,10 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Send,
+  Bell,
+  UserCheck,
+  LoaderCircle,
+  LogOut,
+  Lock,
+} from "lucide-react";
+
 import { ChatEventEnum } from "@/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { connectSocket, disconnectSocket } from "@/sockets/socket";
 
+// Types
 type Message = {
   senderId: string;
   message: string;
@@ -14,7 +32,7 @@ type Message = {
 type ChatRequest = {
   studentId: string;
   studentEmail: string;
-  organizationId?: string; // if needed
+  organizationId?: string;
 };
 
 export default function ChatPage() {
@@ -28,30 +46,24 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatRequests, setChatRequests] = useState<ChatRequest[]>([]);
   const [messageInput, setMessageInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize socket once user is present
+  // Socket Connection
   useEffect(() => {
     if (!user) return;
-
     const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found!");
-      return;
-    }
+    if (!token) return;
 
     const sock = connectSocket(token);
     socketRef.current = sock;
     setSocket(sock);
 
-    // Setup socket listeners
-    sock.on(ChatEventEnum.CONNECTED_EVENT, () => {
-      console.log("Socket connected");
-    });
+    sock.on(ChatEventEnum.CONNECTED_EVENT, () =>
+      console.log("Socket connected")
+    );
 
-    // Active room logic
     sock.emit(ChatEventEnum.GET_ACTIVE_ROOM);
     sock.on(ChatEventEnum.GET_ACTIVE_ROOM, ({ savedRoomId }) => {
-      console.log("Active room:", savedRoomId);
       if (savedRoomId) {
         setRoomId(savedRoomId);
         sock.emit(ChatEventEnum.JOIN_ROOM, savedRoomId);
@@ -59,101 +71,89 @@ export default function ChatPage() {
       }
     });
 
-    // START_CHAT: fired when a session has been started/accepted
-    sock.on(
-      ChatEventEnum.START_CHAT,
-      ({ roomId: newRoomId, volunteer, studentId }) => {
-        console.log("Chat started:", newRoomId, volunteer, studentId);
-        setRoomId(newRoomId);
-        setMessages([]); // clear old messages
-        sock.emit(ChatEventEnum.GET_MESSAGES, newRoomId);
+    sock.on(ChatEventEnum.START_CHAT, ({ roomId: newRoomId }) => {
+      sock.emit(ChatEventEnum.JOIN_ROOM, newRoomId);
+      setRoomId(newRoomId);
+      setMessages([]);
+      sock.emit(ChatEventEnum.GET_MESSAGES, newRoomId);
+    });
+
+    sock.on(ChatEventEnum.NEW_CHAT_REQUEST, (req: ChatRequest) => {
+      if (
+        req.organizationId &&
+        user.organizationId &&
+        req.organizationId !== user.organizationId
+      ) {
+        return;
       }
+      if (user.volunteer) {
+        setChatRequests((prev) =>
+          prev.some((r) => r.studentId === req.studentId)
+            ? prev
+            : [...prev, req]
+        );
+      }
+    });
+
+    sock.on(ChatEventEnum.REQUEST_ACCEPTED, ({ studentId }) =>
+      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId))
     );
 
-    // NEW_CHAT_REQUEST: for volunteers
-    sock.on(
-      ChatEventEnum.NEW_CHAT_REQUEST,
-      (req: ChatRequest & { organizationId?: string }) => {
-        // Only for same organization
-        if (
-          req.organizationId &&
-          user.organizationId &&
-          req.organizationId !== user.organizationId
-        ) {
-          return;
-        }
-        if (user.volunteer) {
-          setChatRequests((prev) => {
-            // avoid duplicates
-            const exists = prev.some((r) => r.studentId === req.studentId);
-            if (exists) return prev;
-            return [...prev, req];
-          });
-        }
-      }
+    sock.on(ChatEventEnum.RECEIVE_MESSAGE, ({ senderId, message }) =>
+      setMessages((prev) => [...prev, { senderId, message }])
     );
 
-    // REQUEST_ACCEPTED: remove request if accepted elsewhere
-    sock.on(ChatEventEnum.REQUEST_ACCEPTED, ({ studentId }) => {
-      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
-    });
+    sock.on(ChatEventEnum.GET_MESSAGES, (msgs: Message[]) => setMessages(msgs));
 
-    // RECEIVE_MESSAGE
-    sock.on(ChatEventEnum.RECEIVE_MESSAGE, ({ senderId, message }) => {
-      setMessages((prev) => [...prev, { senderId, message }]);
-    });
-
-    // GET_MESSAGES
-    sock.on(ChatEventEnum.GET_MESSAGES, (msgs: Message[]) => {
-      setMessages(msgs);
-    });
-
-    // GET_REQUESTS
     sock.emit(ChatEventEnum.GET_REQUESTS);
-    sock.on(ChatEventEnum.GET_REQUESTS, (requests: ChatRequest[]) => {
-      setChatRequests(requests);
-    });
+    sock.on(ChatEventEnum.GET_REQUESTS, (requests: ChatRequest[]) =>
+      setChatRequests(requests)
+    );
 
-    // CANCEL_REQUEST
-    sock.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) => {
-      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
-    });
+    sock.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) =>
+      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId))
+    );
 
-    // LEAVE_ROOM
-    sock.on(ChatEventEnum.LEAVE_ROOM, ({ leftRoomId }) => {
-      console.log("Left room:", leftRoomId, roomId);
-      // if (leftRoomId === roomId) {
+    sock.on(ChatEventEnum.LEAVE_ROOM, () => {
       setRoomId(null);
       setMessages([]);
       sock.emit(ChatEventEnum.GET_REQUESTS);
-      // }
     });
 
-    // Cleanup
     return () => {
-      // Remove listeners
       sock.removeAllListeners();
       disconnectSocket();
     };
-  }, [user]); // Re-run when user changes
+  }, [user]);
 
-  if (!user) {
-    return <div>Loading user...</div>;
-  }
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  // Utility booleans
+  if (!user)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+
   const isStudent = user.role === "student";
   const isVolunteer = Boolean(user.volunteer);
-  const isAdmin = user.role === "admin";
 
-  // Handlers
+  const handleSendMessage = () => {
+    if (!socket || !roomId || messageInput.trim() === "") return;
+    socket.emit(ChatEventEnum.SEND_MESSAGE, { roomId, message: messageInput });
+    setMessages((prev) => [
+      ...prev,
+      { senderId: user.id, message: messageInput },
+    ]);
+    setMessageInput("");
+  };
+
   const handleRequestChat = () => {
-    if (!socket) {
-      console.warn("Socket is not ready");
-      return;
-    }
+    if (!socket) return;
     socket.emit(ChatEventEnum.STUDENT_REQUEST_CHAT);
-    alert("Chat request sent. Please wait for a volunteer to accept.");
+    alert("Chat request sent. Please wait for a volunteer.");
     const req: ChatRequest = {
       studentId: user.id,
       studentEmail: user.email,
@@ -165,7 +165,6 @@ export default function ChatPage() {
   const handleAcceptChat = (studentId: string) => {
     if (!socket) return;
     socket.emit(ChatEventEnum.VOLUNTEER_ACCEPT_REQUEST, studentId);
-    // Optionally remove the request from UI immediately
     setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
   };
 
@@ -184,98 +183,157 @@ export default function ChatPage() {
     alert("Chat request cancelled.");
   };
 
-  const handleSendMessage = () => {
-    if (!socket) return;
-    if (!roomId || messageInput.trim() === "") return;
-    socket.emit(ChatEventEnum.SEND_MESSAGE, { roomId, message: messageInput });
-    setMessages((prev) => [
-      ...prev,
-      { senderId: user.id, message: messageInput },
-    ]);
-    setMessageInput("");
-  };
-
-  // Render UI based on states
   return (
-    <div style={{ padding: 24 }}>
-      <h1>
-        Chat Page — Role: {user.role} {isVolunteer && "(Volunteer)"}
-      </h1>
+    <div className="h-screen w-full bg-gradient-to-b from-sky-100 to-blue-50 flex flex-col">
+      <div className="w-full p-4 flex-1 flex flex-col min-h-0">
+        <header className="mb-4 shrink-0">
+          <h1 className="text-3xl font-bold text-slate-800">Chat Support</h1>
+          <p className="text-sm text-slate-600">
+            Role: <span className="font-semibold capitalize">{user.role}</span>
+            {isVolunteer && (
+              <span className="text-slate-700"> (Volunteer)</span>
+            )}
+          </p>
+        </header>
 
-      {/* If user is a student and not volunteer */}
-      {isStudent && !isVolunteer && !roomId && (
-        <div>
-          {chatRequests.length > 0 ? (
-            <Button onClick={handleCancelRequest}>Cancel Request</Button>
-          ) : (
-            <Button onClick={handleRequestChat}>Request Chat</Button>
-          )}
-        </div>
-      )}
+        <main className="flex-1 flex flex-col min-h-0">
+          {roomId ? (
+            <Card className="flex-1 flex flex-col min-h-0">
+              <CardHeader className="border-b bg-slate-50 p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Lock className="h-5 w-5 text-slate-600" />
+                  <div>
+                    <CardTitle className="text-lg text-slate-700">
+                      Secure Chat Room
+                    </CardTitle>
+                    <div className="flex items-center gap-1.5 text-xs text-green-700">
+                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                      Connected
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleLeaveRoom}
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Leave Chat
+                </Button>
+              </CardHeader>
 
-      {/* If user is volunteer (regardless of admin/student) and not in a room */}
-      {isVolunteer && !roomId && (
-        <div>
-          <h3>Incoming Requests</h3>
-          {chatRequests.length === 0 ? (
-            <p>No requests yet</p>
-          ) : (
-            <ul>
-              {chatRequests.map((req) => (
-                <li key={req.studentId}>
-                  {req.studentEmail}{" "}
-                  <Button onClick={() => handleAcceptChat(req.studentId)}>
-                    Accept
+              <CardContent className="flex-1 p-4 overflow-y-auto bg-white">
+                {messages.map((msg, index) => {
+                  const isSender = msg.senderId === user.id;
+                  return (
+                    <div
+                      key={index}
+                      className={`flex flex-col ${
+                        isSender ? "items-end" : "items-start"
+                      } mb-2`}
+                    >
+                      <div
+                        className={`max-w-xs sm:max-w-md rounded-lg px-3 py-2 ${
+                          isSender
+                            ? "bg-blue-500 text-white rounded-br-none"
+                            : "bg-slate-200 text-slate-800 rounded-bl-none"
+                        }`}
+                      >
+                        <p className="text-sm">{msg.message}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </CardContent>
+
+              <CardFooter className="p-4 border-t bg-slate-50">
+                <div className="flex w-full items-center space-x-2">
+                  <Input
+                    type="text"
+                    placeholder="Type a message..."
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                  />
+                  <Button onClick={handleSendMessage}>
+                    <Send className="h-4 w-4" />
                   </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+                </div>
+              </CardFooter>
+            </Card>
+          ) : (
+            <>
+              {isStudent && !isVolunteer && (
+                <Card className="text-center p-6 shadow bg-white">
+                  <CardHeader>
+                    <CardTitle>Need Help?</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {chatRequests.length > 0 ? (
+                      <div className="flex flex-col items-center gap-4">
+                        <LoaderCircle className="h-10 w-10 text-blue-500 animate-spin" />
+                        <p className="text-slate-600">
+                          Waiting for a volunteer...
+                        </p>
+                        <Button variant="outline" onClick={handleCancelRequest}>
+                          Cancel Request
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-4">
+                        <p className="text-slate-600">
+                          Click below to request a chat.
+                        </p>
+                        <Button onClick={handleRequestChat}>
+                          Request Chat
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
-      {/* Chat window */}
-      {roomId && (
-        <div style={{ marginTop: 24 }}>
-          <h3>Chat Room</h3>
-          <div
-            style={{
-              border: "1px solid #ccc",
-              padding: 12,
-              height: 300,
-              overflowY: "auto",
-            }}
-          >
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                style={{
-                  textAlign: msg.senderId === user.id ? "right" : "left",
-                  margin: "4px 0",
-                }}
-              >
-                <span>{msg.message}</span>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <input
-              type="text"
-              placeholder="Type your message"
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSendMessage();
-              }}
-              style={{ width: "80%", marginRight: 8 }}
-            />
-            <Button onClick={handleSendMessage}>Send</Button>
-            <Button onClick={handleLeaveRoom} style={{ marginLeft: 8 }}>
-              Leave Chat
-            </Button>
-          </div>
-        </div>
-      )}
+              {isVolunteer && (
+                <Card className="shadow bg-white">
+                  <CardHeader>
+                    <CardTitle>Incoming Chat Requests</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {chatRequests.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Bell className="mx-auto h-10 w-10 text-slate-400" />
+                        <p className="mt-2 text-sm text-slate-600">
+                          No requests yet.
+                        </p>
+                      </div>
+                    ) : (
+                      <ul className="divide-y">
+                        {chatRequests.map((req) => (
+                          <li
+                            key={req.studentId}
+                            className="flex justify-between items-center py-2"
+                          >
+                            <span className="text-sm text-slate-700">
+                              {req.studentEmail}
+                            </span>
+                            <Button
+                              size="sm"
+                              onClick={() => handleAcceptChat(req.studentId)}
+                            >
+                              <UserCheck className="mr-2 h-4 w-4" />
+                              Accept
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
