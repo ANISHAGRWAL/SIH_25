@@ -6,7 +6,9 @@ import MemoryGame from "./components/MemoryGame";
 import DrawingGame from "./components/DrawingGame";
 import StressBallGame from "./components/StressBallGame";
 import WorryReleaseGame from "./components/WorryReleaseGame";
-import FluidSimulationGame from "./components/FluidSimulationGame"; // ✨ New import
+import FluidSimulationGame from "./components/FluidSimulationGame";
+import TalkingTomGame from "./components/TalkingTomGame";
+
 
 // Game Component Props Interface
 interface GameComponentProps {
@@ -121,6 +123,8 @@ function GameComponent({ gameType, onGameEnd }: GameComponentProps) {
       return <WorryReleaseGame />;
     case "fluid": // ✨ New case
       return <FluidSimulationGame />;
+    case "talking-tom": // 👈 new case
+      return <TalkingTomGame />;
     default:
       return (
         <div className="text-center space-y-6 p-8">
@@ -212,7 +216,8 @@ export default function StressReliefGamesDemo() {
     { id: 'drawing', name: 'Zen Patterns', icon: '🔮' },
     { id: 'stress-ball', name: 'Stress Ball', icon: '⚾' },
     { id: 'worry-release', name: 'Worry Release', icon: '🕊️' },
-    { id: 'fluid', name: 'Liquid Motion', icon: '💧' } // ✨ New game added to the list
+    { id: 'fluid', name: 'Liquid Motion', icon: '💧' },
+    { id: 'talking-tom', name: 'Talking Tom', icon: '🐱' }
   ];
 
   return (

@@ -137,7 +137,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
             </article>
 
             <aside className="hidden lg:block space-y-4">
-              <div className="bg-white rounded-xl shadow-sm p-4 sticky top-24">
+              <div className="bg-white rounded-xl shadow-sm p-4 top-50">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4">
                   {t("blog.otherBlogs")}
                 </h3>
@@ -149,7 +149,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
               </div>
               <Link
                 href="/blogs"
-                className="block w-full text-center py-3 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-lg text-sm font-medium hover:shadow-md transition-shadow sticky top-[450px]"
+                className="block w-full text-center py-3 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-lg text-sm font-medium hover:shadow-md transition-shadow sticky top-[350px]"
               >
                 {t("blog.backToBlogs")}
               </Link>
