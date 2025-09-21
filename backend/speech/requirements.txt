@@ -6,3 +6,4 @@ soundfile
 pydub
 imageio-ffmpeg
 tensorflow-cpu==2.15.0
+python-multipart
