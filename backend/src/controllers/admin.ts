@@ -282,3 +282,23 @@ export const makeVolunteer = async (authUser: IAuthUser, studentId: string) => {
     throw error;
   }
 };
+
+export const getVolunteers = async (authUser: IAuthUser) => {
+  try {
+    const volunteers = await db.query.user.findMany({
+      where: (u, { eq, and }) =>
+        and(
+          eq(u.role, 'student'),
+          eq(u.volunteer, true),
+          eq(u.organizationId, authUser.organizationId),
+        ),
+    });
+    if (!volunteers) {
+      throw new Error('No volunteers found');
+    }
+    return volunteers;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
