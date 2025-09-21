@@ -375,7 +375,7 @@ const userAvatar = (
           {/* Sidebar */}
           <aside className="hidden md:block bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl h-screen overflow-y-auto sticky top-0">
             <div className="flex items-center gap-4 mb-8">
-              <Avatar className="w-16 h-16">
+              <Avatar className="w-16 h-16 shrink-0">
                 <AvatarImage
                   src={user?.avatarUrl ? user?.avatarUrl : undefined}
                   alt="Avatar"
@@ -387,9 +387,9 @@ const userAvatar = (
                     .join("")}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-bold text-lg">{user?.name}</p>
-                <p className="text-slate-500 text-sm">{user?.email}</p>
+              <div className="min-w-0">
+                <p className="font-bold text-lg truncate">{user?.name}</p>
+                <p className="text-slate-500 text-sm overflow-wrap-anywhere break-words">{user?.email}</p>
               </div>
             </div>
             <nav className="space-y-3">

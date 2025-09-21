@@ -58,22 +58,6 @@ export default function ProfilePage() {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const userAvatar = (
-    <svg
-      className="w-5 h-5 text-white"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-      />
-    </svg>
-  );
-
   useEffect(() => {
     const fetchProfile = async () => {
       if (!token) return;
@@ -140,48 +124,48 @@ export default function ProfilePage() {
   };
 
   const handleBecomeVolunteer = async () => {
-  if (!token) {
-    toast.error("Authentication error. Please log in again.");
-    return;
-  }
+    if (!token) {
+      toast.error("Authentication error. Please log in again.");
+      return;
+    }
 
-  // Log #1: Check if the function starts
-  console.log("Attempting to become a volunteer...");
-  
-  setIsSubmittingVolunteer(true);
-  const res = await becomeVolunteer(token);
+    // Log #1: Check if the function starts
+    console.log("Attempting to become a volunteer...");
 
-  // Log #2: Check the API response
-  console.log("API Response:", res);
+    setIsSubmittingVolunteer(true);
+    const res = await becomeVolunteer(token);
 
-  if (res.ok) {
-    // Log #3: Confirm we are entering the success block
-    console.log("API call was successful. Updating local state.");
+    // Log #2: Check the API response
+    console.log("API Response:", res);
 
-    // This is the safer "functional update" form for useState.
-    // It guarantees the update is based on the most recent state.
-    setProfileData((currentProfileData) => {
-      if (currentProfileData) {
-        // Log #4: See the state BEFORE the update
-        console.log("State before update:", currentProfileData);
-        
-        const updatedData = { ...currentProfileData, volunteer: true };
-        
-        // Log #5: See the state AFTER the update
-        console.log("State after update:", updatedData);
-        
-        return updatedData;
-      }
-      return currentProfileData; // Return old data if it's null for some reason
-    });
-    
-    toast.success("Your request has been sent!");
-  } else {
-    console.error("API call failed:", res.error);
-  }
-  
-  setIsSubmittingVolunteer(false);
-};
+    if (res.ok) {
+      // Log #3: Confirm we are entering the success block
+      console.log("API call was successful. Updating local state.");
+
+      // This is the safer "functional update" form for useState.
+      // It guarantees the update is based on the most recent state.
+      setProfileData((currentProfileData) => {
+        if (currentProfileData) {
+          // Log #4: See the state BEFORE the update
+          console.log("State before update:", currentProfileData);
+
+          const updatedData = { ...currentProfileData, volunteer: true };
+
+          // Log #5: See the state AFTER the update
+          console.log("State after update:", updatedData);
+
+          return updatedData;
+        }
+        return currentProfileData; // Return old data if it's null for some reason
+      });
+
+      toast.success("Your request has been sent!");
+    } else {
+      console.error("API call failed:", res.error);
+    }
+
+    setIsSubmittingVolunteer(false);
+  };
 
   if (loading || !profileData) {
     return (
@@ -236,14 +220,13 @@ export default function ProfilePage() {
                     alt="Avatar"
                   />
                 ) : (
-                  userAvatar
+                  <AvatarFallback className="text-4xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
+                    {profileData.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
                 )}
-                <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
-                  {profileData.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
               </Avatar>
               {isEditing && (
                 <>
@@ -395,3 +378,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+// Rest of the component and helper functions remain unchanged.

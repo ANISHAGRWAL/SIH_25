@@ -291,7 +291,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Quick facial emotion analysis to understand your current mood</p>
                 <div className="flex justify-center mt-3">
-                  <StatusDot status="success" />
+                  {/* <StatusDot status="success" /> */}
                 </div>
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Voice tone analysis to detect emotional patterns - Coming Soon</p>
                 <div className="flex justify-center mt-3">
-                  <StatusDot status="pending" />
+                  {/* <StatusDot status="pending" /> */}
                 </div>
               </div>
             </div>
@@ -327,7 +327,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Guided stretches and breathing exercises to refresh focus and ease stress</p>
                 <div className="flex justify-center mt-3">
-                  <StatusDot status="pending" />
+                  {/* <StatusDot status="pending" /> */}
                 </div>
               </div>
             </div>
@@ -345,7 +345,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Interactive games and activities to boost your mood and have fun</p>
                 <div className="flex justify-center mt-3">
-                  <StatusDot status="success" />
+                  {/* <StatusDot status="success" /> */}
                 </div>
               </div>
             </div>

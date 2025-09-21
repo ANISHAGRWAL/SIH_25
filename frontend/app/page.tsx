@@ -95,6 +95,58 @@ const blogs = [
   },
 ];
 
+// Team data
+const teamMembers = [
+  {
+    name: "Anish Agarwal",
+    // role: "Lead Developer",
+    github: "https://github.com/anishagrwal",
+    linkedin: "https://linkedin.com/in/anish-agarwal-0a6a32257",
+    image: "/team/anish.jpeg", // You'll need to add team member images
+    // specialty: "Full-Stack Development"
+  },
+  {
+    name: "Raj De Modak",
+    // role: "Backend Engineer",
+    github: "https://github.com/rajdemodak01",
+    linkedin: "https://www.linkedin.com/in/rajdemodak01/",
+    image: "/team/raj.jpg",
+    // specialty: "System Architecture"
+  },
+  {
+    name: "Amar Pal",
+    // role: "Frontend Developer",
+    github: "https://github.com/ITSAMARHERE",
+    linkedin: "https://www.linkedin.com/in/amar-pal-a945ba250/",
+    image: "/team/amar.jpg",
+    // specialty: "UI/UX Design"
+  },
+  {
+    name: "Aryan Sinha",
+    // role: "AI/ML Engineer",
+    github: "",
+    linkedin: "https://www.linkedin.com/in/aryan-kr-sinha-81412a271/",
+    image: "/team/aryan.jpeg",
+    // specialty: "Machine Learning"
+  },
+  {
+    name: "Shashank Shekhar",
+    role: "DevOps Engineer",
+    github: "https://github.com/shashankkk05",
+    linkedin: "https://www.linkedin.com/in/shashank-s-1a7469251/",
+    image: "/team/shashank.jpg",
+    specialty: "Cloud Infrastructure"
+  },
+  {
+    name: "Ananya Mishra",
+    // role: "Product Manager",
+    github: "https://github.com/ananyamishra233",
+    linkedin: "https://www.linkedin.com/in/ananya-mishra-41b431248/",
+    image: "/team/ananya.jpg",
+    // specialty: "Product Strategy"
+  }
+];
+
 
 // New ContactForm component using Formspree hook
 function ContactForm() {
@@ -153,6 +205,95 @@ function ContactForm() {
   );
 }
 
+// Team Section Component
+function TeamSection() {
+  return (
+    <section id="team" className="py-16 bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute w-96 h-96 bg-gradient-to-r from-blue-500/5 to-indigo-400/5 rounded-full blur-3xl -top-20 -left-20 animate-pulse"></div>
+        <div className="absolute w-80 h-80 bg-gradient-to-r from-indigo-400/5 to-purple-500/5 rounded-full blur-3xl -bottom-20 -right-20 animate-pulse"></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-blue-200/50 mb-6">
+            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+            <span className="text-sm font-medium text-slate-700">Meet Our Team</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            The Minds Behind{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400">
+              Campus Care
+            </span>
+          </h2>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto text-pretty">
+            A passionate team of developers, designers, and mental health advocates working together to make wellness accessible for every student.
+          </p>
+        </div>
+
+        {/* Team Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-10xl mx-auto">
+          {teamMembers.map((member, index) => (
+            <div key={index} className="group relative">
+              {/* Single card container with no gaps */}
+              <div className="rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 backdrop-blur-sm transform hover:-translate-y-2 hover:ring-2 hover:ring-blue-500/50 overflow-hidden bg-white">
+                
+                {/* Image Container - no separate rounding, inherits from parent */}
+                <div className="relative aspect-square overflow-hidden">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                  />
+                  
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Social Links - appear on hover at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center gap-3 opacity-0 transform translate-y-full group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                    <a 
+                      href={member.linkedin} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      aria-label={`${member.name}'s LinkedIn Profile`}
+                      className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white backdrop-blur-sm hover:bg-blue-600 hover:scale-110 transition-all duration-300 shadow-lg"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                    </a>
+                    <a 
+                      href={member.github} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      aria-label={`${member.name}'s GitHub Profile`}
+                      className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white backdrop-blur-sm hover:bg-gray-800 hover:scale-110 transition-all duration-300 shadow-lg"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+                
+                {/* Title directly attached to image - no padding/gap */}
+                <div className="px-4 py-3 text-center">
+                  <h3 className="text-lg font-bold text-slate-800 relative inline-block">
+                    {member.name}
+                    {/* Underline effect */}
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></span>
+                  </h3>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 // Update the main HomePage component to use the new ContactForm component
 export default function HomePage() {
@@ -176,7 +317,7 @@ export default function HomePage() {
 
 
       // Active section detection
-      const sections = ["about", "services", "contact", "blogs"]
+      const sections = ["about", "services", "team", "contact", "blogs"]
       const current = sections.find(section => {
         const element = document.getElementById(section)
         if (element) {
@@ -263,7 +404,7 @@ export default function HomePage() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              {["about", "services", "contact", "blogs"].map((section, index) => (
+              {["about", "services", "team", "contact", "blogs"].map((section, index) => (
                 <button
                   key={section}
                   onClick={() => scrollToSection(section)}
@@ -278,7 +419,7 @@ export default function HomePage() {
               ))}
               <Link href="/login">
                 <Button className={`rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 transition-all duration-300 hover:scale-105 hover:shadow-lg transform ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-                  }`} style={{ transitionDelay: '400ms' }}>
+                  }`} style={{ transitionDelay: '500ms' }}>
                   Get Started
                 </Button>
               </Link>
@@ -307,7 +448,7 @@ export default function HomePage() {
           {/* Mobile Menu */}
           <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-96 opacity-100 pt-4' : 'max-h-0 opacity-0'}`}>
             <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 p-6 space-y-4">
-              {["about", "services", "contact", "blogs"].map((section, index) => (
+              {["about", "services", "team", "contact", "blogs"].map((section, index) => (
                 <button
                   key={section}
                   onClick={() => scrollToSection(section)}
@@ -467,6 +608,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Team Section */}
+      <TeamSection />
 
       {/* Enhanced Contact Section */}
       <section id="contact" className="py-16 bg-white relative">
@@ -586,6 +729,7 @@ export default function HomePage() {
                 title: "Platform", links: [
                   { name: "About", action: () => scrollToSection("about") },
                   { name: "Services", action: () => scrollToSection("services") },
+                  { name: "Team", action: () => scrollToSection("team") },
                   { name: "Get Started", href: "/signup" },
                   { name: "Login", href: "/login" }
                 ]
@@ -634,4 +778,3 @@ export default function HomePage() {
     </div>
   )
 }
-
