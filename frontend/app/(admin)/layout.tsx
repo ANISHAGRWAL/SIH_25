@@ -18,7 +18,6 @@ import {
   X,
   Shield, // Icon for Volunteers
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export default function AdminLayout({
   children,
@@ -36,6 +35,43 @@ export default function AdminLayout({
   const handleLogout = () => {
     auth.logout();
     console.log("Admin logout clicked");
+  };
+
+  // Helper function to get user initials
+  const getUserInitials = (name: string | undefined) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Profile Avatar Component
+  const ProfileAvatar = ({ size = "w-10 h-10" }: { size?: string }) => {
+    const initials = getUserInitials(user?.name);
+    
+    return (
+      <div className={`${size} rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 text-white flex items-center justify-center font-semibold text-sm shadow-lg overflow-hidden`}>
+        {user?.avatarUrl ? (
+          <img
+            src={user.avatarUrl}
+            alt="Profile"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Hide image and show fallback if image fails to load
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        ) : null}
+        {!user?.avatarUrl && (
+          <span className="text-white font-semibold">
+            {initials}
+          </span>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -79,12 +115,12 @@ export default function AdminLayout({
               >
                 Appointments
               </Link>
-              <Link
+              {/* <Link
                 href="/forums"
                 className="font-medium hover:text-slate-900 transition-colors"
               >
                 Forums
-              </Link>
+              </Link> */}
             </nav>
           </div>
 
@@ -92,20 +128,9 @@ export default function AdminLayout({
           <div className="relative">
             <button
               onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
+              className="hover:scale-105 transition-all duration-200 hover:shadow-xl hover:rounded-b-full transform hover:-translate-y-0.5"
             >
-              <Avatar className="w-10 h-10">
-                <AvatarImage
-                  src={user?.avatarUrl || "/placeholder.svg"}
-                  alt="Avatar"
-                />
-                <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
-                  {user?.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
+              <ProfileAvatar />
             </button>
 
             {isProfileDropdownOpen && (
@@ -178,20 +203,9 @@ export default function AdminLayout({
                   onClick={() =>
                     setIsProfileDropdownOpen(!isProfileDropdownOpen)
                   }
-                  className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="hover:scale-105 transition-all duration-200 hover:shadow-xl"
                 >
-                  <Avatar className="w-10 h-10 rounded-full">
-                    <AvatarImage
-                      src={user?.avatarUrl || "/placeholder.svg"}
-                      alt="Avatar"
-                    />
-                    <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
-                      {user?.name
-                        ?.split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <ProfileAvatar />
                 </button>
 
                 {isProfileDropdownOpen && (
@@ -326,13 +340,13 @@ export default function AdminLayout({
                   >
                     Appointments
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/forums"
                     className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Forums
-                  </Link>
+                  </Link> */}
                 </nav>
               </div>
             </>
@@ -376,12 +390,12 @@ export default function AdminLayout({
               isActive={pathname === "/appointments"}
               icon={Calendar}
             />
-            <MobileLink
+            {/* <MobileLink
               href="/forums"
               label="Forums"
               isActive={pathname === "/forums"}
               icon={MessageSquare}
-            />
+            /> */}
             {/* The "More" menu is removed to make space, but you can add it back if needed */}
           </nav>
         </footer>
