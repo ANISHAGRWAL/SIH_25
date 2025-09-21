@@ -19,7 +19,8 @@ MODEL = None
 @app.on_event("startup")
 def startup_event():
     global MODEL
-    MODEL = load_model("backend/speech/models/my_model.h5")
+    MODEL = load_model("models/my_model.h5")
+
     # optional: print model input shape / summary for debugging
     try:
         print("MODEL input_shape:", MODEL.input_shape)
