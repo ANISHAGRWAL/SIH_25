@@ -3,7 +3,7 @@ services:
     name: speech-backend
     runtime: python
     plan: free
-    buildCommand: |
-      apt-get update && apt-get install -y ffmpeg
-      pip install -r backend/speech/requirements.txt
-    startCommand: uvicorn backend.speech.app:app --host 0.0.0.0 --port $PORT
+    branch: main
+    rootDirectory: backend/speech
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
