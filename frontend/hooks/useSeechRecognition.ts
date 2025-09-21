@@ -90,8 +90,12 @@ export const useSpeechRecognition = () => {
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       setTranscript("");
-      recognitionRef.current.start();
-      setIsListening(true);
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error("Failed to start recognition:", error);
+      }
     }
   };
 
