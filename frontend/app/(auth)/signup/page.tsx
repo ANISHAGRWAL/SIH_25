@@ -175,7 +175,19 @@ export default function SignupPage() {
   if (loading || (isAuthenticated && token)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="flex flex-col items-center justify-center space-y-4">
+          {/* Modern loading spinner with multiple rings */}
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-blue-200 border-solid rounded-full animate-spin border-t-blue-600"></div>
+            <div className="absolute top-2 left-2 w-12 h-12 border-4 border-indigo-200 border-solid rounded-full animate-spin border-t-indigo-500 animate-reverse"></div>
+            <div className="absolute top-4 left-4 w-8 h-8 border-4 border-purple-200 border-solid rounded-full animate-spin border-t-purple-400"></div>
+          </div>
+          
+          {/* Loading text with fade animation */}
+          <div className="text-center">
+            <p className="text-gray-600 font-medium animate-pulse">Loading your dashboard...</p>
+          </div>
+        </div>
       </div>
     );
   }

@@ -204,7 +204,7 @@ const userAvatar = (
                 >
                   <Avatar className="w-10 h-10">
                     <AvatarImage
-                      src={user?.avatarUrl || "/placeholder.svg"}
+                      src={user?.avatarUrl || "/default-avatar.png"}
                       alt="Avatar"
                     />
                     <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">

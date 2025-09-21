@@ -5,40 +5,53 @@ import { useEffect, useRef, useState } from "react";
 const FluidSimulationGame = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // Check if we're in fullscreen mode
     const checkFullscreen = () => {
       const isFS = !!(document.fullscreenElement || 
-                     (document as any).webkitFullscreenElement || 
-                     (document as any).msFullscreenElement);
+                      (document as any).webkitFullscreenElement || 
+                      (document as any).msFullscreenElement);
       setIsFullscreen(isFS);
     };
 
-    // Listen for fullscreen changes
+    const handleResize = () => {
+      // Check for mobile screen size
+      setIsMobile(window.innerWidth < 768); 
+    };
+
+    // Listen for fullscreen and resize changes
     document.addEventListener('fullscreenchange', checkFullscreen);
     document.addEventListener('webkitfullscreenchange', checkFullscreen);
     document.addEventListener('msfullscreenchange', checkFullscreen);
+    window.addEventListener('resize', handleResize);
 
     // Initial check
     checkFullscreen();
+    handleResize();
 
     return () => {
       document.removeEventListener('fullscreenchange', checkFullscreen);
       document.removeEventListener('webkitfullscreenchange', checkFullscreen);
       document.removeEventListener('msfullscreenchange', checkFullscreen);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   useEffect(() => {
-    // Dynamically import the fluid sim script (so it runs client-side only)
     import("./fluid-sim").then((module) => {
       if (canvasRef.current) {
-        // Set canvas size based on fullscreen state
         if (isFullscreen) {
           canvasRef.current.width = window.innerWidth;
           canvasRef.current.height = window.innerHeight;
+        } else if (isMobile) {
+          // Mobile dimensions
+          const mobileWidth = window.innerWidth * 0.9;
+          canvasRef.current.width = mobileWidth;
+          canvasRef.current.height = mobileWidth * (600 / 800); // Maintain aspect ratio
         } else {
+          // Desktop dimensions
           canvasRef.current.width = 800;
           canvasRef.current.height = 600;
         }
@@ -46,7 +59,7 @@ const FluidSimulationGame = () => {
         module.startFluidSimulation(canvasRef.current);
       }
     });
-  }, [isFullscreen]);
+  }, [isFullscreen, isMobile]);
 
   return (
     <div className={`flex items-center justify-center ${
@@ -59,6 +72,8 @@ const FluidSimulationGame = () => {
         className={`${
           isFullscreen 
             ? 'w-screen h-screen' 
+            : isMobile 
+            ? 'w-[90vw] h-[67.5vw]' // w-90vw h-67.5vw
             : 'w-[800px] h-[600px]'
         } rounded-lg`}
         style={{

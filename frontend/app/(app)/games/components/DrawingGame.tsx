@@ -182,7 +182,7 @@ export default function DrawingGame({ isFullscreen = false }: GameProps) {
         </div>
       </div>
 
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col-reverse items-center space-y-15">
         <canvas
           ref={canvasRef}
           style={{ 

@@ -252,33 +252,56 @@ export async function addOrUpdateJournalEntry(
   };
 }
 
-// In src/actions/student.ts
+export const appliedForVolunteer = async (token: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/student/volunteer`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to fetch volunteer status");
+    }
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data,
+    };
+  } catch (error: any) {
+    return {
+      ok: false,
+      status: 500,
+      error: error.message || "Failed to fetch volunteer status. Please try again.",
+    };
+  }
+};
 
 export const becomeVolunteer = async (token: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/student/volunteer`, { // <-- This is the corrected line
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error?.message || "Failed to submit request");
-    }
-
-    return {
-      ok: response.ok,
-      data: result.data,
-    };
-  } catch (error: any) {
-    return {
-      ok: false,
-      error:
-        error.message || "Failed to submit volunteer request. Please try again.",
-    };
-  }
+  try {
+    const response = await fetch(`${BASE_URL}/student/volunteer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to submit volunteer request");
+    }
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data,
+    };
+  } catch (error: any) {
+    return {
+      ok: false,
+      status: 500,
+      error: error.message || "Failed to submit volunteer request. Please try again.",
+    };
+  }
 };

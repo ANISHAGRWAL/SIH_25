@@ -277,3 +277,36 @@ export const makeVolunteer = async (
     return { ok: false, status: 500, error: error.message };
   }
 };
+
+
+export const getAdminVolunteers = async (
+  token: string
+): Promise<{ ok: boolean; status?: number; data?: any; error?: string }> => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/volunteers`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Failed to fetch volunteers");
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: result.data || [],
+    };
+  } catch (error: any) {
+    console.error("Error fetching volunteers:", error);
+    return {
+      ok: false,
+      status: 500,
+      error: error.message || "Failed to fetch volunteers. Please try again.",
+    };
+  }
+};
