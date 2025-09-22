@@ -81,6 +81,9 @@ export default function MindLogPage() {
     "calendar" | "diary" | "report"
   >("calendar");
   const [selectedDate, setSelectedDate] = useState<any>(null);
+  // add this line to store the weekly overall score returned by backend
+  const [overallScore, setOverallScore] = useState<number | null>(null);
+
   const [diaryEntries, setDiaryEntries] = useState<{ [key: string]: string }>(
     {}
   );
@@ -96,6 +99,26 @@ export default function MindLogPage() {
     socialWithdrawal: [],
   });
   const [isEntriesLoading, setIsEntriesLoading] = useState<boolean>(false);
+
+  // dynamic colors for each metric (will be updated after fetching report)
+  const [metricColors, setMetricColors] = useState<Record<string, string>>({
+    average: "#3b82f6",
+    moodDisturbance: "#ef4444",
+    sleepDisruption: "#3b82f6",
+    appetiteIssues: "#10b981",
+    academicDisengagement: "#8b5cf6",
+    socialWithdrawal: "#10b981",
+  });
+
+  // map numeric 0..10 -> color (low -> red, mid -> orange/amber, high -> green)
+  const valueToColor = (v: number | null | undefined) => {
+    if (v == null || Number.isNaN(v)) return "#6b7280"; // neutral gray if unknown
+    if (v <= 3.0) return "#ef4444"; // red - low (high concern)
+    if (v <= 5.0) return "#f97316"; // orange - mild concern
+    if (v <= 7.0) return "#f59e0b"; // amber - moderate
+    return "#10b981"; // green - good
+  };
+
 
   // Helper functions (keeping existing ones)
   const getDateKey = (date: Date): string => {
@@ -275,6 +298,36 @@ export default function MindLogPage() {
 
       const trend = data.data.trend || [];
       const summary = data.data.summary || [];
+      const overall = data.data.overall || { score: 0 };
+
+      // after summary is available
+      const baseMap: Record<string, string> = {
+        average: "#3b82f6",
+        moodDisturbance: "#ef4444",
+        sleepDisruption: "#3b82f6",
+        appetiteIssues: "#10b981",
+        academicDisengagement: "#8b5cf6",
+        socialWithdrawal: "#10b981",
+      };
+
+      const computedColors = { ...baseMap };
+
+      const keyMap: Record<string, string> = {
+        'Mood Disturbance': 'moodDisturbance',
+        'Sleep Disruption': 'sleepDisruption',
+        'Appetite Issues': 'appetiteIssues',
+        'Academic Disengagement': 'academicDisengagement',
+        'Social Withdrawal': 'socialWithdrawal',
+      };
+
+      summary.forEach((s: any) => {
+        const key = keyMap[s.parameter];
+        if (key) computedColors[key] = valueToColor(parseFloat(s.avg));
+      });
+
+      // set the state once
+      setMetricColors(computedColors);
+
 
       // Map pie chart data from summary
       const colorMap: Record<string, string> = {
@@ -308,42 +361,51 @@ export default function MindLogPage() {
             {
               label: item.parameter,
               value: parseFloat(item.avg) || 0,
-              color: colorMap[item.parameter] || "#6b7280",
+              color: computedColors[frontendKey] || colorMap[item.parameter] || "#6b7280",
             },
           ];
         }
       });
 
-      console.log("🥧 Pie chart data mapped:", pieMap);
+
       setPieChartsData(pieMap);
 
-      // Map line chart data from trend
-      let weeklyChartData = weekDays.map((date) => {
+      // ✅ Build weekly chart data using backend daily overall
+      const weeklyChartData = weekDays.map((date) => {
         const dateStr = date.toISOString().split("T")[0];
         const record = trend.find((t: any) => t.date === dateStr);
+
+        const average =
+          record && typeof record.overall === "number" ? record.overall : 0;
 
         return {
           day: days[date.getDay()],
           date: dateStr,
-          moodDisturbance: record ? parseFloat(record.mood_disturbance) : 0,
-          sleepDisruption: record ? parseFloat(record.sleep_disruption) : 0,
-          appetiteIssues: record ? parseFloat(record.appetite_issues) : 0,
+          moodDisturbance: record
+            ? parseFloat(record.mood_disturbance ?? record.moodDisturbance) || 0
+            : 0,
+          sleepDisruption: record
+            ? parseFloat(record.sleep_disruption ?? record.sleepDisruption) || 0
+            : 0,
+          appetiteIssues: record
+            ? parseFloat(record.appetite_issues ?? record.appetiteIssues) || 0
+            : 0,
           academicDisengagement: record
-            ? parseFloat(record.academic_disengagement)
+            ? parseFloat(
+              record.academic_disengagement ?? record.academicDisengagement
+            ) || 0
             : 0,
-          socialWithdrawal: record ? parseFloat(record.social_withdrawal) : 0,
-          average: record
-            ? (parseFloat(record.mood_disturbance) +
-                parseFloat(record.sleep_disruption) +
-                parseFloat(record.appetite_issues) +
-                parseFloat(record.academic_disengagement) +
-                parseFloat(record.social_withdrawal)) /
-              5
+          socialWithdrawal: record
+            ? parseFloat(record.social_withdrawal ?? record.socialWithdrawal) || 0
             : 0,
-        };
+          average, // ✅ daily wellbeing score from backend
+        } as DailyData;
       });
 
       setWeeklyData(weeklyChartData);
+
+      // ✅ Save overall weekly wellbeing score from backend
+      setOverallScore(overall.score || 0);
     } catch (error) {
       console.error("❌ API Error:", error);
 
@@ -370,6 +432,7 @@ export default function MindLogPage() {
         academicDisengagement: [],
         socialWithdrawal: [],
       });
+      setOverallScore(0);
     }
   };
 
@@ -685,16 +748,21 @@ export default function MindLogPage() {
                   <Line
                     type="monotone"
                     dataKey={selectedMetric}
-                    stroke="#3b82f6"
+                    stroke={metricColors[selectedMetric] || "#3b82f6"}
                     strokeWidth={3}
-                    dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
+                    dot={{
+                      fill: metricColors[selectedMetric] || "#3b82f6",
+                      strokeWidth: 2,
+                      r: 5,
+                    }}
                     activeDot={{
                       r: 7,
-                      stroke: "#3b82f6",
+                      stroke: metricColors[selectedMetric] || "#3b82f6",
                       strokeWidth: 2,
                       fill: "white",
                     }}
                   />
+
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -723,12 +791,14 @@ export default function MindLogPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600 mb-1">
-                  {weeklyData.length > 0
-                    ? (
-                        weeklyData.reduce((acc, day) => acc + day.average, 0) /
-                        weeklyData.length
-                      ).toFixed(1)
-                    : "0.0"}
+                  {overallScore != null
+                    ? overallScore.toFixed(1)
+                    : weeklyData.length > 0
+                      ? (weeklyData.reduce((acc, day) => acc + day.average, 0) / weeklyData.length).toFixed(1)
+                      : "0.0"
+                  }
+
+
                 </div>
                 <div className="text-sm text-slate-600">Average Wellbeing</div>
               </div>
@@ -951,14 +1021,14 @@ export default function MindLogPage() {
         {/* Days of week header */}
         {isEntriesLoading ? (
           <div className="flex items-center justify-center h-48 sm:h-64 text-slate-500">
-                       {" "}
+            {" "}
             <svg
               className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
             >
-                           {" "}
+              {" "}
               <circle
                 className="opacity-25"
                 cx="12"
@@ -967,15 +1037,15 @@ export default function MindLogPage() {
                 stroke="currentColor"
                 strokeWidth="4"
               ></circle>
-                           {" "}
+              {" "}
               <path
                 className="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
-                         {" "}
+              {" "}
             </svg>
-                        <span>Loading entries...</span>         {" "}
+            <span>Loading entries...</span>         {" "}
           </div>
         ) : (
           <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3 sm:mb-4">
@@ -1002,13 +1072,12 @@ export default function MindLogPage() {
               <div key={index} className="aspect-square">
                 <button
                   onClick={() => handleDayClick(date)}
-                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${
-                    isDateToday
+                  className={`w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 group relative ${isDateToday
                       ? "bg-gradient-to-br from-blue-500 to-indigo-400 text-white shadow-lg"
                       : hasEntry
-                      ? "bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-md hover:shadow-lg"
-                      : "bg-slate-50 hover:bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
-                  }`}
+                        ? "bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-md hover:shadow-lg"
+                        : "bg-slate-50 hover:bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
+                    }`}
                 >
                   <span className="font-semibold text-sm sm:text-lg">
                     {date.getDate()}
