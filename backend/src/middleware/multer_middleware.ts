@@ -5,7 +5,19 @@ import multer, { FileFilterCallback } from 'multer';
 import { TMP_ATTACHMENT_UPLOAD_DIR } from '../constants';
 import path from 'path';
 
-const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+const allowedMimeTypes = [
+  'image/jpeg',
+  'image/png',
+  'application/pdf',
+  'audio/mpeg', // .mp3
+  'audio/wav', // .wav
+  'audio/wave', // .wav
+  'audio/webm', // .webm
+  'audio/ogg', // .ogg
+  'audio/mp4', // .m4a
+  'audio/x-wav',
+  'audio/x-m4a',
+];
 
 const fileFilter = (
   req: Request,
@@ -15,7 +27,8 @@ const fileFilter = (
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only image or PDF files are allowed for ID card uploads.'));
+    console.log('Rejected file type:', file.mimetype);
+    cb(new Error('Only supported audio files are allowed.'));
   }
 };
 

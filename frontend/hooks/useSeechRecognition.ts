@@ -1,62 +1,39 @@
+// /hooks/useSpeechRecognition.ts
+
 import { useState, useEffect, useRef } from "react";
 
-// Define the SpeechRecognition interface for TypeScript
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onresult: (event: any) => void;
-  onerror: (event: any) => void;
-  onend: () => void;
-}
-
-// Define the types for the SpeechRecognitionEvent
-interface SpeechRecognitionEvent extends Event {
-  resultIndex: number;
-  results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognitionResultList {
-  [index: number]: SpeechRecognitionResult;
-  length: number;
-}
-
-interface SpeechRecognitionResult {
-  [index: number]: SpeechRecognitionAlternative;
-  isFinal: boolean;
-  length: number;
-}
-
-interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
-}
-
-// Check for browser compatibility and get the correct constructor
 export const useSpeechRecognition = () => {
   const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [hasRecognitionSupport, setHasRecognitionSupport] = useState(false);
-  const recognitionRef = useRef<any>(null); // Use `any` here for now
+  const recognitionRef = useRef<any>(null);
+  const hasFatalError = useRef(false); // once set, never tries browser API again
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // Avoid running on the server
+    if (typeof window === "undefined") {
+      return;
+    }
 
-    const SpeechRecognition =
+    const SpeechRecognitionConstructor =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      console.warn("Speech recognition is not supported in this browser.");
+    if (!SpeechRecognitionConstructor) {
+      // API doesn’t exist at all
       setHasRecognitionSupport(false);
       return;
     }
 
-    setHasRecognitionSupport(true);
+    let recognition: any;
 
-    const recognition = new SpeechRecognition();
+    try {
+      recognition = new SpeechRecognitionConstructor();
+    } catch (e) {
+      console.warn("Failed to instantiate SpeechRecognition:", e);
+      setHasRecognitionSupport(false);
+      return;
+    }
+
     recognitionRef.current = recognition;
 
     recognition.continuous = true;
@@ -65,43 +42,85 @@ export const useSpeechRecognition = () => {
 
     recognition.onresult = (event: any) => {
       let finalTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        if (result.isFinal) {
+          finalTranscript += result[0].transcript;
         }
       }
-      setTranscript(finalTranscript);
+      if (finalTranscript) {
+        setTranscript(finalTranscript);
+      }
     };
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
+      if (
+        event.error === "network" ||
+        event.error === "not-allowed" ||
+        event.error === "service-not-allowed"
+      ) {
+        // these errors mean browser's speech recognition is unusable
+        hasFatalError.current = true;
+        setHasRecognitionSupport(false);
+      }
+      setIsListening(false);
     };
 
     recognition.onend = () => {
       setIsListening(false);
-      setTranscript("");
     };
 
-    return () => {
+    // Try a lightweight test only if not already known to be broken
+    // But don’t call recognition.start if it will immediately error
+    // Skip test or wrap in try/catch
+    try {
+      recognition.start();
       recognition.stop();
+      // If no immediate error, assume ok
+      setHasRecognitionSupport(true);
+    } catch (err) {
+      console.warn("Speech recognition initial test failed:", err);
+      setHasRecognitionSupport(false);
+      hasFatalError.current = true;
+    }
+
+    return () => {
+      try {
+        recognition.stop();
+      } catch (e) {
+        // nothing
+      }
     };
   }, []);
 
   const startListening = () => {
-    if (recognitionRef.current && !isListening) {
+    if (
+      recognitionRef.current &&
+      !isListening &&
+      hasRecognitionSupport &&
+      !hasFatalError.current
+    ) {
       setTranscript("");
       try {
         recognitionRef.current.start();
         setIsListening(true);
-      } catch (error) {
-        console.error("Failed to start recognition:", error);
+      } catch (err) {
+        console.error("Error starting speech recognition:", err);
+        // On any start error, disable support
+        hasFatalError.current = true;
+        setHasRecognitionSupport(false);
       }
     }
   };
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch (err) {
+        console.error("Error stopping speech recognition:", err);
+      }
       setIsListening(false);
     }
   };
@@ -111,6 +130,6 @@ export const useSpeechRecognition = () => {
     isListening,
     startListening,
     stopListening,
-    hasRecognitionSupport,
+    hasRecognitionSupport: hasRecognitionSupport && !hasFatalError.current,
   };
 };

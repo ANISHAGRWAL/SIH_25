@@ -76,7 +76,6 @@ export const getMe = async (token: string) => {
 
     const result = await response.json();
 
-    console.log(result);
     if (!response.ok) {
       throw new Error(result.error?.message || "Failed to fetch user data");
     }
@@ -263,7 +262,9 @@ export const appliedForVolunteer = async (token: string) => {
     });
     const result = await response.json();
     if (!response.ok) {
-      throw new Error(result.error?.message || "Failed to fetch volunteer status");
+      throw new Error(
+        result.error?.message || "Failed to fetch volunteer status"
+      );
     }
     return {
       ok: response.ok,
@@ -274,7 +275,8 @@ export const appliedForVolunteer = async (token: string) => {
     return {
       ok: false,
       status: 500,
-      error: error.message || "Failed to fetch volunteer status. Please try again.",
+      error:
+        error.message || "Failed to fetch volunteer status. Please try again.",
     };
   }
 };
@@ -290,7 +292,9 @@ export const becomeVolunteer = async (token: string) => {
     });
     const result = await response.json();
     if (!response.ok) {
-      throw new Error(result.error?.message || "Failed to submit volunteer request");
+      throw new Error(
+        result.error?.message || "Failed to submit volunteer request"
+      );
     }
     return {
       ok: response.ok,
@@ -301,7 +305,9 @@ export const becomeVolunteer = async (token: string) => {
     return {
       ok: false,
       status: 500,
-      error: error.message || "Failed to submit volunteer request. Please try again.",
+      error:
+        error.message ||
+        "Failed to submit volunteer request. Please try again.",
     };
   }
 };

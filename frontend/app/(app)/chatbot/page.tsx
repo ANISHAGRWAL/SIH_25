@@ -1,10 +1,14 @@
+// /app/(or pages)/ChatbotPage.tsx — or wherever your page lives
+// Adjust import paths as needed
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { chat } from "@/actions/chat";
-import { useAuth } from "../../../contexts/AuthContext";
-import { useSpeechRecognition } from "../../../hooks/useSeechRecognition"; // Adjust path if needed
-import { Mic } from 'lucide-react'; // Import the Mic icon
+import { useAuth } from "@/contexts/AuthContext";
+import { Mic } from "lucide-react";
+import SpeechInput from "@/components/SpeechInput";
+import { useSpeechRecognition } from "@/hooks/useSeechRecognition";
 
 type Message = {
   id: string;
@@ -21,7 +25,6 @@ function generateId() {
   return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
 }
 
-// botAvatar and userAvatar SVGs remain the same...
 const botAvatar = (
   <svg
     className="w-5 h-5 text-white"
@@ -54,7 +57,6 @@ const userAvatar = (
   </svg>
 );
 
-
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -66,7 +68,6 @@ export default function ChatbotPage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
 
-  // New: Integrate the speech recognition hook
   const {
     transcript,
     isListening,
@@ -75,7 +76,6 @@ export default function ChatbotPage() {
     hasRecognitionSupport,
   } = useSpeechRecognition();
 
-  // New: Update input field with transcript from voice
   useEffect(() => {
     if (transcript) {
       setInput(transcript);
@@ -110,7 +110,6 @@ export default function ChatbotPage() {
   async function send() {
     if (!input.trim() || loading) return;
 
-    // New: Stop listening when a message is sent
     if (isListening) {
       stopListening();
     }
@@ -207,7 +206,6 @@ export default function ChatbotPage() {
     }
   }, [input]);
 
-  // New: Handler for the microphone button
   const handleVoiceToggle = () => {
     if (isListening) {
       stopListening();
@@ -216,10 +214,8 @@ export default function ChatbotPage() {
     }
   };
 
-
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header remains unchanged */}
       <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg flex-shrink-0">
@@ -238,7 +234,9 @@ export default function ChatbotPage() {
             </svg>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">Campus Care AI</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
+              Campus Care AI
+            </h1>
             <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-600">
               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
               <span>Online</span>
@@ -248,7 +246,9 @@ export default function ChatbotPage() {
 
         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           <div className="flex items-center gap-1 sm:gap-2">
-            <label className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Model:</label>
+            <label className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
+              Model:
+            </label>
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value as "Gemini" | "Groq")}
@@ -306,7 +306,6 @@ export default function ChatbotPage() {
         </div>
       </div>
 
-      {/* Clear Confirmation Modal remains unchanged */}
       {showClearConfirm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm">
@@ -352,10 +351,8 @@ export default function ChatbotPage() {
         </div>
       )}
 
-      {/* Chat Container remains mostly unchanged */}
       <div className="flex-1 flex flex-col min-h-0 p-0 sm:p-4 relative z-10">
         <div className="flex-1 flex flex-col min-h-0 rounded-none sm:rounded-2xl bg-white/80 backdrop-blur-lg border-0 sm:border sm:border-gray-200/60 shadow-none sm:shadow-xl overflow-hidden">
-          {/* Messages Area, including empty state, remains unchanged */}
           {messages.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 text-center">
               <div className="max-w-sm sm:max-w-md">
@@ -403,19 +400,21 @@ export default function ChatbotPage() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
-                    className={`max-w-[90%] sm:max-w-[80%] flex gap-2 sm:gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
-                      }`}
+                    className={`max-w-[90%] sm:max-w-[80%] flex gap-2 sm:gap-3 ${
+                      message.role === "user" ? "flex-row-reverse" : "flex-row"
+                    }`}
                   >
-
                     <div
-                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        message.role === "user"
                           ? "bg-gradient-to-br from-blue-500 to-indigo-600"
                           : "bg-gradient-to-br from-emerald-500 to-teal-600"
-                        }`}
+                      }`}
                     >
                       {message.role === "user" ? (
                         user?.avatarUrl ? (
@@ -434,10 +433,11 @@ export default function ChatbotPage() {
 
                     <div className="flex flex-col">
                       <div
-                        className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${message.role === "user"
+                        className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${
+                          message.role === "user"
                             ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
                             : "bg-gray-100 text-gray-800 rounded-tl-md"
-                          }`}
+                        }`}
                       >
                         {message.isTyping ? (
                           <div className="flex items-center gap-1">
@@ -461,8 +461,9 @@ export default function ChatbotPage() {
                       </div>
                       {message.time && !message.isTyping && (
                         <p
-                          className={`text-xs mt-1 ${message.role === "user" ? "text-right" : "text-left"
-                            } text-gray-500`}
+                          className={`text-xs mt-1 ${
+                            message.role === "user" ? "text-right" : "text-left"
+                          } text-gray-500`}
                         >
                           {message.time}
                         </p>
@@ -475,23 +476,33 @@ export default function ChatbotPage() {
             </div>
           )}
 
-          {/* Input Area - MODIFIED */}
           <div className="p-3 sm:p-4 border-t border-gray-200/60 bg-white/90">
             <div className="flex items-end gap-2 sm:gap-3">
-
-              {/* New: Microphone button */}
-              {hasRecognitionSupport && (
+              {hasRecognitionSupport ? (
                 <button
                   onClick={handleVoiceToggle}
                   disabled={loading}
-                  className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${isListening
+                  className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
+                    isListening
                       ? "bg-red-500 text-white shadow-lg"
                       : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                    } flex items-center justify-center h-[40px] sm:h-[52px]`}
+                  } flex items-center justify-center h-[40px] sm:h-[52px]`}
                 >
                   <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
+              ) : (
+                <SpeechInput
+                  onTranscript={(text) => setInput(text)}
+                  disabled={loading}
+                />
               )}
+              <SpeechInput
+                onTranscript={(text) => setInput(text)}
+                disabled={loading}
+              />
+
+              {/* Optional: you might still want to allow fallback even if browser recog exists but fails at runtime */}
+              {/* e.g. always show SpeechInput as fallback or in parallel, depending on UX you prefer */}
 
               <div className="flex-1 relative">
                 <textarea
@@ -499,7 +510,9 @@ export default function ChatbotPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder={isListening ? "Listening..." : "Share your thoughts..."}
+                  placeholder={
+                    isListening ? "Listening..." : "Share your thoughts..."
+                  }
                   disabled={loading}
                   rows={1}
                   className="w-full px-3 py-2 sm:px-4 sm:py-3 pr-8 sm:pr-12 rounded-lg sm:rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200 placeholder-gray-500 text-sm resize-none bg-white"
@@ -530,10 +543,11 @@ export default function ChatbotPage() {
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
-                className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${loading || !input.trim()
+                className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
+                  loading || !input.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
-                  } flex items-center justify-center h-[40px] sm:h-[52px]`}
+                } flex items-center justify-center h-[40px] sm:h-[52px]`}
               >
                 {loading ? (
                   <svg
