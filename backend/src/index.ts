@@ -14,7 +14,9 @@ import adminRoutes from './routes/admin';
 import docChatRouter from './routes/doc_chat';
 import journalRoutes from './routes/journal';
 import bookingRoutes from './routes/booking';
+import speechToTextRoutes from './routes/speechToText';
 import { initializeSocketIo } from './socket';
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -71,6 +73,7 @@ app.use(`${BASE_PATH}/student`, studentRoutes);
 app.use(`${BASE_PATH}/test`, testRoutes);
 app.use(`${BASE_PATH}/journal`, journalRoutes);
 app.use(`${BASE_PATH}/booking`, bookingRoutes);
+app.use(`${BASE_PATH}/speech-to-text`, speechToTextRoutes);
 
 // admin router
 app.use(adminMiddleware);
