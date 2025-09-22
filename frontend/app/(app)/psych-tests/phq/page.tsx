@@ -24,6 +24,58 @@ const options = [
   { value: 3, label: "Nearly every day" },
 ];
 
+const getRedirectionUrls = (score: number) => {
+  // return like these wll will be used to show buttons for redirection and also with button name and complete message for overall like you scored 15 which is moderate depression you can try mind log andd profile
+  if (score <= 4)
+    return [
+      {
+        title: "You scored Minimal Depression",
+        message: "Great job! Keep maintaining your mental wellness.",
+        buttons: [
+          { name: "Try Mind Log", url: "/mind-log" },
+          { name: "Go to Profile", url: "/profile" },
+        ],
+      },
+    ];
+  if (score <= 9)
+    return [
+      {
+        title: "You scored Mild Depression",
+        message: "Consider speaking with a counselor for additional support.",
+        buttons: [
+          { name: "Find Counselors", url: "/counselors" },
+          { name: "Try Mind Log", url: "/mind-log" },
+          { name: "Go to Profile", url: "/profile" },
+        ],
+      },
+    ];
+  if (score <= 14)
+    return [
+      {
+        title: "You scored Moderate Depression",
+        message:
+          "Professional support is recommended. Please consider reaching out to a mental health professional.",
+        buttons: [
+          { name: "Find Counselors", url: "/counselors" },
+          { name: "Try Mind Log", url: "/mind-log" },
+          { name: "Go to Profile", url: "/profile" },
+        ],
+      },
+    ];
+  if (score <= 19)
+    return [
+      {
+        title: "You scored Moderately Severe Depression",
+        message: "Please seek professional help to address your symptoms.",
+        buttons: [
+          { name: "Find Counselors", url: "/counselors" },
+          { name: "Try Mind Log", url: "/mind-log" },
+          { name: "Go to Profile", url: "/profile" },
+        ],
+      },
+    ];
+};
+
 const getResultInterpretation = (score: number) => {
   if (score <= 4)
     return {
@@ -107,6 +159,7 @@ export default function PHQ9TestPage() {
 
   const totalScore = answers.reduce((sum, answer) => sum + answer, 0);
   const result = getResultInterpretation(totalScore);
+  const redirectionUrls = getRedirectionUrls(totalScore);
 
   const resetTest = () => {
     setCurrentQuestion(0);
@@ -173,6 +226,28 @@ export default function PHQ9TestPage() {
               </div>
             </div>
           </div>
+
+          {/* Redirection Buttons */}
+          {redirectionUrls &&
+            redirectionUrls.map((item, index) => (
+              <div key={index} className="space-y-4">
+                <div className="text-lg font-semibold">{item.title}</div>
+                <p className="text-slate-600">{item.message}</p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {item.buttons.map((button, btnIndex) => (
+                    <button
+                      key={btnIndex}
+                      onClick={() => router.push(button.url)}
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
+                    >
+                      {button.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+          {/* Retake Test Button */}
 
           {/* Action Buttons */}
           <div className="">
