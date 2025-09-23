@@ -149,7 +149,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
               </div>
               <Link
                 href="/blogs"
-                className="block w-full text-center py-3 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-lg text-sm font-medium hover:shadow-md transition-shadow sticky top-[350px]"
+                className="block w-full text-center py-3 bg-gradient-to-r from-blue-500 to-indigo-400 text-white rounded-lg text-sm font-medium hover:shadow-md transition-shadow sticky top-auto"
               >
                 {t("blog.backToBlogs")}
               </Link>

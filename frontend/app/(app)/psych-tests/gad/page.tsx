@@ -65,42 +65,59 @@ const getRedirectionUrls = (score: number) => {
       {
         title: "You scored Minimal Anxiety",
         message:
-          "Great job! Keep maintaining your mental wellness. Explore games, yoga, and multilingual resources to stay balanced.",
+          "Great job! Keep maintaining your mental wellness. Explore games, yoga, and blogs to stay balanced.",
         buttons: [
-          { name: "Gamified Wellbeing & Memory Games", url: "/games" },
-          { name: "Guided Exercises & Yoga", url: "/wellness" },
-          { name: "Multilingual Resource Hub", url: "/blogs" },
+          { name: "Gamified Wellbeing & Games", url: "/games" },
+          { name: "Surya Namaskar (Yoga)", url: "/wellness/surya-namaskar" },
+          { name: "Simple Habits to Boost Your Mental Wellness Daily (Blog)", url: "/blogs/simple-habit-to-boost-your-mind" },
+        ],
+      },
+    ];
+  if (score <= 9)
+    return [
+      {
+        title: "You scored Mild Anxiety",
+        message:
+          "Consider using motivational chats, guided exercises, and blogs to help manage your anxiety.",
+        buttons: [
+          { name: "Motivational Chatbot", url: "/chatbot" },
+          { name: "Child's Pose (Yoga)", url: "/wellness/yoga/1" },
+          { name: "Digital Detox: How to Reset Your Mind (Blog)", url: "/blogs/digital-detox" },
         ],
       },
     ];
   if (score <= 14)
     return [
       {
-        title: "You scored Mild to Moderate Anxiety",
+        title: "You scored Moderate Anxiety",
         message:
-          "Consider using motivational chats, guided exercises, and multilingual resources to help manage your anxiety.",
+          "Your anxiety may need professional support. Try yoga, journaling, and motivational resources.",
         buttons: [
-          { name: "Motivational Chatbot + SOS Alerts", url: "/chatbot" },
-          { name: "Guided Exercises & Yoga", url: "/wellness" },
-          { name: "Multilingual Resource Hub", url: "/blogs" },
+          { name: "Motivational Chatbot", url: "/chatbot" },
+          { name: "4-7-8 Breathing", url: "/wellness/4-7-8-breathing" },
+          { name: "Journaling for Clarity (Blog)", url: "/blogs/journaling-for-clarity" },
         ],
       },
     ];
-  if (score <= 21)
-    return [
-      {
-        title: "You scored Severe Anxiety",
-        message:
-          "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore multilingual resources.",
-        buttons: [
-          { name: "Anonymous Volunteer Forum", url: "/exper-support" },
-          { name: "One-Tap Counselor Booking", url: "/book-session" },
-          { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
-          { name: "Multilingual Resource Hub", url: "/blogs" },
-        ],
-      },
-    ];
+  // Severe: 15+
+  return [
+    {
+      title: "You scored Severe Anxiety",
+      message:
+        "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore resources.",
+      buttons: [
+        { name: "Anonymous Volunteer Forum", url: "/exper-support" },
+        { name: "One-Tap Counselor Booking", url: "/book-session" },
+        { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+        { name: "Resilience Building: How to Bounce Back from Setbacks Stronger (Blog)", url: "/blogs/resilience-building" },
+        { name: "Corpse Pose (Yoga)", url: "/wellness/yoga/5" },
+      ],
+    },
+  ];
 };
+
+const token =
+  typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 export default function GAD7TestPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -108,8 +125,6 @@ export default function GAD7TestPage() {
   const [showResults, setShowResults] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const handleAnswer = async (value: number) => {
     const newAnswers = [...answers, value];
@@ -152,133 +167,171 @@ export default function GAD7TestPage() {
 
   if (showResults) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4 md:p-8 bg-gray-50">
-        <div className="max-w-2xl w-full mx-auto space-y-6 md:space-y-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">GAD-7 Assessment Complete</h1>
-            <p className="text-base md:text-lg text-gray-500">Your Anxiety Screening Results</p>
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="text-center space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-xl md:text-2xl font-semibold">
+              GAD-7 Assessment Complete
+            </h2>
+            <p className="text-slate-600">Your Anxiety Screening Results</p>
           </div>
-          {isSubmitting && <p className="text-center text-slate-600">Saving your results...</p>}
 
-          <div className="rounded-2xl md:rounded-3xl bg-white shadow-lg md:shadow-2xl ring-1 ring-gray-100 p-6 md:p-8 space-y-6 md:space-y-8">
+          {/* Results Card */}
+          <div className="rounded-2xl bg-white ring-1 ring-slate-200 shadow-lg p-8">
             <div className="space-y-6">
+              {/* Score Display */}
               <div className="text-center">
-                <div className="w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white mb-4 shadow-lg md:shadow-xl">
-                  <span className="text-3xl md:text-4xl font-bold">{totalScore}</span>
+                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-indigo-400 flex items-center justify-center text-white mb-4 shadow-lg">
+                  <span className="text-2xl font-bold">{totalScore}</span>
                 </div>
-                <div className="text-sm md:text-lg font-medium text-gray-600">Total Score out of 21</div>
+                <div className="text-sm text-slate-600">
+                  Total Score out of 21
+                </div>
               </div>
 
-              <div className={`rounded-2xl ${result.bgColor} p-6 text-center border border-dashed border-gray-300`}>
-                <div className={`text-xl md:text-3xl font-bold ${result.color} mb-2`}>
+              {/* Result Level */}
+              <div className={`rounded-2xl ${result.bgColor} p-6 text-center`}>
+                <div className={`text-2xl font-bold ${result.color} mb-2`}>
                   {result.level} Anxiety
                 </div>
-                <p className="text-sm md:text-lg text-gray-700 leading-relaxed">{result.message}</p>
+                <p className="text-slate-700 leading-relaxed">
+                  {result.message}
+                </p>
               </div>
 
               {/* Score Breakdown */}
-              <div className="space-y-4">
-                <h3 className="text-base md:text-xl font-semibold text-gray-800">Score Interpretation</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 text-center">
-                  <div className="p-3 md:p-4 bg-green-100 rounded-lg md:rounded-xl">
-                    <div className="font-bold text-green-700 text-sm">Minimal</div>
-                    <div className="text-xs md:text-sm text-green-800">0-4</div>
-                  </div>
-                  <div className="p-3 md:p-4 bg-yellow-100 rounded-lg md:rounded-xl">
-                    <div className="font-bold text-yellow-700 text-sm">Mild</div>
-                    <div className="text-xs md:text-sm text-yellow-800">5-9</div>
-                  </div>
-                  <div className="p-3 md:p-4 bg-orange-100 rounded-lg md:rounded-xl">
-                    <div className="font-bold text-orange-700 text-sm">Moderate</div>
-                    <div className="text-xs md:text-sm text-orange-800">10-14</div>
-                  </div>
-                  <div className="p-3 md:p-4 bg-red-100 rounded-lg md:rounded-xl">
-                    <div className="font-bold text-red-700 text-sm">Severe</div>
-                    <div className="text-xs md:text-sm text-red-800">15-21</div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-xs md:text-sm">
+                <div className="p-2 md:p-3 bg-green-50 rounded-xl">
+                  <div className="font-semibold text-green-600">Minimal</div>
+                  <div className="text-green-700">0-4</div>
+                </div>
+                <div className="p-2 md:p-3 bg-yellow-50 rounded-xl">
+                  <div className="font-semibold text-yellow-600">Mild</div>
+                  <div className="text-yellow-700">5-9</div>
+                </div>
+                <div className="p-2 md:p-3 bg-orange-50 rounded-xl">
+                  <div className="font-semibold text-orange-600">Moderate</div>
+                  <div className="text-orange-700">10-14</div>
+                </div>
+                <div className="p-2 md:p-3 bg-red-50 rounded-xl">
+                  <div className="font-semibold text-red-600">Severe</div>
+                  <div className="text-red-700">15-21</div>
                 </div>
               </div>
-
-              {/* ----------------- Recommendations ----------------- */}
-              {redirectionUrls &&
-                redirectionUrls.map((item, index) => (
-                  <div key={index} className="space-y-4 mt-6">
-                    <div className="text-lg font-semibold">{item.title}</div>
-                    <p className="text-slate-600">{item.message}</p>
-                    <div className="flex flex-wrap justify-center gap-4 mt-2">
-                      {item.buttons.map((button, btnIndex) => (
-                        <button
-                          key={btnIndex}
-                          onClick={() => router.push(button.url)}
-                          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
-                        >
-                          {button.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-
-              {/* Back to Tests Button */}
-              <div className="flex justify-center items-center mt-6">
-                <button
-                  disabled={isSubmitting}
-                  onClick={() => router.push("/psych-tests")}
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
-                >
-                  Back to tests
-                </button>
-              </div>
             </div>
+          </div>
+
+          {/* Redirection Buttons */}
+          {redirectionUrls &&
+            redirectionUrls.map((item, index) => (
+              <div key={index} className="space-y-4">
+                <div className="text-lg font-semibold">{item.title}</div>
+                <p className="text-slate-600">{item.message}</p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {item.buttons.map((button, btnIndex) => (
+                    <button
+                      key={btnIndex}
+                      onClick={() => router.replace(button.url)}
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
+                    >
+                      {button.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+          {/* Action Buttons */}
+          <div className="">
+            <button
+              disabled={isSubmitting}
+              onClick={() => {
+                router.replace("/psych-tests");
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
+            >
+              Back to tests
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  // ---------------------- Test Page ----------------------
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 md:p-8 bg-gray-50">
-      <div className="max-w-2xl w-full mx-auto space-y-6 md:space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">GAD-7 Assessment</h1>
-          <p className="text-sm md:text-lg text-gray-500">Over the last 2 weeks, how often have you been bothered by the following problem?</p>
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-xl md:text-2xl font-semibold">
+            GAD-7 Assessment
+          </h2>
+          <p className="text-slate-600">
+            Over the last 2 weeks, how often have you been bothered by the
+            following problem?
+          </p>
         </div>
 
-        <div className="rounded-2xl md:rounded-3xl bg-white shadow-lg md:shadow-2xl ring-1 ring-gray-100 p-6 md:p-8 space-y-6 md:space-y-8">
-          {/* Progress */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-xs md:text-base font-medium text-gray-600">
-              <span>Question {currentQuestion + 1} of {questions.length}</span>
-              <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
+        {/* Progress Indicator */}
+        <div className="rounded-2xl bg-white ring-1 ring-slate-200 p-4">
+          <div className="flex items-center justify-between text-sm text-slate-600 mb-3">
+            <span>
+              Question {currentQuestion + 1} of {questions.length}
+            </span>
+            <span>
+              {Math.round(((currentQuestion + 1) / questions.length) * 100)}%
+            </span>
+          </div>
+          <div className="w-full bg-slate-200 rounded-full h-2">
+            <div
+              className="bg-gradient-to-r from-blue-500 to-indigo-400 h-2 rounded-full transition-all duration-500"
+              style={{
+                width: `${((currentQuestion + 1) / questions.length) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Question Card */}
+      <div className="rounded-2xl bg-white ring-1 ring-slate-200 shadow-lg p-8">
+        <div className="space-y-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-full rounded-full transition-all duration-500 ease-in-out"
-                style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-              />
-            </div>
+            <h3 className="text-lg font-semibold text-gray-800 leading-relaxed">
+              {questions[currentQuestion]}
+            </h3>
           </div>
 
-          {/* Question & Options */}
-          <div className="space-y-6">
-            <h2 className="text-lg md:text-2xl font-semibold text-gray-800 text-center leading-relaxed">
-              {questions[currentQuestion]}
-            </h2>
-            <div className="space-y-3">
-              {options.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleAnswer(option.value)}
-                  className="w-full p-4 md:p-5 text-left rounded-lg md:rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 group flex items-center gap-4"
-                >
-                  <div className="w-4 h-4 md:w-5 md:h-5 rounded-full border border-gray-300 group-hover:border-blue-500 group-hover:bg-blue-100 transition-colors" />
-                  <span className="font-medium text-gray-700 text-sm md:text-lg group-hover:text-blue-700">
+          <div className="space-y-3">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleAnswer(option.value)}
+                className="w-full p-4 text-left rounded-xl border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-300 group-hover:border-blue-500 group-hover:bg-blue-100 transition-colors" />
+                  <span className="font-medium text-slate-700 group-hover:text-blue-700">
                     {option.label}
                   </span>
-                </button>
-              ))}
-            </div>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>

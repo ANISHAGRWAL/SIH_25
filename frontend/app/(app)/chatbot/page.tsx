@@ -216,7 +216,7 @@ export default function ChatbotPage() {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
+      <div className="flex items-center justify-between p-2 sm:p-2 border-b gap-2 border-gray-200/60 bg-white/80 backdrop-blur-lg relative z-10">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg flex-shrink-0">
             <svg
@@ -235,7 +235,7 @@ export default function ChatbotPage() {
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-              Campus Care AI
+              CampBud
             </h1>
             <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-600">
               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -254,8 +254,8 @@ export default function ChatbotPage() {
               onChange={(e) => setProvider(e.target.value as "Gemini" | "Groq")}
               className="px-2 py-1 border rounded text-xs sm:text-sm bg-white min-w-0"
             >
-              <option value="Gemini">Gemini</option>
-              <option value="Groq">Groq</option>
+              <option value="Daisy">Daisy</option>
+              <option value="Rocky">Rocky</option>
             </select>
           </div>
 

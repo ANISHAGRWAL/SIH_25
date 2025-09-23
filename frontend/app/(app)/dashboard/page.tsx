@@ -298,7 +298,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Voice Mood Check Card - UNIFIED */}
-          <div className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-purple-100/50 transition-all duration-500 transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-purple-50/30" style={{ animationDelay: "100ms" }}>
+          <div onClick={() => (location.href = "/voice_det")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-purple-100/50 transition-all duration-500 transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-purple-50/30" style={{ animationDelay: "100ms" }}>
             <div className="flex flex-col text-center items-center gap-4 h-full">
               <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-all duration-300 group-hover:shadow-lg">
                 <img src="/mic.png" alt="Voice analysis" className="group-hover:scale-110 transition-transform duration-300" />
