@@ -29,6 +29,7 @@ const options = [
 // Questions 4, 5, 7, 8 need reverse scoring (0=4, 1=3, 2=2, 3=1, 4=0)
 const reverseScoreQuestions = [3, 4, 6, 7]; // 0-indexed
 
+// ---------------------- PSS Result Interpretation ----------------------
 const getResultInterpretation = (score: number) => {
   if (score <= 13)
     return {
@@ -52,6 +53,49 @@ const getResultInterpretation = (score: number) => {
   };
 };
 
+// ---------------------- PSS Recommendation System ----------------------
+const getRedirectionUrls = (score: number) => {
+  if (score <= 13)
+    return [
+      {
+        title: "You scored Low Stress",
+        message:
+          "Great! Keep maintaining your mental wellness. Explore journaling, guided exercises, and multilingual resources to stay balanced.",
+        buttons: [
+          { name: "Confidential Journaling + AI Reports", url: "/journaling" },
+          { name: "Guided Exercises & Yoga", url: "/wellness" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
+        ],
+      },
+    ];
+  if (score <= 26)
+    return [
+      {
+        title: "You scored Moderate Stress",
+        message:
+          "You may benefit from motivational support, mood detection, and multilingual resources to help manage stress.",
+        buttons: [
+          { name: "Motivational Chatbot + SOS Alerts", url: "/chatbot" },
+          { name: "Face & Voice Mood Detection", url: "/mood-detection" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
+        ],
+      },
+    ];
+  if (score <= 40)
+    return [
+      {
+        title: "You scored High Stress",
+        message:
+          "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore multilingual resources.",
+        buttons: [
+          { name: "One-Tap Counselor Booking", url: "/book-session" },
+          { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
+        ],
+      },
+    ];
+};
+
 export default function PSSTestPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -69,9 +113,7 @@ export default function PSSTestPage() {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       const finalScore = newAnswers.reduce((sum, answer, index) => {
-        if (reverseScoreQuestions.includes(index)) {
-          return sum + (4 - answer);
-        }
+        if (reverseScoreQuestions.includes(index)) return sum + (4 - answer);
         return sum + answer;
       }, 0);
 
@@ -80,32 +122,27 @@ export default function PSSTestPage() {
         setShowResults(true);
         return;
       }
-      
+
       setIsSubmitting(true);
       const res = await submitTestScore("pss", finalScore, token);
-      
+
       if (res.ok) {
         toast.success("Your PSS results have been saved!");
       } else {
         toast.error(res.error || "Failed to save results.");
       }
-      
+
       setIsSubmitting(false);
       setShowResults(true);
     }
   };
 
-  const calculateScore = () => {
-    return answers.reduce((sum, answer, index) => {
-      if (reverseScoreQuestions.includes(index)) {
-        return sum + (4 - answer);
-      }
-      return sum + answer;
-    }, 0);
-  };
-  
+  const calculateScore = () =>
+    answers.reduce((sum, answer, index) => (reverseScoreQuestions.includes(index) ? sum + (4 - answer) : sum + answer), 0);
+
   const totalScore = calculateScore();
   const result = getResultInterpretation(totalScore);
+  const redirectionUrls = getRedirectionUrls(totalScore);
 
   const resetTest = () => {
     setCurrentQuestion(0);
@@ -132,11 +169,11 @@ export default function PSSTestPage() {
                 <div className="text-sm md:text-lg font-medium text-gray-600">Total Score out of 40</div>
               </div>
               <div className={`rounded-2xl ${result.bgColor} p-6 text-center border border-dashed border-gray-300`}>
-                <div className={`text-xl md:text-3xl font-bold ${result.color} mb-2`}>
-                  {result.level} Perceived Stress
-                </div>
+                <div className={`text-xl md:text-3xl font-bold ${result.color} mb-2`}>{result.level} Perceived Stress</div>
                 <p className="text-sm md:text-lg text-gray-700 leading-relaxed">{result.message}</p>
               </div>
+
+              {/* Score Interpretation */}
               <div className="space-y-4">
                 <h3 className="text-base md:text-xl font-semibold text-gray-800">Score Interpretation</h3>
                 <div className="grid grid-cols-3 gap-2 md:gap-4 text-center">
@@ -154,26 +191,45 @@ export default function PSSTestPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ----------------- Recommendations ----------------- */}
+              {redirectionUrls &&
+                redirectionUrls.map((item, index) => (
+                  <div key={index} className="space-y-4 mt-6">
+                    <div className="text-lg font-semibold">{item.title}</div>
+                    <p className="text-slate-600">{item.message}</p>
+                    <div className="flex flex-wrap justify-center gap-4 mt-2">
+                      {item.buttons.map((button, btnIndex) => (
+                        <button
+                          key={btnIndex}
+                          onClick={() => router.push(button.url)}
+                          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
+                        >
+                          {button.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+              {/* Back to Tests Button */}
+              <div className="flex justify-center items-center mt-6">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => router.push("/psych-tests")}
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
+                >
+                  Back to tests
+                </button>
+              </div>
             </div>
-          </div>
-          
-          {/* Updated Action Button to match GAD style */}
-          <div className="flex justify-center items-center">
-            <button
-              disabled={isSubmitting}
-              onClick={() => {
-                router.push("/psych-tests");
-              }}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
-            >
-              Back to tests
-            </button>
           </div>
         </div>
       </div>
     );
   }
 
+  // ---------------------- Test Page ----------------------
   return (
     <div className="flex min-h-screen items-center justify-center p-4 md:p-8 bg-gray-50">
       <div className="max-w-2xl w-full mx-auto space-y-6 md:space-y-8">
@@ -184,8 +240,8 @@ export default function PSSTestPage() {
         <div className="rounded-2xl md:rounded-3xl bg-white shadow-lg md:shadow-2xl ring-1 ring-gray-100 p-6 md:p-8 space-y-6 md:space-y-8">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-xs md:text-base font-medium text-gray-600">
-              <span className="text-xs md:text-base">Question {currentQuestion + 1} of {questions.length}</span>
-              <span className="text-xs md:text-base">{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
+              <span>Question {currentQuestion + 1} of {questions.length}</span>
+              <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
               <div

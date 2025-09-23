@@ -25,52 +25,42 @@ const options = [
 ];
 
 const getRedirectionUrls = (score: number) => {
-  // return like these wll will be used to show buttons for redirection and also with button name and complete message for overall like you scored 15 which is moderate depression you can try mind log andd profile
   if (score <= 4)
     return [
       {
         title: "You scored Minimal Depression",
-        message: "Great job! Keep maintaining your mental wellness.",
+        message:
+          "Great job! Keep maintaining your mental wellness. Explore journaling, yoga, and multilingual resources to stay balanced.",
         buttons: [
-          { name: "Try Mind Log", url: "/mind-log" },
-          { name: "Go to Profile", url: "/profile" },
-        ],
-      },
-    ];
-  if (score <= 9)
-    return [
-      {
-        title: "You scored Mild Depression",
-        message: "Consider speaking with a counselor for additional support.",
-        buttons: [
-          { name: "Find Counselors", url: "/counselors" },
-          { name: "Try Mind Log", url: "/mind-log" },
-          { name: "Go to Profile", url: "/profile" },
+          { name: "Daily Mind Log", url: "/mind-log" },
+          { name: "Guided Exercises & Yoga", url: "/wellness" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
         ],
       },
     ];
   if (score <= 14)
     return [
       {
-        title: "You scored Moderate Depression",
+        title: "You scored Mild to Moderate Depression",
         message:
-          "Professional support is recommended. Please consider reaching out to a mental health professional.",
+          "Consider using motivational chats, volunteering support, and multilingual resources to help manage your mood.",
         buttons: [
-          { name: "Find Counselors", url: "/counselors" },
-          { name: "Try Mind Log", url: "/mind-log" },
-          { name: "Go to Profile", url: "/profile" },
+          { name: "Motivational Chatbot + SOS Alerts", url: "/chatbot" },
+          { name: "Anonymous Expert Support", url: "/exper-support" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
         ],
       },
     ];
-  if (score <= 19)
+  if (score <= 27)
     return [
       {
-        title: "You scored Moderately Severe Depression",
-        message: "Please seek professional help to address your symptoms.",
+        title: "You scored Severe Depression",
+        message:
+          "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore multilingual resources.",
         buttons: [
-          { name: "Find Counselors", url: "/counselors" },
-          { name: "Try Mind Log", url: "/mind-log" },
-          { name: "Go to Profile", url: "/profile" },
+          { name: "One-Tap Counselor Booking", url: "/book-session" },
+          { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
         ],
       },
     ];

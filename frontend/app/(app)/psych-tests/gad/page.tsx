@@ -5,7 +5,7 @@ import { submitTestScore } from "@/actions/test";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-// GAD-7 Questions
+// ---------------------- GAD-7 Questions ----------------------
 const questions = [
   "Feeling nervous, anxious, or on edge",
   "Not being able to stop or control worrying",
@@ -23,34 +23,83 @@ const options = [
   { value: 3, label: "Nearly every day" },
 ];
 
+// ---------------------- GAD-7 Result Interpretation ----------------------
 const getResultInterpretation = (score: number) => {
   if (score <= 4)
     return {
       level: "Minimal",
       color: "text-green-600",
       bgColor: "bg-green-50",
-      message: "Your symptoms suggest minimal anxiety. Keep up your mental wellness strategies!",
+      message:
+        "Your symptoms suggest minimal anxiety. Keep up your mental wellness strategies!",
     };
   if (score <= 9)
     return {
       level: "Mild",
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
-      message: "You may be experiencing mild anxiety. Consider stress-reduction techniques.",
+      message:
+        "You may be experiencing mild anxiety. Consider stress-reduction techniques.",
     };
   if (score <= 14)
     return {
       level: "Moderate",
       color: "text-orange-600",
       bgColor: "bg-orange-50",
-      message: "Your symptoms suggest moderate anxiety. Professional support is recommended.",
+      message:
+        "Your symptoms suggest moderate anxiety. Professional support is recommended.",
     };
   return {
     level: "Severe",
     color: "text-red-700",
     bgColor: "bg-red-50",
-    message: "Your symptoms suggest severe anxiety. Please contact a mental health professional immediately.",
+    message:
+      "Your symptoms suggest severe anxiety. Please contact a mental health professional immediately.",
   };
+};
+
+// ---------------------- GAD-7 Recommendation System ----------------------
+const getRedirectionUrls = (score: number) => {
+  if (score <= 4)
+    return [
+      {
+        title: "You scored Minimal Anxiety",
+        message:
+          "Great job! Keep maintaining your mental wellness. Explore games, yoga, and multilingual resources to stay balanced.",
+        buttons: [
+          { name: "Gamified Wellbeing & Memory Games", url: "/games" },
+          { name: "Guided Exercises & Yoga", url: "/wellness" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
+        ],
+      },
+    ];
+  if (score <= 14)
+    return [
+      {
+        title: "You scored Mild to Moderate Anxiety",
+        message:
+          "Consider using motivational chats, guided exercises, and multilingual resources to help manage your anxiety.",
+        buttons: [
+          { name: "Motivational Chatbot + SOS Alerts", url: "/chatbot" },
+          { name: "Guided Exercises & Yoga", url: "/wellness" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
+        ],
+      },
+    ];
+  if (score <= 21)
+    return [
+      {
+        title: "You scored Severe Anxiety",
+        message:
+          "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore multilingual resources.",
+        buttons: [
+          { name: "Anonymous Volunteer Forum", url: "/exper-support" },
+          { name: "One-Tap Counselor Booking", url: "/book-session" },
+          { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+          { name: "Multilingual Resource Hub", url: "/blogs" },
+        ],
+      },
+    ];
 };
 
 export default function GAD7TestPage() {
@@ -76,16 +125,16 @@ export default function GAD7TestPage() {
         setShowResults(true);
         return;
       }
-      
+
       setIsSubmitting(true);
       const res = await submitTestScore("gad", finalScore, token);
-      
+
       if (res.ok) {
         toast.success("Your GAD-7 results have been saved!");
       } else {
         toast.error(res.error || "Failed to save results.");
       }
-      
+
       setIsSubmitting(false);
       setShowResults(true);
     }
@@ -93,6 +142,7 @@ export default function GAD7TestPage() {
 
   const totalScore = answers.reduce((sum, answer) => sum + answer, 0);
   const result = getResultInterpretation(totalScore);
+  const redirectionUrls = getRedirectionUrls(totalScore);
 
   const resetTest = () => {
     setCurrentQuestion(0);
@@ -126,6 +176,7 @@ export default function GAD7TestPage() {
                 <p className="text-sm md:text-lg text-gray-700 leading-relaxed">{result.message}</p>
               </div>
 
+              {/* Score Breakdown */}
               <div className="space-y-4">
                 <h3 className="text-base md:text-xl font-semibold text-gray-800">Score Interpretation</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 text-center">
@@ -147,26 +198,45 @@ export default function GAD7TestPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ----------------- Recommendations ----------------- */}
+              {redirectionUrls &&
+                redirectionUrls.map((item, index) => (
+                  <div key={index} className="space-y-4 mt-6">
+                    <div className="text-lg font-semibold">{item.title}</div>
+                    <p className="text-slate-600">{item.message}</p>
+                    <div className="flex flex-wrap justify-center gap-4 mt-2">
+                      {item.buttons.map((button, btnIndex) => (
+                        <button
+                          key={btnIndex}
+                          onClick={() => router.push(button.url)}
+                          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
+                        >
+                          {button.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+              {/* Back to Tests Button */}
+              <div className="flex justify-center items-center mt-6">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => router.push("/psych-tests")}
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
+                >
+                  Back to tests
+                </button>
+              </div>
             </div>
-          </div>
-          
-          {/* Updated Action Buttons to match PHQ-9 style */}
-          <div className="flex justify-center items-center">
-            <button
-              disabled={isSubmitting}
-              onClick={() => {
-                router.push("/psych-tests");
-              }}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
-            >
-              Back to tests
-            </button>
           </div>
         </div>
       </div>
     );
   }
 
+  // ---------------------- Test Page ----------------------
   return (
     <div className="flex min-h-screen items-center justify-center p-4 md:p-8 bg-gray-50">
       <div className="max-w-2xl w-full mx-auto space-y-6 md:space-y-8">
@@ -174,11 +244,13 @@ export default function GAD7TestPage() {
           <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">GAD-7 Assessment</h1>
           <p className="text-sm md:text-lg text-gray-500">Over the last 2 weeks, how often have you been bothered by the following problem?</p>
         </div>
+
         <div className="rounded-2xl md:rounded-3xl bg-white shadow-lg md:shadow-2xl ring-1 ring-gray-100 p-6 md:p-8 space-y-6 md:space-y-8">
+          {/* Progress */}
           <div className="space-y-4">
             <div className="flex items-center justify-between text-xs md:text-base font-medium text-gray-600">
-              <span className="text-xs md:text-base">Question {currentQuestion + 1} of {questions.length}</span>
-              <span className="text-xs md:text-base">{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
+              <span>Question {currentQuestion + 1} of {questions.length}</span>
+              <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
               <div
@@ -187,6 +259,8 @@ export default function GAD7TestPage() {
               />
             </div>
           </div>
+
+          {/* Question & Options */}
           <div className="space-y-6">
             <h2 className="text-lg md:text-2xl font-semibold text-gray-800 text-center leading-relaxed">
               {questions[currentQuestion]}
