@@ -25,6 +25,7 @@ interface GradientButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 interface SelectedDate {
@@ -67,10 +68,16 @@ const GradientButton: React.FC<GradientButtonProps> = ({
   children,
   onClick,
   className = "",
+  disabled = false,
 }) => (
   <button
     onClick={onClick}
-    className={`px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base ${className}`}
+    disabled={disabled}
+    className={`px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base ${
+      disabled 
+        ? 'opacity-60 cursor-not-allowed transform-none shadow-md' 
+        : ''
+    } ${className}`}
   >
     {children}
   </button>
@@ -99,6 +106,8 @@ export default function MindLogPage() {
     socialWithdrawal: [],
   });
   const [isEntriesLoading, setIsEntriesLoading] = useState<boolean>(false);
+  // Add new state for save loading
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // dynamic colors for each metric (will be updated after fetching report)
   const [metricColors, setMetricColors] = useState<Record<string, string>>({
@@ -221,6 +230,8 @@ export default function MindLogPage() {
   const handleSaveEntry = async () => {
     if (!selectedDate || !currentEntry.trim()) return;
 
+    setIsSaving(true); // Start loading state
+
     const dateStr: string = selectedDate.fullDate.toISOString().split("T")[0];
     const token = localStorage.getItem("token") || "";
 
@@ -239,12 +250,16 @@ export default function MindLogPage() {
         [selectedDate.dateKey]: currentEntry,
       }));
 
-      // alert("Entry saved ✅");
+      // Small delay to show the saved state
+      setTimeout(() => {
+        setCurrentView("calendar");
+        setIsSaving(false);
+      }, 800);
+
     } catch (err) {
       console.error("Save failed:", err);
+      setIsSaving(false);
     }
-
-    setCurrentView("calendar");
   };
 
   const handleBackToCalendar = () => {
@@ -925,13 +940,57 @@ export default function MindLogPage() {
             </div>
           </div>
 
-          {/* Save Button */}
+          {/* Save Button with Loading State */}
           <div className="flex justify-center mt-6 sm:mt-8">
             <GradientButton
               onClick={handleSaveEntry}
+              disabled={isSaving}
               className="px-6 py-2.5 sm:px-8 sm:py-3 text-base sm:text-lg"
             >
-              Save My Thoughts
+              <div className="flex items-center gap-2">
+                {isSaving ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                    <span>Save My Thoughts</span>
+                  </>
+                )}
+              </div>
             </GradientButton>
           </div>
         </div>
@@ -1045,7 +1104,7 @@ export default function MindLogPage() {
               ></path>
               {" "}
             </svg>
-            <span>Loading entries...</span>         {" "}
+            <span>Loading entries...</span>         {" "}
           </div>
         ) : (
           <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3 sm:mb-4">

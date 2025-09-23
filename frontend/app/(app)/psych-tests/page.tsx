@@ -82,7 +82,7 @@ export default function PsychTestsPage() {
 
   if (loading) {
     return (
-      <div className="text-center text-slate-600 mt-20 text-lg">
+      <div className="text-center text-slate-600 mt-20 text-lg px-4">
         Loading tests...
       </div>
     );
@@ -90,7 +90,7 @@ export default function PsychTestsPage() {
 
   if (error) {
     return (
-      <div className="text-center text-red-500 mt-20 text-lg">
+      <div className="text-center text-red-500 mt-20 text-lg px-4">
         Error: {error}
       </div>
     );
@@ -111,36 +111,59 @@ export default function PsychTestsPage() {
   });
 
   return (
-    <div className="space-y-12 py-8">
+    <div className="space-y-8 sm:space-y-12 py-4 sm:py-8 px-4 sm:px-0">
+      {/* Header - Mobile optimized */}
       <header className="text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800 leading-tight">
           Psychological Assessments
         </h1>
-        <p className="mt-2 text-md text-slate-600">
+        <p className="mt-2 text-sm sm:text-md text-slate-600 max-w-2xl mx-auto leading-relaxed">
           Explore a range of validated tests to better understand your mental health.
         </p>
       </header>
       
+      {/* Tests Grid - Enhanced mobile layout */}
       <section className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {combinedTests.map((test) => (
             <div 
               key={test.key} 
-              className="group relative rounded-3xl bg-white p-8 ring-1 ring-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl"
+              className="group relative rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 ring-1 ring-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl"
             >
-              <div 
-                className={`w-16 h-16 ${test.bgColor} rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-105`}
-              >
-                <span className="text-3xl">{test.icon}</span>
+              {/* Icon and Header Section */}
+              <div className="flex items-start gap-4 sm:block mb-4">
+                <div 
+                  className={`w-12 h-12 sm:w-16 sm:h-16 ${test.bgColor} rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-105`}
+                >
+                  <span className="text-2xl sm:text-3xl">{test.icon}</span>
+                </div>
+                
+                {/* Mobile: Title next to icon, Desktop: Below icon */}
+                <div className="flex-1 sm:mt-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 leading-tight sm:leading-normal mb-1 sm:mb-2">
+                    {test.title}
+                  </h3>
+                  
+                  {/* Mobile: Show status badge prominently */}
+                  <div className="sm:hidden">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      test.isEligible 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {getStatusText(test.isEligible)}
+                    </span>
+                  </div>
+                </div>
               </div>
               
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">{test.title}</h3>
-              
+              {/* Description */}
               <p className="text-sm text-gray-500 leading-relaxed mb-4">
                 {test.desc}
               </p>
               
-              <div className="flex items-center gap-4 text-xs text-gray-400 mb-6">
+              {/* Status and Time Info - Desktop version */}
+              <div className="hidden sm:flex items-center gap-4 text-xs text-gray-400 mb-6">
                 <span className={`font-medium ${test.isEligible ? 'text-green-600' : 'text-red-500'}`}>
                   {getStatusText(test.isEligible)}
                 </span>
@@ -148,27 +171,41 @@ export default function PsychTestsPage() {
                 <span>{test.estimatedTime}</span>
               </div>
               
-              <div className="text-xs text-slate-500 mb-4">
+              {/* Mobile: Time info as separate line */}
+              <div className="sm:hidden text-xs text-gray-400 mb-4">
+                <span>⏱️ {test.estimatedTime}</span>
+              </div>
+              
+              {/* Last Taken Info - Mobile optimized */}
+              <div className="text-xs text-slate-500 mb-4 sm:mb-4">
                 {test.lastTaken ? (
-                  <div className="flex justify-between items-center">
-                    <span>Last taken: {test.lastTaken}</span>
+                  <div className="space-y-1 sm:space-y-0 sm:flex sm:justify-between sm:items-center">
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">📅</span>
+                      <span>Last taken: {test.lastTaken}</span>
+                    </div>
                     {!test.isEligible && (
-                      <span className="font-semibold text-gray-700">
+                      <span className="font-semibold text-gray-700 text-xs">
                         {test.daysUntilEligible > 0 ? `Available in ${test.daysUntilEligible} days` : "Available now"}
                       </span>
                     )}
                   </div>
                 ) : (
-                  <div>
-                    Test not taken yet.
+                  <div className="flex items-center gap-1">
+                    <span className="text-slate-400">✨</span>
+                    <span>Test not taken yet</span>
                   </div>
                 )}
               </div>
               
+              {/* CTA Button - Mobile optimized */}
               <Link href={`/psych-tests/${test.key}`} className="w-full">
                 <button 
-                  className={`w-full px-6 py-3 text-white rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 font-semibold text-sm group-hover:-translate-y-1
-                  ${test.isEligible ? 'bg-gradient-to-r from-blue-500 to-indigo-500' : 'bg-gray-400 cursor-not-allowed'}`}
+                  className={`w-full px-4 sm:px-6 py-3 text-white rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 font-semibold text-sm group-hover:-translate-y-1 active:scale-95
+                  ${test.isEligible 
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600' 
+                    : 'bg-gray-400 cursor-not-allowed'
+                  }`}
                   disabled={!test.isEligible}
                 >
                   {test.isEligible ? "Start Test" : "Not Available"}
@@ -179,14 +216,16 @@ export default function PsychTestsPage() {
         </div>
       </section>
 
-      <hr className="my-12 border-t border-slate-200" />
+      {/* Divider */}
+      <hr className="my-8 sm:my-12 border-t border-slate-200" />
       
-      <section className="rounded-3xl bg-slate-50 p-8 shadow-inner">
+      {/* Info Section - Mobile optimized */}
+      <section className="rounded-2xl sm:rounded-3xl bg-slate-50 p-6 sm:p-8 shadow-inner">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">ℹ️</span>
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-xl sm:text-2xl">ℹ️</span>
           </div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-2">
             Why Take These Tests?
           </h3>
           <p className="text-sm text-gray-600 leading-relaxed">

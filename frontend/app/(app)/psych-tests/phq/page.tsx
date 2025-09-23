@@ -24,47 +24,54 @@ const options = [
   { value: 3, label: "Nearly every day" },
 ];
 
+// ---------------------- PHQ-9 Recommendation System ----------------------
 const getRedirectionUrls = (score: number) => {
   if (score <= 4)
     return [
       {
         title: "You scored Minimal Depression",
         message:
-          "Great job! Keep maintaining your mental wellness. Explore journaling, yoga, and multilingual resources to stay balanced.",
+          "Great job! Keep maintaining your mental wellness. Explore journaling, yoga, and blogs to stay balanced.",
         buttons: [
           { name: "Daily Mind Log", url: "/mind-log" },
-          { name: "Guided Exercises & Yoga", url: "/wellness" },
-          { name: "Multilingual Resource Hub", url: "/blogs" },
+          { name: "Surya Namaskar (Yoga)", url: "/wellness/surya-namaskar" },
+          { name: "Simple Habits to Boost Your Mental Wellness Daily (Blog)", url: "/blogs/simple-habit-to-boost-your-mind" },
         ],
       },
     ];
+
   if (score <= 14)
     return [
       {
         title: "You scored Mild to Moderate Depression",
         message:
-          "Consider using motivational chats, volunteering support, and multilingual resources to help manage your mood.",
+          "Consider using motivational chats, volunteering support, and specific yoga/blogs to help uplift your mood.",
         buttons: [
-          { name: "Motivational Chatbot + SOS Alerts", url: "/chatbot" },
+          { name: "Motivational Chatbot", url: "/chatbot" },
           { name: "Anonymous Expert Support", url: "/exper-support" },
-          { name: "Multilingual Resource Hub", url: "/blogs" },
+          { name: "Child's Pose (Yoga)", url: "/wellness/yoga/1" },
+          { name: "Digital Detox: How to Reset Your Mind (Blog)", url: "/blogs/digital-detox" },
         ],
       },
     ];
-  if (score <= 27)
-    return [
-      {
-        title: "You scored Severe Depression",
-        message:
-          "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore multilingual resources.",
-        buttons: [
-          { name: "One-Tap Counselor Booking", url: "/book-session" },
-          { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
-          { name: "Multilingual Resource Hub", url: "/blogs" },
-        ],
-      },
-    ];
+
+  // Severe: 15+
+  return [
+    {
+      title: "You scored Severe Depression",
+      message:
+        "Professional help is strongly recommended. You can book a counselor, use AI voice support, and explore yoga and blogs for support.",
+      buttons: [
+        { name: "One-Tap Counselor Booking", url: "/book-session" },
+        { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+        { name: "Journaling for Clarity (Blog)", url: "/blogs/journaling-for-clarity" },
+        { name: "Corpse Pose (Yoga)", url: "/wellness/yoga/5" },
+        { name: "Resilience Building: How to Bounce Back from Setbacks Stronger (Blog)", url: "/blogs/resilience-building" },
+      ],
+    },
+  ];
 };
+
 
 const getResultInterpretation = (score: number) => {
   if (score <= 4)
@@ -227,7 +234,7 @@ export default function PHQ9TestPage() {
                   {item.buttons.map((button, btnIndex) => (
                     <button
                       key={btnIndex}
-                      onClick={() => router.push(button.url)}
+                      onClick={() => router.replace(button.url)}
                       className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
                     >
                       {button.name}
@@ -244,7 +251,7 @@ export default function PHQ9TestPage() {
             <button
               disabled={isSubmitting}
               onClick={() => {
-                router.push("/psych-tests");
+                router.replace("/psych-tests");
               }}
               className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50"
             >

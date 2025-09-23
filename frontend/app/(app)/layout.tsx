@@ -19,21 +19,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const auth = useAuth();
 
-const userAvatar = (
-  <svg
-    className="w-5 h-5 text-white"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-    />
-  </svg>
-);
+  const userAvatar = (
+    <svg
+      className="w-5 h-5 text-white"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
+    </svg>
+  );
 
 
   return (
@@ -42,12 +42,14 @@ const userAvatar = (
         {/* Desktop header */}
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
           {/* Left side: Logo */}
-          <Image
-            src="/logoiconfull.png" // Path from the 'public' folder
-            alt="Sahayog Admin Logo"
-            width={122} // Corresponds to w-8
-            height={122} // Corresponds to h-8
-          />
+          <Link href="/dashboard">
+            <Image
+              src="/logoiconfull.png"
+              alt="CampusCare Logo"
+              width={122}
+              height={122}
+            />
+          </Link>
 
           {/* Center: Navigation Links */}
           <div className="flex-1 flex justify-center">
@@ -186,12 +188,14 @@ const userAvatar = (
         <header className="md:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-40">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
-            <Image
-              src="/logoiconfull.png" // Path from the 'public' folder
-              alt="Sahayog Admin Logo"
-              width={102} // Corresponds to w-8
-              height={102} // Corresponds to h-8
-            />
+            <Link href="/dashboard">
+              <Image
+                src="/logoiconfull.png"
+                alt="CampusCare Logo"
+                width={102}
+                height={102}
+              />
+            </Link>
 
             {/* Right side: Profile and Menu button */}
             <div className="flex items-center gap-2">
@@ -376,10 +380,12 @@ const userAvatar = (
           <aside className="hidden md:block bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl h-screen overflow-y-auto sticky top-0">
             <div className="flex items-center gap-4 mb-8">
               <Avatar className="w-16 h-16 shrink-0">
+                <Link href="/profile">
                 <AvatarImage
                   src={user?.avatarUrl ? user?.avatarUrl : undefined}
                   alt="Avatar"
-                />
+                  />
+                  </Link>
                 <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
                   {user?.name
                     .split(" ")
@@ -406,7 +412,7 @@ const userAvatar = (
                 isActive={pathname === "/psych-tests"}
                 icon="test"
               />
-              
+
               <SideLink
                 href="/mind-log"
                 label="Daily Mind Log"
@@ -416,12 +422,12 @@ const userAvatar = (
 
               <SideLink
                 href="/chatbot"
-                label="MotiveAI"
+                label="CampBud"
                 isActive={pathname === "/chatbot"}
                 icon="chat"
               />
 
-              
+
               <SideLink
                 href="/book-session"
                 label="Book Session"
@@ -455,7 +461,7 @@ const userAvatar = (
             />
             <MobileLink
               href="/chatbot"
-              label="Chat Bot"
+              label="CampBud"
               isActive={pathname === "/chatbot"}
               icon="chat"
             />
@@ -656,9 +662,8 @@ function SideLink({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
-        isActive ? activeClasses : inactiveClasses
-      }`}
+      className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${isActive ? activeClasses : inactiveClasses
+        }`}
     >
       {getIcon(icon, isActive)}
       <span className="font-bold">{label}</span>
@@ -683,9 +688,8 @@ function MobileLink({
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center gap-1 text-xs transition-colors ${
-        isActive ? activeClasses : inactiveClasses
-      }`}
+      className={`flex flex-col items-center gap-1 text-xs transition-colors ${isActive ? activeClasses : inactiveClasses
+        }`}
     >
       <div className="w-6 h-6 flex items-center justify-center">
         {getIcon(icon, isActive)}
@@ -709,9 +713,8 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex flex-col items-center gap-1 text-xs transition-colors ${
-          isAnyMoreItemActive ? "text-blue-600" : "text-slate-500"
-        }`}
+        className={`flex flex-col items-center gap-1 text-xs transition-colors ${isAnyMoreItemActive ? "text-blue-600" : "text-slate-500"
+          }`}
       >
         <div className="w-6 h-6 flex items-center justify-center">
           {getIcon("more", isAnyMoreItemActive)}
@@ -731,11 +734,10 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-                  pathname === item.href
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-slate-600 hover:bg-slate-50"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${pathname === item.href
+                  ? "text-blue-600 bg-blue-50"
+                  : "text-slate-600 hover:bg-slate-50"
+                  }`}
               >
                 {getIcon(item.icon, pathname === item.href)}
                 <span className="font-medium">{item.label}</span>

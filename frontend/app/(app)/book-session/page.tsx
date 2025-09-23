@@ -101,27 +101,27 @@ export default function BookSessionPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 flex items-center justify-center">
-        <Card className="max-w-lg mx-auto border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-6 md:p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-3 sm:p-4 flex items-center justify-center">
+        <Card className="w-full max-w-lg mx-auto border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <CardContent className="p-6 sm:p-8 text-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
-              <CheckCircle className="relative h-16 w-16 md:h-20 md:w-20 text-green-600 mx-auto mb-6" />
+              <CheckCircle className="relative h-16 w-16 sm:h-20 sm:w-20 text-green-600 mx-auto mb-6" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4 leading-tight">
               Request Submitted Successfully
             </h2>
-            <p className="text-slate-700 mb-6 text-base md:text-lg">
+            <p className="text-slate-700 mb-6 text-sm sm:text-base lg:text-lg leading-relaxed">
               Your session request has been securely sent to our mental health
               team.
             </p>
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border border-green-200">
-              <p className="text-sm text-green-700 font-medium flex items-center justify-center gap-2">
-                <Shield className="h-4 w-4" />
-                Your privacy is protected with end-to-end encryption
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4 mb-6 border border-green-200">
+              <p className="text-xs sm:text-sm text-green-700 font-medium flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4 flex-shrink-0" />
+                <span>Your privacy is protected with end-to-end encryption</span>
               </p>
             </div>
-            <p className="text-slate-600 text-sm mb-8">
+            <p className="text-slate-600 text-xs sm:text-sm mb-8 leading-relaxed">
               You'll receive confirmation within 24 hours. For urgent matters,
               contact our crisis helpline immediately.
             </p>
@@ -139,7 +139,7 @@ export default function BookSessionPage() {
                   additionalNotes: "",
                 });
               }}
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 py-3 text-base md:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 h-12 sm:h-auto"
             >
               Book Another Session
             </Button>
@@ -150,95 +150,95 @@ export default function BookSessionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-2 sm:p-4">
-      <div className="max-w-4xl mx-auto py-4 sm:py-6">
-        {/* Header Section */}
-        <div className="text-center mb-6 md:mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+        {/* Header Section - Mobile Optimized */}
+        <div className="text-center mb-6 sm:mb-8">
           <div className="relative mb-4">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-            <h1 className="relative text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+            <h1 className="relative text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent leading-tight px-2">
               Book Your Session
             </h1>
           </div>
-          <p className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed px-2">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed px-4 sm:px-2">
             Connect with our mental health professionals in a secure,
             confidential environment.
           </p>
         </div>
 
-        {/* Progress Indicator */}
-        <div className="mb-6">
-          <div className="flex items-center justify-center space-x-2 sm:space-x-4">
+        {/* Progress Indicator - Mobile Enhanced */}
+        <div className="mb-6 px-2">
+          <div className="flex items-center justify-between max-w-xs mx-auto">
             <div
-              className={`flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-full transition-all duration-300 ${
+              className={`flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full transition-all duration-300 flex-1 justify-center ${
                 currentStep >= 1
                   ? "bg-blue-100 text-blue-700"
                   : "bg-slate-100 text-slate-400"
               }`}
             >
-              <User className="h-4 w-4" />
-              <span className="font-medium text-sm">Details</span>
+              <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="font-medium text-xs sm:text-sm">Details</span>
             </div>
             <div
-              className={`h-1 w-8 rounded transition-all duration-300 ${
+              className={`h-1 w-6 sm:w-8 rounded mx-2 transition-all duration-300 ${
                 currentStep >= 2 ? "bg-blue-500" : "bg-slate-300"
               }`}
             ></div>
             <div
-              className={`flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-full transition-all duration-300 ${
+              className={`flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full transition-all duration-300 flex-1 justify-center ${
                 currentStep >= 2
                   ? "bg-blue-100 text-blue-700"
                   : "bg-slate-100 text-slate-400"
               }`}
             >
-              <Calendar className="h-4 w-4" />
-              <span className="font-medium text-sm">Schedule</span>
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="font-medium text-xs sm:text-sm">Schedule</span>
             </div>
           </div>
         </div>
 
-        {/* Single Privacy Notice */}
-        <Card className="mb-6 border-0 shadow-lg bg-white/60 backdrop-blur-sm">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-blue-600 flex-shrink-0" />
-              <p className="text-blue-800 font-medium text-sm">
+        {/* Privacy Notice - Mobile Optimized */}
+        <Card className="mb-4 sm:mb-6 border-0 shadow-lg bg-white/60 backdrop-blur-sm mx-1 sm:mx-0">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
+              <p className="text-blue-800 font-medium text-xs sm:text-sm leading-tight">
                 🔒 Your information is encrypted and completely confidential.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Main Form */}
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-          <CardHeader className="bg-gradient-to-r  from-blue-500 to-indigo-600 text-white py-4 px-4">
-            <CardTitle className="flex items-center gap-3 text-lg md:text-xl">
+        {/* Main Form - Mobile Enhanced */}
+        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden mx-1 sm:mx-0">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 sm:py-6 px-4 sm:px-6">
+            <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
               {currentStep === 1 ? (
                 <>
-                  <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />
-                  Tell Us About Your Session
+                  <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 flex-shrink-0" />
+                  <span>Tell Us About Your Session</span>
                 </>
               ) : (
                 <>
-                  <Calendar className="h-5 w-5 md:h-6 md:w-6" />
-                  Choose Your Schedule
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 flex-shrink-0" />
+                  <span>Choose Your Schedule</span>
                 </>
               )}
             </CardTitle>
-            <CardDescription className="text-indigo-100">
+            <CardDescription className="text-indigo-100 text-sm sm:text-base mt-1">
               {currentStep === 1
                 ? "Help us understand what kind of support you're looking for."
                 : "Select your preferred date, time, and any additional preferences."}
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-4 md:p-6">
-            <div className="space-y-6">
+          <CardContent className="p-4 sm:p-6">
+            <div className="space-y-5 sm:space-y-6">
               {currentStep === 1 && (
-                <div className="space-y-6">
-                  {/* Session Type */}
+                <div className="space-y-5 sm:space-y-6">
+                  {/* Session Type - Mobile Enhanced */}
                   <div className="space-y-3">
-                    <Label className="text-base md:text-lg font-semibold text-slate-800">
+                    <Label className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block">
                       What type of session do you need?
                     </Label>
                     <Select
@@ -247,7 +247,7 @@ export default function BookSessionPage() {
                       }
                       value={formData.sessionType}
                     >
-                      <SelectTrigger className="w-full h-12 text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors">
+                      <SelectTrigger className="w-full h-11 sm:h-12 text-sm sm:text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors">
                         <SelectValue placeholder="Choose the type of support" />
                       </SelectTrigger>
                       <SelectContent>
@@ -282,11 +282,11 @@ export default function BookSessionPage() {
                     </Select>
                   </div>
 
-                  {/* Reason */}
+                  {/* Reason - Mobile Enhanced */}
                   <div className="space-y-3">
                     <Label
                       htmlFor="reason"
-                      className="text-base md:text-lg font-semibold text-slate-800"
+                      className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block"
                     >
                       What would you like to discuss?
                     </Label>
@@ -297,45 +297,45 @@ export default function BookSessionPage() {
                       onChange={(e) =>
                         handleInputChange("reason", e.target.value)
                       }
-                      className="min-h-[100px] resize-none text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
+                      className="min-h-[90px] sm:min-h-[100px] resize-none text-sm sm:text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
                       required
                     />
                   </div>
 
-                  {/* Session Mode - UPDATED WITH BETTER VISUAL FEEDBACK */}
+                  {/* Session Mode - Mobile Enhanced */}
                   <div className="space-y-3">
-                    <Label className="text-base md:text-lg font-semibold text-slate-800">
+                    <Label className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block">
                       How would you prefer to meet?
                     </Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3 sm:space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                       {/* Virtual Session Option */}
                       <div
                         onClick={() => handleInputChange("mode", "virtual")}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl p-4 md:p-5 border-2 ${
+                        className={`cursor-pointer transition-all duration-200 rounded-xl p-3 sm:p-4 md:p-5 border-2 ${
                           formData.mode === "virtual"
                             ? "border-blue-600 bg-blue-50 shadow-lg ring-2 ring-blue-200"
                             : "border-slate-300 bg-white hover:border-blue-400 hover:shadow-md"
                         }`}
                       >
-                        <div className="flex items-center space-x-4">
-                          <Video className="h-7 w-7 md:h-8 md:w-8 text-blue-600 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <div className="font-semibold text-slate-800">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <Video className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-blue-600 flex-shrink-0" />
+                          <div className="flex-grow min-w-0">
+                            <div className="font-semibold text-slate-800 text-sm sm:text-base">
                               Virtual Session
                             </div>
-                            <div className="text-slate-600 text-sm">
+                            <div className="text-slate-600 text-xs sm:text-sm">
                               Secure video call
                             </div>
                           </div>
                           <div
-                            className={`transition-all duration-200 ${
+                            className={`transition-all duration-200 flex-shrink-0 ${
                               formData.mode === "virtual"
                                 ? "opacity-100 scale-100"
                                 : "opacity-0 scale-75"
                             }`}
                           >
-                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-white" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                             </div>
                           </div>
                         </div>
@@ -344,31 +344,31 @@ export default function BookSessionPage() {
                       {/* In-Person Session Option */}
                       <div
                         onClick={() => handleInputChange("mode", "physical")}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl p-4 md:p-5 border-2 ${
+                        className={`cursor-pointer transition-all duration-200 rounded-xl p-3 sm:p-4 md:p-5 border-2 ${
                           formData.mode === "physical"
                             ? "border-purple-600 bg-purple-50 shadow-lg ring-2 ring-purple-200"
                             : "border-slate-300 bg-white hover:border-purple-400 hover:shadow-md"
                         }`}
                       >
-                        <div className="flex items-center space-x-4">
-                          <MapPin className="h-7 w-7 md:h-8 md:w-8 text-purple-600 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <div className="font-semibold text-slate-800">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <MapPin className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-purple-600 flex-shrink-0" />
+                          <div className="flex-grow min-w-0">
+                            <div className="font-semibold text-slate-800 text-sm sm:text-base">
                               In-Person Session
                             </div>
-                            <div className="text-slate-600 text-sm">
+                            <div className="text-slate-600 text-xs sm:text-sm">
                               At our center
                             </div>
                           </div>
                           <div
-                            className={`transition-all duration-200 ${
+                            className={`transition-all duration-200 flex-shrink-0 ${
                               formData.mode === "physical"
                                 ? "opacity-100 scale-100"
                                 : "opacity-0 scale-75"
                             }`}
                           >
-                            <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-white" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                             </div>
                           </div>
                         </div>
@@ -376,56 +376,57 @@ export default function BookSessionPage() {
                     </div>
                   </div>
 
-                  <div className="pt-2">
+                  {/* Continue Button */}
+                  <div className="pt-4 sm:pt-2">
                     <Button
                       type="button"
                       onClick={() => setCurrentStep(2)}
                       disabled={!canProceedToStep2}
-                      className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed py-3 sm:py-4 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 h-12 sm:h-auto"
                     >
                       Continue to Schedule
-                      <Calendar className="h-5 w-5 ml-2" />
+                      <Calendar className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
                     </Button>
                   </div>
                 </div>
               )}
 
               {currentStep === 2 && (
-                <div className="space-y-6">
-                  {/* Urgency Level - UPDATED WITH BETTER VISUAL FEEDBACK */}
+                <div className="space-y-5 sm:space-y-6">
+                  {/* Urgency Level - Mobile Enhanced */}
                   <div className="space-y-3">
-                    <Label className="text-base md:text-lg font-semibold text-slate-800">
+                    <Label className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block">
                       How soon do you need this session?
                     </Label>
                     <div className="space-y-3">
                       {/* Routine Option */}
                       <div
                         onClick={() => handleInputChange("urgency", "routine")}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl p-4 border-2 ${
+                        className={`cursor-pointer transition-all duration-200 rounded-xl p-3 sm:p-4 border-2 ${
                           formData.urgency === "routine"
                             ? "border-green-600 bg-green-50 shadow-lg ring-2 ring-green-200"
                             : "border-green-300 bg-white hover:border-green-400 hover:shadow-md"
                         }`}
                       >
-                        <div className="flex items-center space-x-4">
-                          <Clock className="h-6 w-6 text-green-600 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <div className="font-semibold text-green-700 text-base mb-1">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0" />
+                          <div className="flex-grow min-w-0">
+                            <div className="font-semibold text-green-700 text-sm sm:text-base mb-0.5 sm:mb-1">
                               Routine
                             </div>
-                            <div className="text-slate-600 text-sm">
+                            <div className="text-slate-600 text-xs sm:text-sm">
                               Within 1-2 weeks
                             </div>
                           </div>
                           <div
-                            className={`transition-all duration-200 ${
+                            className={`transition-all duration-200 flex-shrink-0 ${
                               formData.urgency === "routine"
                                 ? "opacity-100 scale-100"
                                 : "opacity-0 scale-75"
                             }`}
                           >
-                            <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-white" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-green-600 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                             </div>
                           </div>
                         </div>
@@ -434,31 +435,31 @@ export default function BookSessionPage() {
                       {/* Priority Option */}
                       <div
                         onClick={() => handleInputChange("urgency", "priority")}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl p-4 border-2 ${
+                        className={`cursor-pointer transition-all duration-200 rounded-xl p-3 sm:p-4 border-2 ${
                           formData.urgency === "priority"
                             ? "border-orange-600 bg-orange-50 shadow-lg ring-2 ring-orange-200"
                             : "border-orange-300 bg-white hover:border-orange-400 hover:shadow-md"
                         }`}
                       >
-                        <div className="flex items-center space-x-4">
-                          <Clock className="h-6 w-6 text-orange-600 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <div className="font-semibold text-orange-700 text-base mb-1">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 flex-shrink-0" />
+                          <div className="flex-grow min-w-0">
+                            <div className="font-semibold text-orange-700 text-sm sm:text-base mb-0.5 sm:mb-1">
                               Priority
                             </div>
-                            <div className="text-slate-600 text-sm">
+                            <div className="text-slate-600 text-xs sm:text-sm">
                               Within 3-5 days
                             </div>
                           </div>
                           <div
-                            className={`transition-all duration-200 ${
+                            className={`transition-all duration-200 flex-shrink-0 ${
                               formData.urgency === "priority"
                                 ? "opacity-100 scale-100"
                                 : "opacity-0 scale-75"
                             }`}
                           >
-                            <div className="w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-white" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-orange-600 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                             </div>
                           </div>
                         </div>
@@ -467,31 +468,31 @@ export default function BookSessionPage() {
                       {/* Urgent Option */}
                       <div
                         onClick={() => handleInputChange("urgency", "urgent")}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl p-4 border-2 ${
+                        className={`cursor-pointer transition-all duration-200 rounded-xl p-3 sm:p-4 border-2 ${
                           formData.urgency === "urgent"
                             ? "border-red-700 bg-red-50 shadow-lg ring-2 ring-red-200"
                             : "border-red-300 bg-white hover:border-red-500 hover:shadow-md"
                         }`}
                       >
-                        <div className="flex items-center space-x-4">
-                          <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <div className="font-semibold text-red-700 text-base mb-1">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 flex-shrink-0" />
+                          <div className="flex-grow min-w-0">
+                            <div className="font-semibold text-red-700 text-sm sm:text-base mb-0.5 sm:mb-1">
                               Urgent
                             </div>
-                            <div className="text-red-600 text-sm">
+                            <div className="text-red-600 text-xs sm:text-sm">
                               Within 24-48 hours
                             </div>
                           </div>
                           <div
-                            className={`transition-all duration-200 ${
+                            className={`transition-all duration-200 flex-shrink-0 ${
                               formData.urgency === "urgent"
                                 ? "opacity-100 scale-100"
                                 : "opacity-0 scale-75"
                             }`}
                           >
-                            <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-white" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-red-600 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                             </div>
                           </div>
                         </div>
@@ -499,12 +500,12 @@ export default function BookSessionPage() {
                     </div>
                   </div>
 
-                  {/* Date & Time */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Date & Time - Mobile Enhanced */}
+                  <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
                     <div className="space-y-2">
                       <Label
                         htmlFor="date"
-                        className="text-base md:text-lg font-semibold text-slate-800"
+                        className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block"
                       >
                         Preferred Date
                       </Label>
@@ -516,14 +517,14 @@ export default function BookSessionPage() {
                           handleInputChange("preferredDate", e.target.value)
                         }
                         min={new Date().toISOString().split("T")[0]}
-                        className="h-12 text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
+                        className="h-11 sm:h-12 text-sm sm:text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
                         required
                       />
                     </div>
                     <div className="space-y-2">
                       <Label
                         htmlFor="time"
-                        className="text-base md:text-lg font-semibold text-slate-800"
+                        className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block"
                       >
                         Preferred Time
                       </Label>
@@ -533,7 +534,7 @@ export default function BookSessionPage() {
                         }
                         value={formData.preferredTime}
                       >
-                        <SelectTrigger className="h-12 text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors">
+                        <SelectTrigger className="h-11 sm:h-12 text-sm sm:text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors">
                           <SelectValue placeholder="Choose a time" />
                         </SelectTrigger>
                         <SelectContent>
@@ -550,11 +551,11 @@ export default function BookSessionPage() {
                     </div>
                   </div>
 
-                  {/* Additional Notes */}
+                  {/* Additional Notes - Mobile Enhanced */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="notes"
-                      className="text-base md:text-lg font-semibold text-slate-800"
+                      className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 block"
                     >
                       Additional Notes (Optional)
                     </Label>
@@ -565,27 +566,27 @@ export default function BookSessionPage() {
                       onChange={(e) =>
                         handleInputChange("additionalNotes", e.target.value)
                       }
-                      className="min-h-[80px] resize-none text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
+                      className="min-h-[70px] sm:min-h-[80px] resize-none text-sm sm:text-base border-2 hover:border-blue-400 focus:ring-blue-500 transition-colors"
                     />
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                  {/* Action Buttons - Mobile Enhanced */}
+                  <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:gap-4 pt-4 sm:pt-2">
                     <Button
                       type="button"
                       onClick={() => setCurrentStep(1)}
                       variant="outline"
-                      className="w-full sm:w-auto sm:flex-1 py-3 text-base font-semibold border-2 hover:bg-slate-100 hover:border-slate-400"
+                      className="w-full sm:w-auto sm:flex-1 py-3 sm:py-4 text-sm sm:text-base font-semibold border-2 hover:bg-slate-100 hover:border-slate-400 h-12 sm:h-auto order-2 sm:order-1"
                     >
                       Back to Details
                     </Button>
                     <Button
                       onClick={handleSubmit}
                       disabled={!canSubmit}
-                      className="w-full sm:w-auto sm:flex-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="w-full sm:w-auto sm:flex-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed py-3 sm:py-4 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 h-12 sm:h-auto order-1 sm:order-2"
                     >
-                      <Shield className="h-5 w-5 mr-2" />
-                      Submit Booking Request
+                      <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                      <span>Submit Booking Request</span>
                     </Button>
                   </div>
                 </div>
@@ -594,23 +595,23 @@ export default function BookSessionPage() {
           </CardContent>
         </Card>
 
-        {/* Crisis Notice */}
-        <Card className="mt-6 border-red-200 bg-gradient-to-r from-red-50 to-orange-50 border-0 shadow-lg">
-          <CardContent className="p-5">
-            <div className="flex items-start gap-4">
-              <AlertTriangle className="h-6 w-6 text-red-600 mt-1 flex-shrink-0" />
-              <div>
-                <h4 className="font-bold text-red-800 text-lg mb-2">
+        {/* Crisis Notice - Mobile Enhanced */}
+        <Card className="mt-4 sm:mt-6 border-red-200 bg-gradient-to-r from-red-50 to-orange-50 border-0 shadow-lg mx-1 sm:mx-0">
+          <CardContent className="p-4 sm:p-5">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 mt-1 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <h4 className="font-bold text-red-800 text-base sm:text-lg mb-2">
                   Need Immediate Help?
                 </h4>
-                <p className="text-red-700 mb-3">
+                <p className="text-red-700 mb-3 text-sm sm:text-base leading-relaxed">
                   If you're in crisis, please reach out now:
                 </p>
-                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 text-sm">
-                  <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full font-medium">
+                <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:flex-wrap sm:gap-3">
+                  <span className="bg-red-100 text-red-800 px-3 py-2 rounded-full font-medium text-xs sm:text-sm text-center sm:text-left">
                     📞 Campus Crisis: 1800-XXX-XXXX
                   </span>
-                  <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full font-medium">
+                  <span className="bg-red-100 text-red-800 px-3 py-2 rounded-full font-medium text-xs sm:text-sm text-center sm:text-left">
                     🆘 National: 988
                   </span>
                 </div>

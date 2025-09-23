@@ -5,16 +5,21 @@ import {
   type LucideProps,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 type SpinnerVariantProps = Omit<SpinnerProps, "variant">;
+
 const Default = ({ className, ...props }: SpinnerVariantProps) => (
   <LoaderIcon className={cn("animate-spin", className)} {...props} />
 );
+
 const Circle = ({ className, ...props }: SpinnerVariantProps) => (
   <LoaderCircleIcon className={cn("animate-spin", className)} {...props} />
 );
+
 const Pinwheel = ({ className, ...props }: SpinnerVariantProps) => (
   <LoaderPinwheelIcon className={cn("animate-spin", className)} {...props} />
 );
+
 const CircleFilled = ({
   className,
   size = 24,
@@ -35,14 +40,144 @@ const CircleFilled = ({
     />
   </div>
 );
-const Ellipsis = ({ size = 24, ...props }: SpinnerVariantProps) => {
+
+// Enhanced Glass Ring - matching signup page style
+const GlassRing = ({ size = 64, className, ...rest }: SpinnerVariantProps) => {
+  const sizeNum = typeof size === 'number' ? size : 64;
+  return (
+    <div 
+      className={cn(
+        "relative rounded-full bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg flex items-center justify-center",
+        className
+      )}
+      style={{ width: sizeNum, height: sizeNum }}
+    >
+      <div 
+        className="border-4 border-blue-600 border-solid rounded-full animate-spin border-t-transparent transition-all duration-300"
+        style={{ width: sizeNum * 0.7, height: sizeNum * 0.7 }}
+      />
+    </div>
+  );
+};
+
+// Premium Loading - with gradient and glow
+const Premium = ({ size = 48, className, ...rest }: SpinnerVariantProps) => {
+  const sizeNum = typeof size === 'number' ? size : 48;
+  return (
+    <div className={cn("relative", className)}>
+      <div 
+        className="border-4 border-transparent bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-spin"
+        style={{ 
+          width: sizeNum, 
+          height: sizeNum,
+          backgroundClip: 'padding-box',
+          border: '4px solid transparent',
+        }}
+      >
+        <div 
+          className="bg-white rounded-full"
+          style={{ 
+            width: sizeNum - 8, 
+            height: sizeNum - 8,
+            margin: '4px'
+          }}
+        />
+      </div>
+      <div 
+        className="absolute inset-0 border-4 border-transparent rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-20 animate-pulse"
+        style={{ 
+          background: 'linear-gradient(45deg, #3b82f6, #6366f1)',
+          filter: 'blur(8px)',
+          zIndex: -1
+        }}
+      />
+    </div>
+  );
+};
+
+// Glassmorphism Pulse - modern glass effect
+const GlassPulse = ({ size = 56, className, ...rest }: SpinnerVariantProps) => {
+  const sizeNum = typeof size === 'number' ? size : 56;
+  return (
+    <div className={cn("relative", className)}>
+      <div 
+        className="bg-white/80 backdrop-blur-sm rounded-full border border-white/20 shadow-xl flex items-center justify-center animate-pulse"
+        style={{ width: sizeNum, height: sizeNum }}
+      >
+        <div 
+          className="bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full animate-spin"
+          style={{ width: sizeNum * 0.3, height: sizeNum * 0.3 }}
+        />
+      </div>
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-full opacity-50 animate-ping"
+        style={{ 
+          animationDuration: '2s',
+          animationDelay: '0.5s'
+        }}
+      />
+    </div>
+  );
+};
+
+// Modern Gradient Ring
+const ModernRing = ({ size = 48, className, ...rest }: SpinnerVariantProps) => {
+  const sizeNum = typeof size === 'number' ? size : 48;
+  return (
+    <div className={cn("relative", className)}>
+      <svg
+        width={sizeNum}
+        height={sizeNum}
+        viewBox="0 0 50 50"
+        className="animate-spin"
+      >
+        <defs>
+          <linearGradient id="spinner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="50%" stopColor="#6366f1" />
+            <stop offset="100%" stopColor="#8b5cf6" />
+          </linearGradient>
+        </defs>
+        <circle
+          cx="25"
+          cy="25"
+          r="20"
+          fill="none"
+          stroke="url(#spinner-gradient)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray="31.416"
+          strokeDashoffset="31.416"
+        />
+      </svg>
+      <style jsx>{`
+        @keyframes dash {
+          0% {
+            stroke-dasharray: 1, 150;
+            stroke-dashoffset: 0;
+          }
+          50% {
+            stroke-dasharray: 90, 150;
+            stroke-dashoffset: -35;
+          }
+          100% {
+            stroke-dasharray: 90, 150;
+            stroke-dashoffset: -124;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const Ellipsis = ({ size = 24, className, ...rest }: SpinnerVariantProps) => {
   return (
     <svg
       height={size}
       viewBox="0 0 24 24"
       width={size}
       xmlns="http://www.w3.org/2000/svg"
-      {...props}
+      className={className}
     >
       <title>Loading...</title>
       <circle cx="4" cy="12" fill="currentColor" r="2">
@@ -80,14 +215,15 @@ const Ellipsis = ({ size = 24, ...props }: SpinnerVariantProps) => {
     </svg>
   );
 };
-const Ring = ({ size = 24, ...props }: SpinnerVariantProps) => (
+
+const Ring = ({ size = 24, className, ...rest }: SpinnerVariantProps) => (
   <svg
     height={size}
     stroke="currentColor"
     viewBox="0 0 44 44"
     width={size}
     xmlns="http://www.w3.org/2000/svg"
-    {...props}
+    className={className}
   >
     <title>Loading...</title>
     <g fill="none" fillRule="evenodd" strokeWidth="2">
@@ -138,13 +274,14 @@ const Ring = ({ size = 24, ...props }: SpinnerVariantProps) => (
     </g>
   </svg>
 );
-const Bars = ({ size = 24, ...props }: SpinnerVariantProps) => (
+
+const Bars = ({ size = 24, className, ...rest }: SpinnerVariantProps) => (
   <svg
     height={size}
     viewBox="0 0 24 24"
     width={size}
     xmlns="http://www.w3.org/2000/svg"
-    {...props}
+    className={className}
   >
     <title>Loading...</title>
     <style>{`
@@ -196,14 +333,15 @@ const Bars = ({ size = 24, ...props }: SpinnerVariantProps) => (
     />
   </svg>
 );
-const Infinite = ({ size = 24, ...props }: SpinnerVariantProps) => (
+
+const Infinite = ({ size = 24, className, ...rest }: SpinnerVariantProps) => (
   <svg
     height={size}
     preserveAspectRatio="xMidYMid"
     viewBox="0 0 100 100"
     width={size}
     xmlns="http://www.w3.org/2000/svg"
-    {...props}
+    className={className}
   >
     <title>Loading...</title>
     <path
@@ -228,18 +366,24 @@ const Infinite = ({ size = 24, ...props }: SpinnerVariantProps) => (
     </path>
   </svg>
 );
+
 export type SpinnerProps = LucideProps & {
   variant?:
     | "default"
     | "circle"
     | "pinwheel"
     | "circle-filled"
+    | "glass-ring"
+    | "premium"
+    | "glass-pulse"
+    | "modern-ring"
     | "ellipsis"
     | "ring"
     | "bars"
     | "infinite";
 };
-export const Spinner = ({ variant, ...props }: SpinnerProps) => {
+
+export const Spinner = ({ variant = "glass-ring", ...props }: SpinnerProps) => {
   switch (variant) {
     case "circle":
       return <Circle {...props} />;
@@ -247,6 +391,14 @@ export const Spinner = ({ variant, ...props }: SpinnerProps) => {
       return <Pinwheel {...props} />;
     case "circle-filled":
       return <CircleFilled {...props} />;
+    case "glass-ring":
+      return <GlassRing {...props} />;
+    case "premium":
+      return <Premium {...props} />;
+    case "glass-pulse":
+      return <GlassPulse {...props} />;
+    case "modern-ring":
+      return <ModernRing {...props} />;
     case "ellipsis":
       return <Ellipsis {...props} />;
     case "ring":
