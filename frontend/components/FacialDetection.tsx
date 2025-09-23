@@ -4,6 +4,114 @@ import { getCameraInput } from "@/utils/getCameraInput";
 import { useEffect, useRef, useState } from "react";
 import * as faceapi from "@vladmandic/face-api";
 import { backendTest, facialDetection } from "@/actions/student";
+import { useRouter } from "next/navigation";
+
+export const getRedirectionByMood = (mood: string) => {
+  switch (mood) {
+    case "neutral":
+      return [
+        {
+          title: "You seem Neutral",
+          message: "You're doing well! Take a moment to reflect or enjoy something fun.",
+          buttons: [
+            { name: "Self-Assessment Tools", url: "/psych-tests" },
+            { name: "Surya Namaskar (Yoga)", url: "/wellness/surya-namaskar" },
+            { name: "Simple Habits to Boost Your Mental Wellness Daily (Blog)", url: "/blogs/simple-habit-to-boost-your-mind" },
+          ],
+        },
+      ];
+    case "happy":
+      return [
+        {
+          title: "You seem Happy",
+          message: "Keep up the good mood! Here's something to keep you inspired.",
+          buttons: [
+            { name: "Gamified Wellbeing & Games", url: "/games" },
+            { name: "Hidden Link Between Creativity and Mental Health (Blog)", url: "/blogs/creativity-mental-health-link" },
+            { name: "Surya Namaskar (Yoga)", url: "/wellness/surya-namaskar" },
+          ],
+        },
+      ];
+    case "sad":
+      return [
+        {
+          title: "You seem Sad",
+          message: "It's okay to feel down sometimes. Try these to uplift yourself.",
+          buttons: [
+            { name: "Confidential Journaling", url: "/mind-log" },
+            { name: "Motivational Chatbot", url: "/chatbot" },
+            { name: "4-7-8 Breathing", url: "/wellness/4-7-8-breathing" },
+            { name: "When Mental Health Makes Connections Harder (Blog)", url: "/blogs/mental-health-and-connection" },
+          ],
+        },
+      ];
+    case "angry":
+      return [
+        {
+          title: "You seem Angry",
+          message: "Take a moment to breathe. These might help you cool down.",
+          buttons: [
+            { name: "5-4-3-2-1 Grounding", url: "/wellness/5-4-3-2-1-grounding" },
+            { name: "Motivational Chatbot", url: "/chatbot" },
+            { name: "Digital Detox: How to Reset Your Mind (Blog)", url: "/blogs/digital-detox" },
+          ],
+        },
+      ];
+    case "fearful":
+      return [
+        {
+          title: "You seem Fearful",
+          message: "You're not alone. Consider reaching out or talking to someone.",
+          buttons: [
+            { name: "Motivational Chatbot", url: "/chatbot" },
+            { name: "One-Tap Counselor Booking", url: "/book-session" },
+            { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+            { name: "Legs-Up-the-Wall Pose (Yoga)", url: "/wellness/legs-up-wall" },
+          ],
+        },
+      ];
+    case "disgusted":
+      return [
+        {
+          title: "You seem Disgusted",
+          message: "It might help to express or share with someone. Try these:",
+          buttons: [
+            { name: "Confidential Journaling", url: "/mind-log" },
+            { name: "Expert Support", url: "/exper-support" },
+            { name: "Journaling for Clarity (Blog)", url: "/blogs/journaling-for-clarity" },
+            { name: "Mindful Body Scan", url: "/wellness/mindful-body-scan" },
+          ],
+        },
+      ];
+    case "surprised":
+      return [
+        {
+          title: "You seem Surprised",
+          message: "Use this spark of emotion to explore or reflect.",
+          buttons: [
+            { name: "Self-Assessment Tools", url: "/psych-tests" },
+            { name: "Gamified Wellbeing & Games", url: "/games" },
+            { name: "Silence and Solitude: Why Doing Nothing is Sometimes Everything (Blog)", url: "/blogs/silence-and-solitude" },
+            { name: "Mindful Body Scan", url: "/wellness/mindful-body-scan" },
+          ],
+        },
+      ];
+    default:
+      return [
+        {
+          title: "Mood Detection Unclear",
+          message: "We couldn't determine your mood. Here's something you can still try:",
+          buttons: [
+            { name: "Motivational Chatbot", url: "/chatbot" },
+            { name: "AI Calling Bot (Voice Support)", url: "/ai-calling" },
+            { name: "Child's Pose (Yoga)", url: "/wellness/childs-pose" },
+            { name: "Why Talking About Mental Health Matters? (Blog)", url: "/blogs/why-Talking-About-Mental-Health-Matters" },
+          ],
+        },
+      ];
+  }
+};
+
 
 // The MOOD_DATA object is unchanged as it provides the core logic and content.
 const MOOD_DATA = {
@@ -57,6 +165,8 @@ export default function ExpertSupportPage() {
   const [detectionStatus, setDetectionStatus] = useState<
     "idle" | "complete" | "incomplete"
   >("idle");
+  const [recommendation, setRecommendation] = useState<any[] | null>(null);
+  const router = useRouter();
   const token = localStorage.getItem("token") || "";
 
   useEffect(() => {
@@ -117,12 +227,14 @@ export default function ExpertSupportPage() {
     setErrorMsg(null);
     setIsDetecting(true);
     setDetectionStatus("idle");
+    setRecommendation(null);
 
     const input = await getCameraInput();
     if (!input) {
       setErrorMsg("Unable to access camera.");
       setIsDetecting(false);
       setDetectionStatus("incomplete");
+      setRecommendation(getRedirectionByMood("default"));
       return;
     }
 
@@ -132,6 +244,7 @@ export default function ExpertSupportPage() {
       setErrorMsg("Canvas not available.");
       setIsDetecting(false);
       setDetectionStatus("incomplete");
+      setRecommendation(getRedirectionByMood("default"));
       return;
     }
 
@@ -145,6 +258,7 @@ export default function ExpertSupportPage() {
       if (!detection) {
         setErrorMsg("No face detected. Please try again.");
         setDetectionStatus("incomplete");
+        setRecommendation(getRedirectionByMood("default"));
       } else {
         const topMood = Object.entries(detection.expressions!).reduce((a, b) =>
           a[1] > b[1] ? a : b
@@ -155,6 +269,7 @@ export default function ExpertSupportPage() {
         setMoodScore(score);
         setMood(topMood);
         setDetectionStatus("complete");
+        setRecommendation(getRedirectionByMood(topMood));
       }
       setIsDetecting(false);
     };
@@ -198,6 +313,7 @@ export default function ExpertSupportPage() {
     setMood(null);
     setErrorMsg(null);
     setDetectionStatus("idle");
+    setRecommendation(null);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
@@ -212,6 +328,7 @@ export default function ExpertSupportPage() {
     setMood(null);
     setErrorMsg(null);
     setDetectionStatus("idle");
+    setRecommendation(null);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
@@ -230,7 +347,6 @@ export default function ExpertSupportPage() {
   const displayMessage = mood || errorMsg || "";
   const displayDescription = currentData?.desc || errorMsg || "";
 
-  // I've cleaned up the icon component for better reusability and clarity.
   const CameraIcon = ({ className = "w-6 h-6 text-white" }) => (
     <svg
       className={className}
@@ -247,8 +363,6 @@ export default function ExpertSupportPage() {
     </svg>
   );
 
-  // I've simplified the ReadyState and ResultDisplay components to be more
-  // direct with their styling and layout.
   const ReadyState = ({ isMobile = false }) => (
     <div className="absolute inset-0 flex items-center justify-center p-4">
       <div
@@ -296,12 +410,12 @@ export default function ExpertSupportPage() {
       }`}
     >
       <div
-        className={`bg-white/95 backdrop-blur-md rounded-2xl text-center w-full shadow-xl ${
+        className={`bg-white/95 backdrop-blur-md rounded-2xl text-center w-full shadow-xl overflow-y-auto max-h-[90%] ${
           isMobile ? "p-4 max-w-xs" : "p-6 max-w-sm"
         }`}
       >
         <div
-          className={`mx-auto mb-4 bg-gradient-to-r from-gray-200 to-white rounded-2xl flex items-center justify-center ${
+          className={`mx-auto mb-4 bg-gradient-to-r from-gray-200 to-white rounded-2xl flex items-center justify-center flex-shrink-0 ${
             isMobile ? "w-16 h-16" : "w-20 h-20"
           }`}
         >
@@ -355,8 +469,32 @@ export default function ExpertSupportPage() {
             </div>
           </div>
         </div>
+        
+        {recommendation &&
+          recommendation.map((item, index) => (
+            <div key={index} className="space-y-3 mt-4 text-left">
+              <div className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>{item.title}</div>
+              <p className={`text-slate-600 ${isMobile ? "text-xs" : "text-sm"}`}>{item.message}</p>
+              <div className="flex flex-col gap-2 mt-2">
+                {item.buttons.map(
+                  (
+                    button: { name: string; url: string },
+                    btnIndex: number
+                  ) => (
+                    <button
+                      key={btnIndex}
+                      onClick={() => router.push(button.url)}
+                      className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-sm"
+                    >
+                      {button.name}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+          ))}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-4">
           <button
             onClick={handleCloseResult}
             className={`flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded-lg transition-colors ${
@@ -370,8 +508,7 @@ export default function ExpertSupportPage() {
     </div>
   );
 
-  // I've completely redesigned the full-screen (mobile) layout to be
-  // more streamlined and visually appealing.
+
   if (isFullScreen) {
     return (
       <div className="min-h-screen bg-white flex flex-col font-sans text-slate-800">
@@ -435,6 +572,30 @@ export default function ExpertSupportPage() {
               </div>
             </button>
           )}
+          
+          {!isDetecting && (mood || errorMsg) && (
+            <button
+              onClick={handleRetake}
+              className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <div className="flex items-center justify-center gap-3">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Try Again
+              </div>
+            </button>
+          )}
 
           {isDetecting && (
             <div className="text-center py-2">
@@ -449,8 +610,6 @@ export default function ExpertSupportPage() {
     );
   }
 
-  // I've also redesigned the desktop layout to be more
-  // modern and professional, keeping the new color scheme.
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans text-slate-800">
       <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 shadow-sm">
