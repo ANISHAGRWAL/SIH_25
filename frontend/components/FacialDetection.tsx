@@ -78,6 +78,7 @@ const getRedirectionUrls = (mood: string) => {
             { name: "Self-Assessment Tools", url: "/psych-tests" },
             { name: "Surya Namaskar (Yoga)", url: "/wellness/surya-namaskar" },
             { name: "Simple Habits to Boost Your Mental Wellness Daily (Blog)", url: "/blogs/simple-habit-to-boost-your-mind" },
+            { name: "Gamified Wellbeing & Games", url: "/games" },
           ],
         },
       ];

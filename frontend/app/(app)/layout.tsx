@@ -422,7 +422,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
               <SideLink
                 href="/chatbot"
-                label="CampBud"
+                label="MotiveAI"
                 isActive={pathname === "/chatbot"}
                 icon="chat"
               />
@@ -461,7 +461,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             />
             <MobileLink
               href="/chatbot"
-              label="CampBud"
+              label="MotiveAI"
               isActive={pathname === "/chatbot"}
               icon="chat"
             />

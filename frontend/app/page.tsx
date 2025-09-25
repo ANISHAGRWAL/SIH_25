@@ -624,9 +624,9 @@ export default function HomePage() {
               </p>
               <div className="space-y-4">
                 {[
-                  { icon: "📧", text: "support@Campus Care.edu" },
-                  { icon: "📞", text: "24/7 Crisis Helpline: 1-800-MINDMATE" },
-                  { icon: "🏫", text: "Available at 500+ Educational Institutions" }
+                  { icon: "📧", text: "campuscare.team@gmail.com" },
+                  { icon: "📞", text: "24/7 Crisis Helpline: KIRAN (1800-599-0019)" },
+                  // { icon: "🏫", text: "Available at 500+ Educational Institutions" }
                 ].map((contact, index) => (
                   <div key={index} className="flex items-center gap-3 group hover:translate-x-2 transition-transform duration-300">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
