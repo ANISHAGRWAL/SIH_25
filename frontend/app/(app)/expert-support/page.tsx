@@ -19,6 +19,8 @@ import {
   Lock,
 } from "lucide-react";
 
+import toast, { Toaster } from "react-hot-toast"; // 👈 Import toast and Toaster
+
 import { ChatEventEnum } from "@/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { connectSocket, disconnectSocket } from "@/sockets/socket";
@@ -76,6 +78,7 @@ export default function ChatPage() {
       setRoomId(newRoomId);
       setMessages([]);
       sock.emit(ChatEventEnum.GET_MESSAGES, newRoomId);
+      toast.success("Chat started! You are now connected with a volunteer.");
     });
 
     sock.on(ChatEventEnum.NEW_CHAT_REQUEST, (req: ChatRequest) => {
@@ -92,6 +95,7 @@ export default function ChatPage() {
             ? prev
             : [...prev, req]
         );
+        toast("New chat request received!");
       }
     });
 
@@ -110,14 +114,18 @@ export default function ChatPage() {
       setChatRequests(requests)
     );
 
-    sock.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) =>
-      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId))
-    );
+    sock.on(ChatEventEnum.CANCEL_REQUEST, ({ studentId }) => {
+      setChatRequests((prev) => prev.filter((r) => r.studentId !== studentId));
+      if (isVolunteer) {
+        toast.error("A student has cancelled their chat request.");
+      }
+    });
 
     sock.on(ChatEventEnum.LEAVE_ROOM, () => {
       setRoomId(null);
       setMessages([]);
       sock.emit(ChatEventEnum.GET_REQUESTS);
+      toast.success("You have successfully left the chat room.");
     });
 
     return () => {
@@ -153,7 +161,7 @@ export default function ChatPage() {
   const handleRequestChat = () => {
     if (!socket) return;
     socket.emit(ChatEventEnum.STUDENT_REQUEST_CHAT);
-    alert("Chat request sent. Please wait for a volunteer.");
+    toast.success("Chat request sent. Please wait for a volunteer.");
     const req: ChatRequest = {
       studentId: user.id,
       studentEmail: user.email,
@@ -174,17 +182,19 @@ export default function ChatPage() {
     setRoomId(null);
     setMessages([]);
     socket.emit(ChatEventEnum.GET_REQUESTS);
+    toast.success("You have successfully left the chat.");
   };
 
   const handleCancelRequest = () => {
     if (!socket) return;
     socket.emit(ChatEventEnum.CANCEL_REQUEST);
     setChatRequests([]);
-    alert("Chat request cancelled.");
+    toast.error("Chat request cancelled.");
   };
 
   return (
     <div className="h-screen w-full bg-gradient-to-b from-sky-100 to-blue-50 flex flex-col">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="w-full p-4 flex-1 flex flex-col min-h-0">
         <header className="mb-4 shrink-0">
           <h1 className="text-3xl font-bold text-slate-800">Chat Support</h1>
@@ -314,7 +324,8 @@ export default function ChatPage() {
                             className="flex justify-between items-center py-2"
                           >
                             <span className="text-sm text-slate-700">
-                              {req.studentEmail}
+                              {/* {req.studentEmail} */}
+                                Wants to connect
                             </span>
                             <Button
                               size="sm"

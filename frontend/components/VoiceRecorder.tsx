@@ -34,6 +34,7 @@ const getVoiceRecommendation = (mood: string): Recommendation[] => {
             { name: "Daily Mind Log", url: "/mind-log" },
             { name: "Anonymous Volunteer Forum", url: "/exper-support" },
             { name: "Simple Habits to Boost Your Mental Wellness Daily", url: "/blogs#habit-blog" },
+            { name: "Yoga", url: "/wellness/yoga" },
           ],
         },
       ];

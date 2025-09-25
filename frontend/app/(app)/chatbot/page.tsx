@@ -1,12 +1,9 @@
-// /app/(or pages)/ChatbotPage.tsx — or wherever your page lives
-// Adjust import paths as needed
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { chat } from "@/actions/chat";
 import { useAuth } from "@/contexts/AuthContext";
-import { Mic } from "lucide-react";
+import { Mic, PhoneCall } from "lucide-react";
 import SpeechInput from "@/components/SpeechInput";
 import { useSpeechRecognition } from "@/hooks/useSeechRecognition";
 
@@ -107,74 +104,88 @@ export default function ChatbotPage() {
     setShowSettings(false);
   };
 
-  async function send() {
-    if (!input.trim() || loading) return;
+  // replace your existing async function send() with this
+async function send() {
+  if (!input.trim() || loading) return;
 
-    if (isListening) {
-      stopListening();
-    }
+  if (isListening) {
+    stopListening();
+  }
 
-    const userMessage: Message = {
+  const userMessage: Message = {
+    id: generateId(),
+    role: "user",
+    text: input.trim(),
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+
+  // Build the updated messages array synchronously (do NOT rely on state updating immediately)
+  const updatedMessages = [...messages, userMessage];
+  // update state so UI shows the user message immediately
+  setMessages(updatedMessages);
+  // clear input and set loading + typing indicator
+  setInput("");
+  setLoading(true);
+
+  const typingMessage: Message = {
+    id: "typing",
+    role: "bot",
+    text: "",
+    time: "",
+    isTyping: true,
+  };
+  // show typing indicator
+  setMessages((prev) => [...prev, typingMessage]);
+
+  try {
+    const token = localStorage.getItem("token") || "";
+    // IMPORTANT: send the updatedMessages we created above
+    const data = await chat(token, provider, updatedMessages);
+
+    // server shape expected: { ok, provider_chosen, assistant_text, note }
+    // be defensive in case older versions return different shapes
+    const assistantText =
+      (data && (data.assistant_text ?? (data.response ?? data?.message ?? ""))) ||
+      "No response from server";
+
+    const botMessage: Message = {
       id: generateId(),
-      role: "user",
-      text: input.trim(),
+      role: "bot",
+      text: assistantText,
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setLoading(true);
-
-    const typingMessage: Message = {
-      id: "typing",
-      role: "bot",
-      text: "",
-      time: "",
-      isTyping: true,
-    };
-    setMessages((prev) => [...prev, typingMessage]);
-
-    try {
-      const token = localStorage.getItem("token") || "";
-      const data = await chat(token, provider, [...messages, userMessage]);
-
-      const botMessage: Message = {
+    setMessages((prev) => {
+      const filtered = prev.filter((msg) => msg.id !== "typing");
+      return [...filtered, botMessage];
+    });
+  } catch (error) {
+    console.error("chat send error:", error);
+    setMessages((prev) => {
+      const filtered = prev.filter((msg) => msg.id !== "typing");
+      const errorMessage: Message = {
         id: generateId(),
         role: "bot",
-        text: data.response || "No response from server",
+        text: "⚠️ Could not connect to backend. Please check server.",
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
       };
-
-      setMessages((prev) => {
-        const filtered = prev.filter((msg) => msg.id !== "typing");
-        return [...filtered, botMessage];
-      });
-    } catch (error) {
-      console.error(error);
-      setMessages((prev) => {
-        const filtered = prev.filter((msg) => msg.id !== "typing");
-        const errorMessage: Message = {
-          id: generateId(),
-          role: "bot",
-          text: "⚠️ Could not connect to backend. Please check server.",
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-        return [...filtered, errorMessage];
-      });
-    } finally {
-      setLoading(false);
-      inputRef.current?.focus();
-    }
+      return [...filtered, errorMessage];
+    });
+  } finally {
+    setLoading(false);
+    inputRef.current?.focus();
   }
+}
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -235,7 +246,7 @@ export default function ChatbotPage() {
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-              CampBud
+              MotiveAI
             </h1>
             <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-600">
               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -259,6 +270,14 @@ export default function ChatbotPage() {
             </select>
           </div>
 
+          <a
+            href="tel:+1234567890"
+            className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            title="Call for Support"
+          >
+            <PhoneCall className="w-4 h-4 sm:w-5 sm:h-5" />
+          </a>
+
           <div className="relative settings-container">
             <button
               onClick={() => setShowSettings(!showSettings)}
@@ -280,7 +299,7 @@ export default function ChatbotPage() {
             </button>
 
             {showSettings && (
-              <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
+              <div className="absolute bottom-full right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
                 <button
                   onClick={() => setShowClearConfirm(true)}
                   className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -496,13 +515,6 @@ export default function ChatbotPage() {
                   disabled={loading}
                 />
               )}
-              <SpeechInput
-                onTranscript={(text) => setInput(text)}
-                disabled={loading}
-              />
-
-              {/* Optional: you might still want to allow fallback even if browser recog exists but fails at runtime */}
-              {/* e.g. always show SpeechInput as fallback or in parallel, depending on UX you prefer */}
 
               <div className="flex-1 relative">
                 <textarea
