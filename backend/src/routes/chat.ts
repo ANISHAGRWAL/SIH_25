@@ -1,47 +1,54 @@
-import express, { Response } from 'express';
-import { ChatRequest, IApiRequest } from '../types';
-import { getAgentResponse } from '../controllers/chatengine';
+// src/routes/chat.ts
+import express, { Request, Response } from "express";
+import { getAgentResponse } from "../controllers/chatengine";
+
+type ChatRequestBody = {
+  model_provider?: "Gemini" | "Groq";
+  messages: string[];
+  allow_search?: boolean;
+};
+
+type ChatResponseBody = {
+  ok: boolean;
+  provider_chosen: string;
+  assistant_text: string;
+  note?: string | null;
+};
 
 const router = express.Router();
 
-router.post('/', async (req: IApiRequest, res: Response) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-  const {
-    model_provider,
-    messages,
-    allow_search = true,
-  } = req.body as ChatRequest;
-
-  const DEFAULT_MODELS = {
-    Gemini: 'gemini-2.5-flash',
-    Groq: 'llama-3.3-70b-versatile',
-  };
-
-  type ModelProvider = keyof typeof DEFAULT_MODELS; // 'Gemini' | 'Groq'
-
-  if (!DEFAULT_MODELS.hasOwnProperty(model_provider)) {
-    return res.status(400).json({ error: 'Invalid provider.' });
-  }
-
+router.post("/", async (req: Request, res: Response) => {
   try {
-    const llm_id =
-      DEFAULT_MODELS[model_provider as keyof typeof DEFAULT_MODELS];
-    const authUser = req.user;
+    const body = req.body as ChatRequestBody | undefined;
+    if (!body || !Array.isArray(body.messages) || body.messages.length === 0) {
+      return res.status(400).json({ ok: false, provider_chosen: "unknown", assistant_text: "", note: "messages array must not be empty" } as ChatResponseBody);
+    }
 
-    const response = await getAgentResponse({
-      authUser,
-      provider: model_provider,
-      llm_id,
-      query: messages,
-      allow_search,
+    const latest = String(body.messages[body.messages.length - 1] ?? "").trim();
+    if (!latest) {
+      return res.status(400).json({ ok: false, provider_chosen: "unknown", assistant_text: "", note: "latest message is empty" } as ChatResponseBody);
+    }
+
+    const providerPref = body.model_provider === "Groq" ? "Groq" : "Gemini";
+
+    // call agent
+    const result = await getAgentResponse({
+      authUser: (req as any).user,
+      provider: providerPref,
+      llm_id: providerPref === "Groq" ? "llama-3.3-70b-versatile" : "gemini-2.5-flash",
+      query: body.messages,
+      allow_search: body.allow_search ?? true,
     });
 
-    return res.json({ response });
-  } catch (err) {
-    console.error('❌ Agent Error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    // Normalize result: agent returns { assistant_text, provider_chosen, note? }
+    let assistant_text = String((result as any)?.assistant_text ?? result ?? "");
+    let provider_chosen = String((result as any)?.provider_chosen ?? providerPref);
+    const note = (result as any)?.note ?? null;
+
+    return res.json({ ok: true, provider_chosen, assistant_text, note } as ChatResponseBody);
+  } catch (err: any) {
+    console.error("❌ /chat handler error:", err?.message ?? err);
+    return res.status(500).json({ ok: false, provider_chosen: "unknown", assistant_text: "⚠️ Internal server error.", note: String(err?.message || err) } as ChatResponseBody);
   }
 });
 

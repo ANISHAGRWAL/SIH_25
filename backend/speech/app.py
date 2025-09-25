@@ -35,5 +35,13 @@ async def transcribe(file: UploadFile = File(...)):
     # return class label and probability vector
     return {"label": label, "vector": vector.tolist()}
 
+@app.get("/wake-up")
+async def wake_up():
+    """
+    A simple endpoint to wake up the server from a cold start.
+    Does nothing but return a success message.
+    """
+    return {"status": "awake"}
+
 if __name__ == "__main__":
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
