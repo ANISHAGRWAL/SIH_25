@@ -2,14 +2,17 @@
 import { ChatGroq } from '@langchain/groq';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
-import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
+import {
+  AIMessage,
+  HumanMessage,
+  SystemMessage,
+} from '@langchain/core/messages';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import axios from 'axios';
 import nodemailer from 'nodemailer';
-import { queryMedGemma } from "./ollama_tool";
+import { queryMedGemma } from './ollama_tool';
 import { db } from '../db';
 import { IAuthUser } from '../types';
-
 
 type Provider = 'Gemini' | 'Groq';
 
@@ -21,8 +24,10 @@ const EMAIL_ID = process.env.EMAIL_ID || '';
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || '';
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://34.93.235.135:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'alibayram/medgemma:4b';
-const OLLAMA_TIMEOUT_MS = parseInt(process.env.OLLAMA_REQUEST_TIMEOUT || '600000', 10);
-
+const OLLAMA_TIMEOUT_MS = parseInt(
+  process.env.OLLAMA_REQUEST_TIMEOUT || '600000',
+  10,
+);
 
 // prompts and fallbacks
 const BASE_SYSTEM_PROMPT = `
@@ -96,8 +101,24 @@ Please respond YES or NO.
 `;
 
 // simple fallback keyword lists used when classifier returns null
-const CRISIS_KEYWORDS_FALLBACK = ['suicide', 'kill myself', 'end my life', 'want to die', 'hurt myself'];
-const THERAPY_KEYWORDS_FALLBACK = ['depress', 'depression', 'anxiety', 'panic', 'lonely', 'alone', 'overwhelmed', 'therapy', 'therapist'];
+const CRISIS_KEYWORDS_FALLBACK = [
+  'suicide',
+  'kill myself',
+  'end my life',
+  'want to die',
+  'hurt myself',
+];
+const THERAPY_KEYWORDS_FALLBACK = [
+  'depress',
+  'depression',
+  'anxiety',
+  'panic',
+  'lonely',
+  'alone',
+  'overwhelmed',
+  'therapy',
+  'therapist',
+];
 
 // Optional short-chat guard config (disabled by default)
 const SHORT_CHAT_MIN_CHARS = 12;
@@ -110,18 +131,25 @@ function safeExtractContent(resp: any): string {
     // common shapes
     if (typeof resp === 'string') return resp;
     if (typeof resp.content === 'string') return resp.content;
-    if (resp.message && typeof resp.message === 'object' && typeof resp.message.content === 'string') return resp.message.content;
+    if (
+      resp.message &&
+      typeof resp.message === 'object' &&
+      typeof resp.message.content === 'string'
+    )
+      return resp.message.content;
     if (Array.isArray(resp.choices) && resp.choices.length) {
       const first = resp.choices[0];
       if (first && typeof first === 'object') {
-        if (first.message && typeof first.message.content === 'string') return first.message.content;
+        if (first.message && typeof first.message.content === 'string')
+          return first.message.content;
         if (typeof first.text === 'string') return first.text;
       }
     }
     // langchain-ish
     if (Array.isArray(resp.messages) && resp.messages.length) {
       for (const m of resp.messages) {
-        if (m && m.role === 'assistant' && typeof m.content === 'string') return m.content;
+        if (m && m.role === 'assistant' && typeof m.content === 'string')
+          return m.content;
       }
     }
     return JSON.stringify(resp).slice(0, 5000);
@@ -133,36 +161,39 @@ function safeExtractContent(resp: any): string {
 // NEW: Parse streaming JSON chunks and combine content
 function parseStreamingResponse(streamData: string): string {
   try {
-    if (!streamData || typeof streamData !== "string") return "";
-    
+    if (!streamData || typeof streamData !== 'string') return '';
+
     // Split by lines and filter out empty lines
-    const lines = streamData.trim().split('\n').filter(line => line.trim());
-    let fullContent = "";
-    
+    const lines = streamData
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim());
+    let fullContent = '';
+
     for (const line of lines) {
       try {
         const chunk = JSON.parse(line.trim());
-        
+
         // Extract content from each chunk
         if (chunk.message && chunk.message.content) {
           fullContent += chunk.message.content;
         }
-        
+
         // If this chunk is marked as done, we can stop
         if (chunk.done === true) {
           break;
         }
       } catch (parseError) {
         // Skip malformed JSON lines
-        console.warn("Failed to parse streaming chunk:", line);
+        console.warn('Failed to parse streaming chunk:', line);
         continue;
       }
     }
-    
+
     return fullContent.trim();
   } catch (error) {
-    console.error("Error parsing streaming response:", error);
-    return "";
+    console.error('Error parsing streaming response:', error);
+    return '';
   }
 }
 
@@ -171,52 +202,71 @@ async function callOllama(prompt: string): Promise<string> {
   const payload = {
     model: OLLAMA_MODEL,
     messages: [
-      { role: 'system', content: 'You are a supportive, calm assistant. Answer in 2–4 concise sentences, avoid repeating phrases, and finish with one gentle open-ended question.' },
+      {
+        role: 'system',
+        content:
+          'You are a supportive, calm assistant. Answer in 2–4 concise sentences, avoid repeating phrases, and finish with one gentle open-ended question.',
+      },
       { role: 'user', content: prompt },
     ],
     stream: false, // Explicitly set stream to false
   };
 
   try {
-    console.log("Making request to Ollama...", { model: OLLAMA_MODEL, prompt: prompt.slice(0, 100) });
-    
-    const resp = await axios.post(`${OLLAMA_HOST.replace(/\/$/, '')}/api/chat`, payload, {
-      timeout: OLLAMA_TIMEOUT_MS,
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    console.log('Making request to Ollama...', {
+      model: OLLAMA_MODEL,
+      prompt: prompt.slice(0, 100),
     });
 
-    console.log("Ollama response status:", resp.status);
-    console.log("Ollama response data type:", typeof resp.data);
-    
-    let content = "";
-    
+    const resp = await axios.post(
+      `${OLLAMA_HOST.replace(/\/$/, '')}/api/chat`,
+      payload,
+      {
+        timeout: OLLAMA_TIMEOUT_MS,
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      },
+    );
+
+    console.log('Ollama response status:', resp.status);
+    console.log('Ollama response data type:', typeof resp.data);
+
+    let content = '';
+
     // Check if we got streaming data (string with multiple JSON objects)
-    if (typeof resp.data === "string" && resp.data.includes('{"model":')) {
-      console.log("Detected streaming response, parsing...");
+    if (typeof resp.data === 'string' && resp.data.includes('{"model":')) {
+      console.log('Detected streaming response, parsing...');
       content = parseStreamingResponse(resp.data);
     } else {
       // Normal JSON response
-      console.log("Normal JSON response");
+      console.log('Normal JSON response');
       content = safeExtractContent(resp.data);
     }
 
-    console.log("Extracted content length:", content.length);
-    console.log("Content preview:", content.slice(0, 200));
+    console.log('Extracted content length:', content.length);
+    console.log('Content preview:', content.slice(0, 200));
 
-    return content.trim() || '⚠️ The therapist model returned an empty response.';
-
+    return (
+      content.trim() || '⚠️ The therapist model returned an empty response.'
+    );
   } catch (err: any) {
     console.error('Ollama call failed:', err?.message ?? err);
-    
+
     // Handle streaming response in error case too
-    if (err?.response?.data && typeof err.response.data === "string" && err.response.data.includes('{"model":')) {
-      console.log("Parsing streaming response from error...");
+    if (
+      err?.response?.data &&
+      typeof err.response.data === 'string' &&
+      err.response.data.includes('{"model":')
+    ) {
+      console.log('Parsing streaming response from error...');
       const content = parseStreamingResponse(err.response.data);
       if (content) {
         return content.trim();
       }
     }
-    
+
     // try to provide user-friendly message
     if (err?.code === 'ECONNABORTED') {
       return '⚠️ The therapist model timed out. Please try again shortly.';
@@ -226,7 +276,13 @@ async function callOllama(prompt: string): Promise<string> {
 }
 
 // optional: send crisis email (uses Gmail creds)
-async function sendCrisisEmail(adminEmail?: string, adminName?: string, userName?: string, userEmail?: string, excerpt?: string) {
+async function sendCrisisEmail(
+  adminEmail?: string,
+  adminName?: string,
+  userName?: string,
+  userEmail?: string,
+  excerpt?: string,
+) {
   if (!EMAIL_ID || !EMAIL_PASSWORD || !adminEmail) {
     console.warn('Email creds or admin email missing — skipping crisis email.');
     return;
@@ -238,22 +294,42 @@ async function sendCrisisEmail(adminEmail?: string, adminName?: string, userName
     });
     const subject = `Urgent: user ${userName ?? 'unknown'} may be in crisis`;
     const text = `Hello ${adminName ?? ''},\n\nUser: ${userName ?? ''} (${userEmail ?? ''}) may be in crisis.\n\nMessage excerpt:\n"${excerpt ?? ''}"\n\nPlease reach out immediately.`;
-    await transporter.sendMail({ from: EMAIL_ID, to: adminEmail, subject, text });
+    await transporter.sendMail({
+      from: EMAIL_ID,
+      to: adminEmail,
+      subject,
+      text,
+    });
   } catch (e) {
     console.error('Failed to send crisis email:', e);
   }
 }
 
 // ---------------- classifier (binary yes/no) ----------------
-async function askBinaryYesNoWithProvider(provider: Provider, promptText: string): Promise<string | null> {
+async function askBinaryYesNoWithProvider(
+  provider: Provider,
+  promptText: string,
+): Promise<string | null> {
   try {
     if (provider === 'Groq') {
-      const llm = new ChatGroq({ apiKey: GROQ_API_KEY, model: 'llama-3.3-70b-versatile' });
-      const resp: any = await llm.invoke([ new SystemMessage('You are a binary classifier. Reply only YES or NO.'), new HumanMessage(promptText) ]);
+      const llm = new ChatGroq({
+        apiKey: GROQ_API_KEY,
+        model: 'llama-3.3-70b-versatile',
+      });
+      const resp: any = await llm.invoke([
+        new SystemMessage('You are a binary classifier. Reply only YES or NO.'),
+        new HumanMessage(promptText),
+      ]);
       return safeExtractContent(resp).trim();
     } else {
-      const llm = new ChatGoogleGenerativeAI({ apiKey: GOOGLE_GEMINI_API_KEY, model: 'gemini-2.5-flash' });
-      const resp: any = await llm.invoke([ new SystemMessage('You are a binary classifier. Reply only YES or NO.'), new HumanMessage(promptText) ]);
+      const llm = new ChatGoogleGenerativeAI({
+        apiKey: GOOGLE_GEMINI_API_KEY,
+        model: 'gemini-2.5-flash',
+      });
+      const resp: any = await llm.invoke([
+        new SystemMessage('You are a binary classifier. Reply only YES or NO.'),
+        new HumanMessage(promptText),
+      ]);
       return safeExtractContent(resp).trim();
     }
   } catch (e: any) {
@@ -263,14 +339,25 @@ async function askBinaryYesNoWithProvider(provider: Provider, promptText: string
 }
 
 async function runClassifierPair(message: string, provider: Provider) {
-  const debug: any = { used_model: provider, crisis_raw: null, therapy_raw: null, errors: [] };
+  const debug: any = {
+    used_model: provider,
+    crisis_raw: null,
+    therapy_raw: null,
+    errors: [],
+  };
 
-  const crisisPrompt = CLASSIFIER_PROMPT_CRISIS.replace('{message}', message.replace(/"/g, "'"));
+  const crisisPrompt = CLASSIFIER_PROMPT_CRISIS.replace(
+    '{message}',
+    message.replace(/"/g, "'"),
+  );
   try {
     const crisisResp = await askBinaryYesNoWithProvider(provider, crisisPrompt);
     debug.crisis_raw = crisisResp;
   } catch (e: any) {
-    debug.errors.push({ stage: 'crisis_classifier', error: e?.message ?? String(e) });
+    debug.errors.push({
+      stage: 'crisis_classifier',
+      error: e?.message ?? String(e),
+    });
     debug.crisis_raw = null;
   }
 
@@ -283,12 +370,21 @@ async function runClassifierPair(message: string, provider: Provider) {
 
   // therapy only if crisis not YES
   if (crisisVal !== true) {
-    const therapyPrompt = CLASSIFIER_PROMPT_THERAPY.replace('{message}', message.replace(/"/g, "'"));
+    const therapyPrompt = CLASSIFIER_PROMPT_THERAPY.replace(
+      '{message}',
+      message.replace(/"/g, "'"),
+    );
     try {
-      const therapyResp = await askBinaryYesNoWithProvider(provider, therapyPrompt);
+      const therapyResp = await askBinaryYesNoWithProvider(
+        provider,
+        therapyPrompt,
+      );
       debug.therapy_raw = therapyResp;
     } catch (e: any) {
-      debug.errors.push({ stage: 'therapy_classifier', error: e?.message ?? String(e) });
+      debug.errors.push({
+        stage: 'therapy_classifier',
+        error: e?.message ?? String(e),
+      });
       debug.therapy_raw = null;
     }
   } else {
@@ -306,16 +402,20 @@ async function runClassifierPair(message: string, provider: Provider) {
 }
 
 // fallback checks when classifier returned null
-function fallbackChecks(message: string, crisisFlag: boolean | null, therapyFlag: boolean | null) {
+function fallbackChecks(
+  message: string,
+  crisisFlag: boolean | null,
+  therapyFlag: boolean | null,
+) {
   const text = (message || '').toLowerCase();
   let crisisDetected = crisisFlag === true;
   let therapyNeeded = therapyFlag === true;
 
   if (crisisFlag === null) {
-    crisisDetected = CRISIS_KEYWORDS_FALLBACK.some(k => text.includes(k));
+    crisisDetected = CRISIS_KEYWORDS_FALLBACK.some((k) => text.includes(k));
   }
   if (therapyFlag === null) {
-    therapyNeeded = THERAPY_KEYWORDS_FALLBACK.some(k => text.includes(k));
+    therapyNeeded = THERAPY_KEYWORDS_FALLBACK.some((k) => text.includes(k));
   }
   return { crisisDetected, therapyNeeded };
 }
@@ -341,14 +441,23 @@ export async function getAgentResponse({
   llm_id?: string;
   query: string[];
   allow_search?: boolean;
-}): Promise<{ assistant_text: string; provider_chosen: string; note?: string | null }> {
+}): Promise<{
+  assistant_text: string;
+  provider_chosen: string;
+  note?: string | null;
+}> {
   const latest = String(query?.[query.length - 1] ?? '').trim();
   if (!latest) {
-    return { assistant_text: '', provider_chosen: 'unknown', note: 'empty_latest_message' };
+    return {
+      assistant_text: '',
+      provider_chosen: 'unknown',
+      note: 'empty_latest_message',
+    };
   }
 
   try {
-    const classifierProvider: Provider = provider === 'Groq' ? 'Groq' : 'Gemini';
+    const classifierProvider: Provider =
+      provider === 'Groq' ? 'Groq' : 'Gemini';
     const classifier = await runClassifierPair(latest, classifierProvider);
     const crisisFlag = classifier.crisis;
     const therapyFlag = classifier.therapy;
@@ -356,8 +465,17 @@ export async function getAgentResponse({
     console.info('=== CLASSIFIER DEBUG ===', debug);
 
     // fallback heuristics
-    let { crisisDetected, therapyNeeded } = fallbackChecks(latest, crisisFlag, therapyFlag);
-    console.info('after fallback -> crisisDetected:', crisisDetected, 'therapyNeeded:', therapyNeeded);
+    let { crisisDetected, therapyNeeded } = fallbackChecks(
+      latest,
+      crisisFlag,
+      therapyFlag,
+    );
+    console.info(
+      'after fallback -> crisisDetected:',
+      crisisDetected,
+      'therapyNeeded:',
+      therapyNeeded,
+    );
 
     // OPTIONAL short-chat guard (currently disabled).
     // If you want to skip Ollama for very short chit-chat, you can enable this guard:
@@ -378,7 +496,10 @@ export async function getAgentResponse({
         // 1. Find admin of this org
         const admin = await db.query.user.findFirst({
           where: (user, { eq, and }) =>
-            and(eq(user.role, 'admin'), eq(user.organizationId, authUser.organizationId)),
+            and(
+              eq(user.role, 'admin'),
+              eq(user.organizationId, authUser.organizationId),
+            ),
         });
 
         // 2. Find current user
@@ -402,6 +523,7 @@ export async function getAgentResponse({
               user: process.env.EMAIL_ID,
               pass: process.env.EMAIL_PASSWORD,
             },
+            connectionTimeout: 30000,
           });
 
           // 5. Send email
@@ -423,66 +545,101 @@ You can also contact ${admin?.name ?? 'an administrator'} at ${admin?.email ?? '
 Your life matters, and support is just a call away. 💙`,
           provider_chosen: 'Ollama (MedGemma)',
           note: 'crisis_mode',
-    };
-
-  } catch (err) {
-    console.error('❌ Failed to send crisis email:', err);
-    return {
-      assistant_text: "It sounds like you're in a really difficult place. Please reach out to a trusted friend, a mental health professional, or call a helpline: +91 9152987821. 💙",
-      provider_chosen: 'unknown',
-      note: 'crisis_email_failed',
-    };
-  }
-}
-
+        };
+      } catch (err) {
+        console.error('❌ Failed to send crisis email:', err);
+        return {
+          assistant_text:
+            "It sounds like you're in a really difficult place. Please reach out to a trusted friend, a mental health professional, or call a helpline: +91 9152987821. 💙",
+          provider_chosen: 'unknown',
+          note: 'crisis_email_failed',
+        };
+      }
+    }
 
     // Therapy-needed => Ollama therapist
     if (therapyNeeded) {
       console.info('Therapy-needed → Routing to Ollama therapist.');
       const therapistReply = await queryMedGemma(latest);
-      return { assistant_text: therapistReply, provider_chosen: 'Ollama (MedGemma)', note: 'therapy_mode' };
+      return {
+        assistant_text: therapistReply,
+        provider_chosen: 'Ollama (MedGemma)',
+        note: 'therapy_mode',
+      };
     }
 
     // Normal friendly flow => chosen provider (Groq or Gemini)
     try {
       const chosenProvider: Provider = provider === 'Groq' ? 'Groq' : 'Gemini';
       let llm: any;
-      let stylePrompt = chosenProvider === 'Groq' ? GROQ_STYLE_PROMPT : GEMINI_STYLE_PROMPT;
+      let stylePrompt =
+        chosenProvider === 'Groq' ? GROQ_STYLE_PROMPT : GEMINI_STYLE_PROMPT;
 
       if (chosenProvider === 'Groq') {
-        llm = new ChatGroq({ apiKey: GROQ_API_KEY, model: llm_id || 'llama-3.3-70b-versatile' });
+        llm = new ChatGroq({
+          apiKey: GROQ_API_KEY,
+          model: llm_id || 'llama-3.3-70b-versatile',
+        });
       } else {
-        llm = new ChatGoogleGenerativeAI({ apiKey: GOOGLE_GEMINI_API_KEY, model: llm_id || 'gemini-2.5-flash' });
+        llm = new ChatGoogleGenerativeAI({
+          apiKey: GOOGLE_GEMINI_API_KEY,
+          model: llm_id || 'gemini-2.5-flash',
+        });
       }
 
       const finalSystemPrompt = `${BASE_SYSTEM_PROMPT}\n\n${stylePrompt}`;
 
-      const tools = allow_search && TAVILY_API_KEY ? [ new TavilySearchResults({ maxResults: 2, apiKey: TAVILY_API_KEY }) ] : [];
+      const tools =
+        allow_search && TAVILY_API_KEY
+          ? [new TavilySearchResults({ maxResults: 2, apiKey: TAVILY_API_KEY })]
+          : [];
       const agent = createReactAgent({ llm, tools });
 
-      const messages = [ new SystemMessage(finalSystemPrompt), ...query.map(m => new HumanMessage(m)) ];
+      const messages = [
+        new SystemMessage(finalSystemPrompt),
+        ...query.map((m) => new HumanMessage(m)),
+      ];
 
       const result: any = await agent.invoke({ messages });
 
       const outputs = (result.messages || [])
         .filter((m: any) => m instanceof AIMessage)
-        .map((m: any) => (m.content?.toString?.() ?? ''));
+        .map((m: any) => m.content?.toString?.() ?? '');
 
-      const assistantText = outputs.length ? outputs[outputs.length - 1] : 'No response.';
-      return { assistant_text: assistantText, provider_chosen: chosenProvider, note: null };
+      const assistantText = outputs.length
+        ? outputs[outputs.length - 1]
+        : 'No response.';
+      return {
+        assistant_text: assistantText,
+        provider_chosen: chosenProvider,
+        note: null,
+      };
     } catch (e: any) {
       console.error('Non-therapy provider invocation failed:', e?.message ?? e);
       // fallback to Ollama gracefully
       try {
         const fallback = await callOllama(latest);
-        return { assistant_text: fallback, provider_chosen: 'Ollama (MedGemma)', note: 'fallback_to_ollama' };
+        return {
+          assistant_text: fallback,
+          provider_chosen: 'Ollama (MedGemma)',
+          note: 'fallback_to_ollama',
+        };
       } catch (err2: any) {
         console.error('Fallback to Ollama also failed:', err2?.message ?? err2);
-        return { assistant_text: "⚠️ I'm having technical difficulties right now. Please try again shortly.", provider_chosen: 'unknown', note: 'provider_and_fallback_failed' };
+        return {
+          assistant_text:
+            "⚠️ I'm having technical difficulties right now. Please try again shortly.",
+          provider_chosen: 'unknown',
+          note: 'provider_and_fallback_failed',
+        };
       }
     }
   } catch (e: any) {
     console.error('getAgentResponse top-level error:', e?.message ?? e);
-    return { assistant_text: '⚠️ Internal error in agent.', provider_chosen: provider || 'unknown', note: 'agent_error' };
+    return {
+      assistant_text: '⚠️ Internal error in agent.',
+      provider_chosen: provider || 'unknown',
+      note: 'agent_error',
+    };
   }
 }
