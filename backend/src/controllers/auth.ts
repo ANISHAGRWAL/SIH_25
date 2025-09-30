@@ -46,10 +46,12 @@ export const sendOtp = async (email: string) => {
     const subject = 'Your OTP Code for Completing Registration at Campus Care';
     const text = `Your OTP code is ${otp.toString()}. It is valid for 10 minutes.`;
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com', // Gmail SMTP
+      port: 587,              // TLS port
+      secure: false,           // use TLS
       auth: {
-        user: process.env.EMAIL_ID,
-        pass: process.env.EMAIL_PASSWORD,
+        user: process.env.EMAIL_ID,        // Gmail email
+        pass: process.env.EMAIL_PASSWORD,  // Gmail App Password
       },
     });
     const mailOptions = {
