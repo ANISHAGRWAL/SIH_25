@@ -68,7 +68,83 @@ Campus Care combines mental health assessments, real-time emotional tracking, AI
 - Capacitor (optional for mobile)
 
 ### Clone & Install:
-```bash
 git clone https://github.com/<your-username>/campus-care.git
 cd campus-care
 npm install
+
+Setup Environment
+
+Create a .env file:
+
+DATABASE_URL=your_postgres_connection_string
+OPENAI_API_KEY=your_openai_key
+NEXT_PUBLIC_API_URL=http://localhost:5000
+
+Run the App
+For Frontend (Next.js)
+npm run dev
+
+For Backend (Express)
+cd backend
+npm install
+npm run dev
+
+For Mobile (Capacitor)
+npx cap add android
+npx cap open android
+
+---
+
+##  📂 Folder Structure
+campus-care/
+├── app/               # Frontend (Next.js)
+├── backend/           # Backend (Express.js)
+├── prisma/            # Database schema
+├── public/            # Static assets
+├── components/        # UI Components
+├── utils/             # Utility Functions
+└── README.md
+
+---
+
+## 🧑‍💻 Team Members
+
+Anish Agarwal
+
+Raj De Modak
+
+Amar Pal
+
+Aryan Kr Sinha
+
+Shashank Shekhar
+
+Ananya Mishra
+
+---
+
+## 🛡️ Data Privacy & Ethics
+
+Journaling & mood data are confidential by default
+
+Admin dashboard shows only de-identified trends
+
+AI tools used only with user consent
+
+Designed for privacy-first, student-centric experiences
+
+---
+
+## 📄 License
+
+This project is currently not licensed.
+All rights reserved by the authors.
+Please contact the team for any reuse or contribution permissions.
+
+---
+
+## 🙌 Acknowledgements
+
+This project was built as part of a hackathon to create real-world impact in student mental health through inclusive design, ethical AI, and accessible tech.
+
+🧠 “Mental health is not a luxury. It's a right. Campus Care brings that right into reach.”
