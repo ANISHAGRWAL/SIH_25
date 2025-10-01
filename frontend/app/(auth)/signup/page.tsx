@@ -236,7 +236,7 @@ export default function SignupPage() {
                                 <Image
                                     className="mx-auto pb-2"
                                     src="/logoicon.png" // Path from the 'public' folder
-                                    alt="Sahayog Admin Logo"
+                                    alt="CampusCare Logo"
                                     width={52} // Corresponds to w-8
                                     height={52} // Corresponds to h-8
                                 />
