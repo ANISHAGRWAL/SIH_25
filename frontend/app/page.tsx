@@ -395,7 +395,7 @@ export default function HomePage() {
               <Image
                 className="mx-auto pb-2"
                 src="/logoiconfull.png" // Path from the 'public' folder
-                alt="Sahayog Admin Logo"
+                alt="CampusCare Logo"
                 width={122} // Corresponds to w-8
                 height={122} // Corresponds to h-8
               />
