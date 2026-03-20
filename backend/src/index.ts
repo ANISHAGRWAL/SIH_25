@@ -81,6 +81,23 @@ app.use(`${BASE_PATH}/admin`, adminRoutes);
 
 initializeSocketIo(io);
 
+server.on('error', (error: NodeJS.ErrnoException) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(
+      `❌ Port ${port} is already in use. Please stop the process using that port or set a different PORT in your .env file.`,
+    );
+    process.exit(1);
+  } else if (error.code === 'EACCES') {
+    console.error(
+      `❌ Port ${port} requires elevated privileges. Use a port number above 1024 or run with appropriate permissions.`,
+    );
+    process.exit(1);
+  } else {
+    console.error('❌ Server error:', error);
+    throw error;
+  }
+});
+
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
