@@ -12,7 +12,7 @@ Viral memes
 Profile identification badge based upon stress level. 
 
 Features 
-Chat BOT
+Chat Bot
 
 Chat Journal
 A AI trained daily journal section in which the user updates his daily life and also answers some preset questions and creates a weekly report according to the performance in the form of grids and graphs.(encrpted)
