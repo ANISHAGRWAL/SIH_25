@@ -378,15 +378,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] gap-6 p-4 md:p-8">
           {/* Sidebar */}
           <aside className="hidden md:block mental-shell p-6 h-screen overflow-y-auto sticky top-2">
-            <div className="flex items-center gap-4 mb-8">
-              <Avatar className="w-16 h-16 shrink-0">
+            <div className="flex items-center gap-3 mb-8 p-3 rounded-2xl bg-gradient-to-br from-blue-50/80 to-indigo-50/60 border border-blue-100/70">
+              <Avatar className="w-12 h-12 shrink-0 ring-2 ring-blue-200 ring-offset-1">
                 <Link href="/profile">
                 <AvatarImage
                   src={user?.avatarUrl ? user?.avatarUrl : undefined}
                   alt="Avatar"
                   />
                   </Link>
-                <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
+                <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
                   {user?.name
                     .split(" ")
                     .map((n) => n[0])
@@ -394,8 +394,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="font-bold text-lg truncate">{user?.name}</p>
-                <p className="text-slate-500 text-sm overflow-wrap-anywhere break-words">{user?.email}</p>
+                <p className="font-bold text-sm text-slate-800 truncate">{user?.name}</p>
+                <p className="text-slate-400 text-xs overflow-wrap-anywhere break-words leading-tight mt-0.5">{user?.email}</p>
               </div>
             </div>
             <nav className="space-y-3">
@@ -440,7 +440,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 isActive={pathname === "/expert-support"}
                 icon="support"
               />
-              <div className="border-t border-gray-200 my-4"></div>
+              <div className="mc-divider"></div>
             </nav>
           </aside>
 
@@ -654,19 +654,22 @@ function SideLink({
   isActive?: boolean;
   icon: string;
 }) {
-  const activeClasses =
-    "bg-white text-blue-600 border border-blue-200 shadow-md";
-  const inactiveClasses =
-    "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900";
-
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${isActive ? activeClasses : inactiveClasses
-        }`}
+      className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 group ${
+        isActive
+          ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-100 shadow-sm"
+          : "text-slate-600 hover:bg-slate-100/70 hover:text-slate-900"
+      }`}
     >
-      {getIcon(icon, isActive)}
-      <span className="font-bold">{label}</span>
+      <span className={`transition-transform duration-200 ${isActive ? "" : "group-hover:scale-110"}`}>
+        {getIcon(icon, isActive)}
+      </span>
+      <span>{label}</span>
+      {isActive && (
+        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />
+      )}
     </Link>
   );
 }
@@ -682,19 +685,15 @@ function MobileLink({
   isActive?: boolean;
   icon: string;
 }) {
-  const activeClasses = "text-blue-600";
-  const inactiveClasses = "text-slate-500";
-
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center gap-1 text-xs transition-colors ${isActive ? activeClasses : inactiveClasses
-        }`}
+      className={`mobile-nav-item ${isActive ? "mobile-nav-item-active" : ""}`}
     >
-      <div className="w-6 h-6 flex items-center justify-center">
+      <div className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isActive ? "bg-blue-100" : ""}`}>
         {getIcon(icon, isActive)}
       </div>
-      <span className="font-medium">{label}</span>
+      <span>{label}</span>
     </Link>
   );
 }
@@ -713,13 +712,12 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex flex-col items-center gap-1 text-xs transition-colors ${isAnyMoreItemActive ? "text-blue-600" : "text-slate-500"
-          }`}
+        className={`mobile-nav-item ${isAnyMoreItemActive ? "mobile-nav-item-active" : ""}`}
       >
-        <div className="w-6 h-6 flex items-center justify-center">
+        <div className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isAnyMoreItemActive ? "bg-blue-100" : ""}`}>
           {getIcon("more", isAnyMoreItemActive)}
         </div>
-        <span className="font-medium">More</span>
+        <span>More</span>
       </button>
 
       {isOpen && (
@@ -728,14 +726,14 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-48 z-50">
+          <div className="absolute bottom-full right-0 mb-2 mental-surface py-2 min-w-48 z-50 animate-in fade-in zoom-in-95 duration-200">
             {moreItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${pathname === item.href
-                  ? "text-blue-600 bg-blue-50"
+                  ? "text-blue-600 bg-blue-50 font-semibold"
                   : "text-slate-600 hover:bg-slate-50"
                   }`}
               >
