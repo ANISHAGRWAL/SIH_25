@@ -82,7 +82,7 @@ export default function AdminLayout({
           {/* Left side: Logo */}
           <Image
             src="/logoiconfull.png"
-            alt="Sahayog Admin Logo"
+            alt="CampusCare logo"
             width={122}
             height={122}
           />
@@ -191,7 +191,7 @@ export default function AdminLayout({
             {/* Left side: Logo */}
             <Image
               src="/logoiconfull.png"
-              alt="Sahayog Admin Logo"
+              alt="CampusCare log"
               width={102}
               height={102}
             />

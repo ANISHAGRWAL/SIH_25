@@ -9,7 +9,7 @@ import {
 } from '@langchain/core/messages';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import axios from 'axios';
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { queryMedGemma } from './ollama_tool';
 import { db } from '../db';
 import { IAuthUser } from '../types';
@@ -20,8 +20,16 @@ type Provider = 'Gemini' | 'Groq';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const GOOGLE_GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY || '';
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY || '';
-const EMAIL_ID = process.env.EMAIL_ID || '';
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || '';
+
+// --- SendGrid Configuration ---
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
+const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || '';
+
+if (SENDGRID_API_KEY) {
+    sgMail.setApiKey(SENDGRID_API_KEY);
+}
+// ------------------------------
+
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://34.93.235.135:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'alibayram/medgemma:4b';
 const OLLAMA_TIMEOUT_MS = parseInt(
@@ -31,54 +39,54 @@ const OLLAMA_TIMEOUT_MS = parseInt(
 
 // prompts and fallbacks
 const BASE_SYSTEM_PROMPT = `
-You are an AI best-friend motivator and companion whose ultimate goal is to improve your friend's mental health.  
+You are an AI best-friend motivator and companion whose ultimate goal is to improve your friend's mental health.  
 
 
 💡 Core Personality:
-- Talk like a real friend: warm, casual, supportive, sometimes funny.  
-- Always reply in the same language as the user (Hindi, English, Hinglish, etc.).  
-- Avoid robotic or lecture-like tone.  
+- Talk like a real friend: warm, casual, supportive, sometimes funny.  
+- Always reply in the same language as the user (Hindi, English, Hinglish, etc.).  
+- Avoid robotic or lecture-like tone.  
 
 
 🎭 Conversation Flow:
 - If user feels low/sad → first validate feelings, then gently suggest ONE small, doable action
-  (drink water, stretch, text a friend, take a short walk).  
-- If user is fine/happy → celebrate with them, joke, or ask a curious/fun question.  
-- If user asks a general knowledge/search question → answer clearly but in a friendly, buddy-like way.  
+  (drink water, stretch, text a friend, take a short walk).  
+- If user is fine/happy → celebrate with them, joke, or ask a curious/fun question.  
+- If user asks a general knowledge/search question → answer clearly but in a friendly, buddy-like way.  
 - If user tries to end chat (e.g., "ok bye", "that’s it", "good night") → ask ONE interesting, light question
-  before ending, so the conversation feels fun and caring.  
+  before ending, so the conversation feels fun and caring.  
 
 
 🚀 Motivation Rule:
-- Don’t overdo motivation — use it only when needed to lift their mood or push them gently.  
-- Your ultimate goal is always to leave the user feeling a little better than before.  
+- Don’t overdo motivation — use it only when needed to lift their mood or push them gently.  
+- Your ultimate goal is always to leave the user feeling a little better than before.  
 
 
 ⚠️ Safety Rules:
-1. Always respond in the same language as the user.  
-2. Never be cruel, shaming, or overly medical.  
-3. If user expresses self-harm or crisis → stop jokes/roasts. Respond calmly, urge them to contact a hotline, local emergency services, or a trusted person.  
+1. Always respond in the same language as the user.  
+2. Never be cruel, shaming, or overly medical.  
+3. If user expresses self-harm or crisis → stop jokes/roasts. Respond calmly, urge them to contact a hotline, local emergency services, or a trusted person.  
 `;
 
 const GROQ_STYLE_PROMPT = `
-    You speak like a young man talking to his best friend.  
-    Your tone: playful, sarcastic, funny — like a friend who roasts in a lighthearted way, but always with love.  
-    - Use jokes, memes, and banter to keep things casual.  
-    - If your friend is sad, cheer them up with humor and small, doable suggestions — but don’t be extreme or overly serious.  
-    - Never shame, insult, or be cruel — your roasting is always soft, like a bestie making them smile.  
-    - Balance fun + care: roast a little, then show support.  
-  `;
+    You speak like a young man talking to his best friend.  
+    Your tone: playful, sarcastic, funny — like a friend who roasts in a lighthearted way, but always with love.  
+    - Use jokes, memes, and banter to keep things casual.  
+    - If your friend is sad, cheer them up with humor and small, doable suggestions — but don’t be extreme or overly serious.  
+    - Never shame, insult, or be cruel — your roasting is always soft, like a bestie making them smile.  
+    - Balance fun + care: roast a little, then show support.  
+  `;
 
 const GEMINI_STYLE_PROMPT = `
-    You speak like a caring, witty girl best friend.
-    - Show genuine care in a wholesome way, but keep the vibe light.  
-    - Use playful sarcasm, witty comebacks, and silly exaggerations to make conversations fun.  
-    - Sometimes roast yourself in a funny way to keep it real.  
-    - Occasionally act a little confused or silly in a cute way, but not too much.  
-    - Humor should feel clever and natural, not cringe or overly flirty, and dont use sugarcoated words.  
-    - Always balance jokes with warmth and care — ultimate goal is to support your friend’s mental health.  
-    - Encourage small positive actions when your friend feels low.  
-  `;
+    You speak like a caring, witty girl best friend.
+    - Show genuine care in a wholesome way, but keep the vibe light.  
+    - Use playful sarcasm, witty comebacks, and silly exaggerations to make conversations fun.  
+    - Sometimes roast yourself in a funny way to keep it real.  
+    - Occasionally act a little confused or silly in a cute way, but not too much.  
+    - Humor should feel clever and natural, not cringe or overly flirty, and dont use sugarcoated words.  
+    - Always balance jokes with warmth and care — ultimate goal is to support your friend’s mental health.  
+    - Encourage small positive actions when your friend feels low.  
+  `;
 
 const CLASSIFIER_PROMPT_CRISIS = `Answer with exactly one word: YES or NO (only that word).
 
@@ -275,35 +283,8 @@ async function callOllama(prompt: string): Promise<string> {
   }
 }
 
-// optional: send crisis email (uses Gmail creds)
-async function sendCrisisEmail(
-  adminEmail?: string,
-  adminName?: string,
-  userName?: string,
-  userEmail?: string,
-  excerpt?: string,
-) {
-  if (!EMAIL_ID || !EMAIL_PASSWORD || !adminEmail) {
-    console.warn('Email creds or admin email missing — skipping crisis email.');
-    return;
-  }
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: EMAIL_ID, pass: EMAIL_PASSWORD },
-    });
-    const subject = `Urgent: user ${userName ?? 'unknown'} may be in crisis`;
-    const text = `Hello ${adminName ?? ''},\n\nUser: ${userName ?? ''} (${userEmail ?? ''}) may be in crisis.\n\nMessage excerpt:\n"${excerpt ?? ''}"\n\nPlease reach out immediately.`;
-    await transporter.sendMail({
-      from: EMAIL_ID,
-      to: adminEmail,
-      subject,
-      text,
-    });
-  } catch (e) {
-    console.error('Failed to send crisis email:', e);
-  }
-}
+// REMOVED OLD sendCrisisEmail helper function (it used Nodemailer/Gmail)
+// We will now handle the email sending directly in getAgentResponse using SendGrid.
 
 // ---------------- classifier (binary yes/no) ----------------
 async function askBinaryYesNoWithProvider(
@@ -478,7 +459,6 @@ export async function getAgentResponse({
     );
 
     // OPTIONAL short-chat guard (currently disabled).
-    // If you want to skip Ollama for very short chit-chat, you can enable this guard:
     /*
     const isShortText = latest.length < SHORT_CHAT_MIN_CHARS;
     const fewTurns = (query?.length ?? 0) < SHORT_CHAT_MIN_TURNS;
@@ -490,7 +470,7 @@ export async function getAgentResponse({
     */
 
     if (crisisDetected) {
-      console.warn('🛑 Crisis detected → Routing to Ollama therapist.');
+      console.warn('🛑 Crisis detected → Sending alert and providing safety info.');
 
       try {
         // 1. Find admin of this org
@@ -508,51 +488,55 @@ export async function getAgentResponse({
           where: (user, { eq }) => eq(user.id, userId),
         });
 
-        // 3. Prepare email
+        // 3. Prepare email content
         const to = admin?.email || process.env.ADMIN_EMAIL; // fallback
         const subject = `🚨 Urgent: User ${user?.name ?? 'Unknown'} May Be in Crisis`;
         const text = `Hello ${admin?.name ?? 'Admin'},\n\nThis is an automated alert from the Mental Health Support Chat Application.\n\nUser: ${user?.name ?? 'Unknown'} (${user?.email ?? 'no email'})\nMessage: "${latest}"\n\nPlease reach out ASAP to provide support.\n\n- Crisis Alert System`;
 
-        if (!to) {
-          console.warn('⚠️ No admin email available. Crisis email not sent.');
+        // 4. Send email using SendGrid
+        if (!SENDGRID_API_KEY || !SENDGRID_FROM_EMAIL) {
+            console.warn('⚠️ SendGrid API key or From Email missing. Crisis email not sent.');
+        } else if (!to) {
+            console.warn('⚠️ No admin email available. Crisis email not sent.');
         } else {
-          // 4. Setup Nodemailer transporter
-          const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: process.env.EMAIL_ID,
-              pass: process.env.EMAIL_PASSWORD,
-            },
-            connectionTimeout: 120000,
-          });
+            try {
+                const msg = {
+                    from: SENDGRID_FROM_EMAIL, // Use the verified sender email
+                    to,
+                    subject,
+                    text,
+                    html: `<p>Hello ${admin?.name ?? 'Admin'},</p><p>This is an automated alert from the Mental Health Support Chat Application.</p><p><strong>User:</strong> ${user?.name ?? 'Unknown'} (${user?.email ?? 'no email'})</p><p><strong>Message:</strong> "${latest}"</p><p>Please reach out ASAP to provide support.</p><p>- Crisis Alert System</p>`,
+                };
 
-          // 5. Send email
-          const info = await transporter.sendMail({
-            from: process.env.EMAIL_ID,
-            to,
-            subject,
-            text,
-          });
+                const [info] = await sgMail.send(msg);
 
-          console.log('✅ Crisis email sent:', info.response);
+                if (info.statusCode === 202) {
+                    console.log('✅ Crisis email sent via SendGrid.');
+                } else {
+                    console.error('❌ Failed to send crisis email via SendGrid. Response:', info);
+                }
+
+            } catch (sendGridError: any) {
+                console.error('❌ Failed to send crisis email via SendGrid:', sendGridError.response?.body || sendGridError);
+            }
         }
 
-        // 6. Return safe response for user
+        // 5. Return safe response for user
         return {
-          assistant_text: `It sounds like you're going through a really difficult time right now. 💙 You're not alone — there are people who care about you and want to help.  
-Please consider reaching out to a mental health professional or calling a trusted helpline: **+91 9152987821**.  
-You can also contact ${admin?.name ?? 'an administrator'} at ${admin?.email ?? 'support@example.com'} ${admin?.contact ? `(${admin?.contact})` : ''}.  
+          assistant_text: `It sounds like you're going through a really difficult time right now. 💙 You're not alone — there are people who care about you and want to help.  
+Please consider reaching out to a mental health professional or calling a trusted helpline: **+91 9152987821**.  
+You can also contact ${admin?.name ?? 'an administrator'} at ${admin?.email ?? 'support@example.com'} ${admin?.contact ? `(${admin?.contact})` : ''}.  
 Your life matters, and support is just a call away. 💙`,
           provider_chosen: 'Ollama (MedGemma)',
           note: 'crisis_mode',
         };
       } catch (err) {
-        console.error('❌ Failed to send crisis email:', err);
+        console.error('❌ Failed during crisis flow execution:', err);
         return {
           assistant_text:
             "It sounds like you're in a really difficult place. Please reach out to a trusted friend, a mental health professional, or call a helpline: +91 9152987821. 💙",
           provider_chosen: 'unknown',
-          note: 'crisis_email_failed',
+          note: 'crisis_email_failed_or_db_error',
         };
       }
     }

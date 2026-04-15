@@ -157,7 +157,7 @@ export default function BlogsPage() {
               <Image
                 className="mx-auto pb-2"
                 src="/logoiconfull.png" // Path from the 'public' folder
-                alt="Sahayog Admin Logo"
+                alt="CampusCare logo"
                 width={142} // Corresponds to w-8
                 height={142} // Corresponds to h-8
               />
