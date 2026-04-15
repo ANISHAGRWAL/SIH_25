@@ -14,10 +14,7 @@ export const getStudents = async (authUser: IAuthUser): Promise<IUser[]> => {
           eq(user.organizationId, authUser.organizationId),
         ),
     });
-    if (!students || students.length === 0) {
-      throw new Error('No students found');
-    }
-    return students;
+    return students ?? [];
   } catch (error) {
     console.log(error);
     throw error;
@@ -187,10 +184,7 @@ export const getSessions = async (authUser: IAuthUser) => {
         },
       },
     });
-    if (!sessions || sessions.length === 0) {
-      throw new Error('No sessions found');
-    }
-    return sessions;
+    return sessions ?? [];
   } catch (error) {
     console.log(error);
     throw error;
@@ -245,10 +239,7 @@ export const wantToVolunteer = async (authUser: IAuthUser) => {
     const volunteers = await db.query.volunteerRequests.findMany({
       where: (vr, { eq }) => eq(vr.organizationId, authUser.organizationId),
     });
-    if (!volunteers) {
-      throw new Error('No volunteer requests found');
-    }
-    return volunteers;
+    return volunteers ?? [];
   } catch (error) {
     console.log(error);
     throw error;
@@ -293,10 +284,7 @@ export const getVolunteers = async (authUser: IAuthUser) => {
           eq(u.organizationId, authUser.organizationId),
         ),
     });
-    if (!volunteers) {
-      throw new Error('No volunteers found');
-    }
-    return volunteers;
+    return volunteers ?? [];
   } catch (error) {
     console.log(error);
     throw error;

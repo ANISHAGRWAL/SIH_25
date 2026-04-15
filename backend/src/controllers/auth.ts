@@ -25,8 +25,18 @@ const generateAccessToken = (user: IUser): string => {
 
 export const sendOtp = async (email: string) => {
   try {
-    if (!process.env.EMAIL_ID || !process.env.EMAIL_PASSWORD) {
-      throw new Error('Missing email credentials in environment variables');
+    const sendgridApiKey = process.env.SENDGRID_API_KEY;
+    const sendgridFromEmail = process.env.SENDGRID_FROM_EMAIL;
+    const gmailEmail = process.env.EMAIL_ID;
+    const gmailPassword = process.env.EMAIL_PASSWORD;
+
+    const hasSendgridConfig = !!sendgridApiKey && !!sendgridFromEmail;
+    const hasGmailConfig = !!gmailEmail && !!gmailPassword;
+
+    if (!hasSendgridConfig && !hasGmailConfig) {
+      throw new Error(
+        'Missing email credentials. Configure SENDGRID_API_KEY + SENDGRID_FROM_EMAIL or EMAIL_ID + EMAIL_PASSWORD.',
+      );
     }
 
     const existingOtp = await db.query.otp.findFirst({
@@ -45,17 +55,27 @@ export const sendOtp = async (email: string) => {
     const to = email;
     const subject = 'Your OTP Code for Completing Registration at Campus Care';
     const text = `Your OTP code is ${otp.toString()}. It is valid for 10 minutes.`;
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com', // Gmail SMTP
-      port: 587,              // TLS port
-      secure: false,           // use TLS
-      auth: {
-        user: process.env.EMAIL_ID,        // Gmail email
-        pass: process.env.EMAIL_PASSWORD,  // Gmail App Password
-      },
-    });
+    const transporter = hasSendgridConfig
+      ? nodemailer.createTransport({
+          host: 'smtp.sendgrid.net',
+          port: 587,
+          secure: false,
+          auth: {
+            user: 'apikey',
+            pass: sendgridApiKey,
+          },
+        })
+      : nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          auth: {
+            user: gmailEmail,
+            pass: gmailPassword,
+          },
+        });
     const mailOptions = {
-      from: process.env.EMAIL_ID,
+      from: hasSendgridConfig ? sendgridFromEmail : gmailEmail,
       to,
       subject,
       text,
