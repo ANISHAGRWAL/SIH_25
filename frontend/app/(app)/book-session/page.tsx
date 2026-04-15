@@ -101,29 +101,31 @@ export default function BookSessionPage() {
 
   if (isSubmitted) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Card className="w-full max-w-lg mx-auto mc-card border-0">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-3 sm:p-4 flex items-center justify-center">
+        <Card className="w-full max-w-lg mx-auto border-0 shadow-xl bg-white/80 backdrop-blur-sm">
           <CardContent className="p-6 sm:p-8 text-center">
-            <div className="relative mb-4">
+            <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
-              <CheckCircle className="relative h-16 w-16 text-green-600 mx-auto" />
+              <CheckCircle className="relative h-16 w-16 sm:h-20 sm:w-20 text-green-600 mx-auto mb-6" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4 leading-tight">
               Request Submitted Successfully
             </h2>
-            <p className="text-slate-600 mb-5 text-sm leading-relaxed">
-              Your session request has been securely sent to our mental health team.
+            <p className="text-slate-700 mb-6 text-sm sm:text-base lg:text-lg leading-relaxed">
+              Your session request has been securely sent to our mental health
+              team.
             </p>
-            <div className="bg-green-50 rounded-xl p-3 mb-5 border border-green-100">
-              <p className="text-xs text-green-700 font-medium flex items-center justify-center gap-2">
-                <Shield className="h-3.5 w-3.5 flex-shrink-0" />
-                Your privacy is protected with end-to-end encryption
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4 mb-6 border border-green-200">
+              <p className="text-xs sm:text-sm text-green-700 font-medium flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4 flex-shrink-0" />
+                <span>Your privacy is protected with end-to-end encryption</span>
               </p>
             </div>
-            <p className="text-slate-500 text-xs mb-6 leading-relaxed">
-              You'll receive confirmation within 24 hours. For urgent matters, contact our crisis helpline immediately.
+            <p className="text-slate-600 text-xs sm:text-sm mb-8 leading-relaxed">
+              You'll receive confirmation within 24 hours. For urgent matters,
+              contact our crisis helpline immediately.
             </p>
-            <button
+            <Button
               onClick={() => {
                 setIsSubmitted(false);
                 setCurrentStep(1);
@@ -137,10 +139,10 @@ export default function BookSessionPage() {
                   additionalNotes: "",
                 });
               }}
-              className="mc-btn-primary w-full py-3"
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 h-12 sm:h-auto"
             >
               Book Another Session
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -148,7 +150,8 @@ export default function BookSessionPage() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto py-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
         {/* Header Section - Mobile Optimized */}
         <div className="text-center mb-6 sm:mb-8">
           <div className="relative mb-4">
@@ -616,6 +619,7 @@ export default function BookSessionPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
     </div>
   );
 }

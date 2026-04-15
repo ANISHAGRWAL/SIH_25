@@ -20,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ChangePasswordModal from "@/components/changePassword";
-import PageLoader from "@/components/ui/page-loader";
 
 export default function AdminProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -97,7 +96,13 @@ export default function AdminProfilePage() {
   };
 
   if (loading || !profileData) {
-    return <PageLoader title="Loading admin profile" subtitle="Preparing account and organization details..." compact />;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center text-slate-600 text-lg">
+          Loading Admin Profile...
+        </div>
+      </div>
+    );
   }
 
   return (

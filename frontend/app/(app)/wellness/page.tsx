@@ -61,54 +61,59 @@ export default function WellnessPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-2">
-      {/* Header Section */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 mb-1">Yoga &amp; Meditation</h1>
-        <p className="text-slate-500 text-sm">Your 5-minute mental detox — quick techniques for busy students</p>
-      </div>
-
-      <div className="mb-10">
-        <h2 className="text-base font-semibold text-slate-700 mb-4">Quick Wellness Techniques</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {techniques.map((technique) => (
-            <Card
-              key={technique.id}
-              className={`mc-card mc-lift cursor-pointer bg-gradient-to-br ${technique.color} border-0`}
-              onClick={() => startTechnique(technique)}
-            >
-              <CardContent className="p-5 text-center">
-                <div className="text-4xl mb-3">{technique.emoji}</div>
-                <h3 className="text-base font-semibold text-slate-800 mb-1">{technique.name}</h3>
-                <div className="flex items-center justify-center gap-1 text-slate-500 mb-2">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span className="text-xs">{technique.duration}</span>
-                </div>
-                <p className="text-slate-600 text-xs mb-4 leading-relaxed">{technique.benefits}</p>
-                <Button size="sm" className="bg-white/90 hover:bg-white text-slate-700 rounded-full border border-white/60 shadow-sm hover:shadow transition-all duration-200 text-xs">
-                  <Play className="h-3 w-3 mr-1" />
-                  Try Now
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="min-h-screen bg-blue-50">
+      <div className="max-w-6xl mx-auto p-6">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">Yoga & Meditation</h1>
+          <p className="text-xl text-slate-600 mb-2">Your 5-minute mental detox</p>
+          <p className="text-slate-500 max-w-2xl mx-auto">
+            Take a break from your studies and nurture your mental well-being with these simple, effective techniques
+            designed specifically for busy students.
+          </p>
         </div>
+
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-slate-800 mb-6">Quick Wellness Techniques</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {techniques.map((technique) => (
+              <Card
+                key={technique.id}
+                className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br ${technique.color} border border-gray-200`}
+                onClick={() => startTechnique(technique)}
+              >
+                <CardContent className="p-6 text-center">
+                  <div className="text-4xl mb-3">{technique.emoji}</div>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-2">{technique.name}</h3>
+                  <div className="flex items-center justify-center gap-1 text-slate-600 mb-3">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">{technique.duration}</span>
+                  </div>
+                  <p className="text-slate-600 text-sm mb-4">{technique.benefits}</p>
+                  <Button size="sm" className="bg-white/90 hover:bg-white text-slate-700 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                    Try Now
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Call to Action */}
-      <div className="mc-card p-6 text-center mt-8">
-        <h2 className="text-lg font-semibold text-slate-800 mb-2">Ready to Begin Your Wellness Journey?</h2>
-        <p className="text-slate-500 text-sm mb-5 max-w-lg mx-auto">
-          Begin your journey to inner calm and clarity. All you need is a few minutes and a quiet space.
-        </p>
-        <Button
-          className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
-          onClick={() => startTechnique(techniques[0])}
-        >
-          <Play className="h-4 w-4 mr-2" />
-          Start Now
-        </Button>
+        <div className="text-center bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+          <h2 className="text-2xl font-semibold text-slate-800 mb-3">Ready to Begin Your Wellness Journey?</h2>
+          <p className="text-slate-600 mb-6 max-w-lg mx-auto">
+            Begin your journey to inner calm and clarity. All you need is a few minutes and a quiet space.
+          </p>
+          <Button
+            className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white px-8 py-3 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            onClick={() => startTechnique(techniques[0])}
+          >
+            <Play className="h-5 w-5 mr-2" />
+            Start Now
+          </Button>
+        </div>
       </div>
     </div>
   )

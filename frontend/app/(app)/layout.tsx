@@ -38,9 +38,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ProtectedRoute requiredRole="student">
-      <div className="min-h-screen text-slate-800 page-fade-in">
+      <div className="min-h-screen bg-blue-50 font-sans text-slate-800">
         {/* Desktop header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 mental-surface fixed top-2 left-3 right-3 z-50">
+        <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
           {/* Left side: Logo */}
           <Link href="/dashboard">
             <Image
@@ -56,25 +56,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <nav className="flex items-center gap-6 text-slate-600">
               <Link
                 href="/#home"
-                className="mental-nav-link"
+                className="font-medium hover:text-slate-900 transition-colors"
               >
                 Home
               </Link>
               <Link
                 href="/#services"
-                className="mental-nav-link"
+                className="font-medium hover:text-slate-900 transition-colors"
               >
                 Services
               </Link>
               <Link
                 href="/#contact"
-                className="mental-nav-link"
+                className="font-medium hover:text-slate-900 transition-colors"
               >
                 Contact
               </Link>
               <Link
                 href="/blogs"
-                className="mental-nav-link"
+                className="font-medium hover:text-slate-900 transition-colors"
               >
                 Blogs
               </Link>
@@ -107,7 +107,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   className="fixed inset-0 z-40"
                   onClick={() => setIsProfileDropdownOpen(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 mental-surface py-2 z-[60] animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[60]">
                   <Link
                     href="/profile"
                     onClick={() => setIsProfileDropdownOpen(false)}
@@ -185,7 +185,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Mobile header */}
-        <header className="md:hidden mental-surface fixed top-2 left-2 right-2 z-40">
+        <header className="md:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-40">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
             <Link href="/dashboard">
@@ -226,7 +226,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       className="fixed inset-0 z-[100]"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 w-44 mental-surface py-2 z-[110] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[110]">
                       <Link
                         href="/profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
@@ -338,7 +338,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className="fixed inset-0 bg-black/20 z-30"
                 onClick={() => setIsMobileMenuOpen(false)}
               />
-               <div className="absolute top-full left-0 right-0 mental-surface z-40 animate-in slide-in-from-top-2 duration-200">
+              <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-40">
                 <nav className="px-4 py-3 space-y-1">
                   <Link
                     href="/#home"
@@ -374,19 +374,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </header>
         {/* Spacer div */}
-        <div className="h-20 md:h-24"></div>
+        <div className="h-16 md:h-20"></div>
         <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] gap-6 p-4 md:p-8">
           {/* Sidebar */}
-          <aside className="hidden md:block mental-shell p-6 h-screen overflow-y-auto sticky top-2">
-            <div className="flex items-center gap-3 mb-8 p-3 rounded-2xl bg-gradient-to-br from-blue-50/80 to-indigo-50/60 border border-blue-100/70">
-              <Avatar className="w-12 h-12 shrink-0 ring-2 ring-blue-200 ring-offset-1">
+          <aside className="hidden md:block bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl h-screen overflow-y-auto sticky top-0">
+            <div className="flex items-center gap-4 mb-8">
+              <Avatar className="w-16 h-16 shrink-0">
                 <Link href="/profile">
                 <AvatarImage
                   src={user?.avatarUrl ? user?.avatarUrl : undefined}
                   alt="Avatar"
                   />
                   </Link>
-                <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+                <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-indigo-400 text-white">
                   {user?.name
                     .split(" ")
                     .map((n) => n[0])
@@ -394,8 +394,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="font-bold text-sm text-slate-800 truncate">{user?.name}</p>
-                <p className="text-slate-400 text-xs overflow-wrap-anywhere break-words leading-tight mt-0.5">{user?.email}</p>
+                <p className="font-bold text-lg truncate">{user?.name}</p>
+                <p className="text-slate-500 text-sm overflow-wrap-anywhere break-words">{user?.email}</p>
               </div>
             </div>
             <nav className="space-y-3">
@@ -440,18 +440,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 isActive={pathname === "/expert-support"}
                 icon="support"
               />
-              <div className="mc-divider"></div>
+              <div className="border-t border-gray-200 my-4"></div>
             </nav>
           </aside>
 
           {/* Main content */}
-          <main className="min-h-[80vh] mental-shell p-6 md:p-8 mb-20 md:mb-0 page-fade-in">
+          <main className="min-h-[80vh] bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-gray-200 shadow-xl mb-20 md:mb-0">
             {children}
           </main>
         </div>
 
         {/* Mobile nav bar */}
-        <footer className="fixed bottom-2 left-2 right-2 z-50 md:hidden mental-surface">
+        <footer className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/90 backdrop-blur-md border-t border-gray-200">
           <nav className="flex items-center justify-around px-2 py-3">
             <MobileLink
               href="/dashboard"
@@ -654,22 +654,19 @@ function SideLink({
   isActive?: boolean;
   icon: string;
 }) {
+  const activeClasses =
+    "bg-white text-blue-600 border border-blue-200 shadow-md";
+  const inactiveClasses =
+    "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900";
+
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 group ${
-        isActive
-          ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-100 shadow-sm"
-          : "text-slate-600 hover:bg-slate-100/70 hover:text-slate-900"
-      }`}
+      className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${isActive ? activeClasses : inactiveClasses
+        }`}
     >
-      <span className={`transition-transform duration-200 ${isActive ? "" : "group-hover:scale-110"}`}>
-        {getIcon(icon, isActive)}
-      </span>
-      <span>{label}</span>
-      {isActive && (
-        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />
-      )}
+      {getIcon(icon, isActive)}
+      <span className="font-bold">{label}</span>
     </Link>
   );
 }
@@ -685,15 +682,19 @@ function MobileLink({
   isActive?: boolean;
   icon: string;
 }) {
+  const activeClasses = "text-blue-600";
+  const inactiveClasses = "text-slate-500";
+
   return (
     <Link
       href={href}
-      className={`mobile-nav-item ${isActive ? "mobile-nav-item-active" : ""}`}
+      className={`flex flex-col items-center gap-1 text-xs transition-colors ${isActive ? activeClasses : inactiveClasses
+        }`}
     >
-      <div className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isActive ? "bg-blue-100" : ""}`}>
+      <div className="w-6 h-6 flex items-center justify-center">
         {getIcon(icon, isActive)}
       </div>
-      <span>{label}</span>
+      <span className="font-medium">{label}</span>
     </Link>
   );
 }
@@ -712,12 +713,13 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`mobile-nav-item ${isAnyMoreItemActive ? "mobile-nav-item-active" : ""}`}
+        className={`flex flex-col items-center gap-1 text-xs transition-colors ${isAnyMoreItemActive ? "text-blue-600" : "text-slate-500"
+          }`}
       >
-        <div className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isAnyMoreItemActive ? "bg-blue-100" : ""}`}>
+        <div className="w-6 h-6 flex items-center justify-center">
           {getIcon("more", isAnyMoreItemActive)}
         </div>
-        <span>More</span>
+        <span className="font-medium">More</span>
       </button>
 
       {isOpen && (
@@ -726,14 +728,14 @@ function MobileMoreMenu({ pathname }: { pathname: string }) {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 mental-surface py-2 min-w-48 z-50 animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-48 z-50">
             {moreItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${pathname === item.href
-                  ? "text-blue-600 bg-blue-50 font-semibold"
+                  ? "text-blue-600 bg-blue-50"
                   : "text-slate-600 hover:bg-slate-50"
                   }`}
               >

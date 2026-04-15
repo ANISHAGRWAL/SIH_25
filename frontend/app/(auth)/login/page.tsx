@@ -75,92 +75,113 @@ export default function LoginPage() {
 
     if (loading || (isAuthenticated && token)) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-violet-50">
-                <div className="flex flex-col items-center gap-5">
-                    <div className="relative">
-                        <div className="w-20 h-20 rounded-full border-4 border-blue-100 flex items-center justify-center bg-white shadow-lg">
-                            <Image src="/logoicon.png" alt="Campus Care" width={48} height={48} className="opacity-90" />
-                        </div>
-                        <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
-                    </div>
-                    <p className="text-sm font-semibold text-slate-500 tracking-wider uppercase">Loading your space…</p>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+                <div className="flex flex-col items-center justify-center space-y-6">
+                    {/* Brand logo at the top */}
+                    <Image
+                        src="/logoicon.png"
+                        alt="Campus Care Logo"
+                        width={80}
+                        height={80}
+                        className="animate-scale-in"
+                    />
+                    
+                    {/* Improved single-ring spinner */}
+                    <div className="w-16 h-16 border-4 border-blue-600 border-solid rounded-full animate-spin border-t-transparent transition-all duration-300"></div>
+                    
+                    {/* Loading text with a gradient and pulse animation */}
+                    <p className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 animate-pulse">
+                        Loading your dashboard...
+                    </p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/60">
-            {/* Left Side – brand panel */}
-            <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 items-center justify-center p-16">
-                {/* Decorative circles */}
-                <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-                <div className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-indigo-400/20 blur-3xl" />
-                <div className="absolute top-1/3 right-0 w-60 h-60 rounded-full bg-violet-500/15 blur-2xl" />
-
-                <div className="relative z-10 text-center max-w-md">
-                    <div className="mb-8 inline-flex items-center gap-3 bg-white/10 rounded-2xl px-5 py-3 border border-white/15">
-                        <Image src="/logoicon.png" alt="Campus Care" width={32} height={32} />
-                        <span className="text-white font-bold text-lg tracking-tight">Campus Care</span>
+        <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+            {/* Left Side - Centered Image and Text */}
+            <div className="hidden lg:flex lg:flex-1 items-center justify-center p-12">
+                <div className="text-center max-w-md">
+                    {/* Centered Image */}
+                    <div className="mb-8">
+                        <img
+                            src={centerImage}
+                            alt="Mental health and wellness"
+                            className="w-96 h-96 object-cover"
+                        />
                     </div>
-                    <img src="/login.png" alt="Mental wellness illustration" className="w-72 h-72 object-contain mx-auto mb-8 drop-shadow-2xl" />
-                    <h2 className="text-3xl font-bold text-white mb-3 leading-snug">
-                        Your Mental Wellness<br />Journey Starts Here
-                    </h2>
-                    <p className="text-blue-100 text-base leading-relaxed">
-                        Connect with expert support, track your progress, and discover tools for better mental health.
-                    </p>
-                    <div className="mt-8 flex items-center justify-center gap-6 text-blue-100/80 text-sm">
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-green-400" />
-                            Confidential
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-green-400" />
-                            Secure
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-green-400" />
-                            Always Available
-                        </div>
+
+                    {/* Text Content */}
+                    <div className="space-y-4">
+                        <h2 className="text-4xl font-bold text-[#7586FF]">
+                            Your Mental Wellness Journey
+                        </h2>
+                        <p className="text-xl text-[#3780FF] leading-relaxed">
+                            Connect with expert support, track your progress, and discover
+                            tools for better mental health.
+                        </p>
                     </div>
                 </div>
             </div>
 
-            {/* Right Side – Login Form */}
-            <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-14">
-                <div className="w-full max-w-[420px]">
-                    {/* Mobile logo */}
-                    <div className="lg:hidden flex items-center gap-2 mb-8">
-                        <Image src="/logoicon.png" alt="Campus Care" width={36} height={36} />
-                        <span className="font-bold text-slate-800 text-xl">Campus Care</span>
-                    </div>
+            {/* Right Side - Login Form */}
+            <div className="flex-1 flex items-center justify-center px-8 py-12">
+                <div className="w-full max-w-md">
+                    {/* Glass-like card effect */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 space-y-8">
+                        {/* Logo/Brand */}
+                        <div className="text-center">
+                            <Image
+                                className="mx-auto pb-2"
+                                src="/logoicon.png" // Path from the 'public' folder
+                                alt="Campus Care Logo"
+                                width={52} // Corresponds to w-8
+                                height={52} // Corresponds to h-8
+                            />
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                Welcome Back
+                            </h1>
+                            <p className="text-gray-600">
+                                Sign in to your Campus Care account
+                            </p>
+                        </div>
 
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back</h1>
-                        <p className="text-slate-500 mt-1.5">Sign in to continue to your account</p>
-                    </div>
-
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-7">
                         {/* Login Form */}
-                        <form className="space-y-5" onSubmit={handleLogin}>
+                        <form className="space-y-6" onSubmit={handleLogin}>
                             {/* Error Message */}
                             {error && (
-                                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                                    <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
-                                    </svg>
-                                    <p className="text-sm text-red-700">{error}</p>
+                                <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-lg p-4">
+                                    <div className="flex items-center">
+                                        <svg
+                                            className="w-5 h-5 text-red-400 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
+                                            />
+                                        </svg>
+                                        <p className="text-sm text-red-700 font-medium">{error}</p>
+                                    </div>
                                 </div>
                             )}
 
                             <div>
-                                <label className="mc-label">Email address</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email Address
+                                </label>
                                 <input
                                     type="email"
                                     required
-                                    className={`mc-input ${error ? "border-red-300 focus:border-red-400" : ""}`}
-                                    placeholder="you@university.edu"
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
+                                        error ? "border-red-300" : "border-gray-300"
+                                    }`}
+                                    placeholder="Enter your email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     disabled={isSubmitting}
@@ -168,21 +189,15 @@ export default function LoginPage() {
                             </div>
 
                             <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="mc-label mb-0">Password</label>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowForgotModal(true)}
-                                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
-                                        disabled={isSubmitting}
-                                    >
-                                        Forgot password?
-                                    </button>
-                                </div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Password
+                                </label>
                                 <input
                                     type="password"
                                     required
-                                    className={`mc-input ${error ? "border-red-300 focus:border-red-400" : ""}`}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white/50 backdrop-blur-sm ${
+                                        error ? "border-red-300" : "border-gray-300"
+                                    }`}
                                     placeholder="Enter your password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -190,37 +205,54 @@ export default function LoginPage() {
                                 />
                             </div>
 
+                            <div className="flex items-center justify-between">
+                                <div className="text-sm">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowForgotModal(true)}
+                                        className="font-medium text-blue-600 hover:text-blue-500 disabled:opacity-50 transition-colors"
+                                        disabled={isSubmitting}
+                                    >
+                                        Forgot password?
+                                    </button>
+                                </div>
+                            </div>
+
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="mc-btn-primary w-full py-3 text-base mt-1"
+                                className="w-full bg-gradient-to-r from-blue-500 to-indigo-400 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
                             >
                                 {isSubmitting ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                                        Signing in…
-                                    </>
+                                    <div className="flex items-center justify-center">
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                        Signing In...
+                                    </div>
                                 ) : (
                                     "Sign In"
                                 )}
                             </button>
                         </form>
+
+                        {/* Sign Up Link */}
+                        <div className="text-center">
+                            <p className="text-sm text-gray-600">
+                                Don't have an account?{" "}
+                                <Link
+                                    href="/signup"
+                                    className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                                >
+                                    Sign up here
+                                </Link>
+                            </p>
+                        </div>
                     </div>
-
-                    {/* Sign Up Link */}
-                    <p className="text-center text-sm text-slate-500 mt-6">
-                        Don&apos;t have an account?{" "}
-                        <Link href="/signup" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                            Create one free
-                        </Link>
-                    </p>
                 </div>
+                <ForgotPasswordModal
+                    isOpen={showForgotModal}
+                    onClose={() => setShowForgotModal(false)}
+                />
             </div>
-
-            <ForgotPasswordModal
-                isOpen={showForgotModal}
-                onClose={() => setShowForgotModal(false)}
-            />
         </div>
     );
 }

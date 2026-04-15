@@ -124,20 +124,48 @@ const GlassPulse = ({ size = 56, className, ...rest }: SpinnerVariantProps) => {
 const ModernRing = ({ size = 48, className, ...rest }: SpinnerVariantProps) => {
   const sizeNum = typeof size === 'number' ? size : 48;
   return (
-    <div className={cn("relative", className)} style={{ width: sizeNum, height: sizeNum }}>
-      <div
-        className="absolute inset-0 rounded-full border-4 border-slate-200/60"
-        style={{ width: sizeNum, height: sizeNum }}
-      />
-      <div
-        className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-indigo-500 animate-spin"
-        style={{ width: sizeNum, height: sizeNum }}
-      />
-      <div
-        className="absolute left-1/2 top-1/2 rounded-full bg-white/80 backdrop-blur-sm -translate-x-1/2 -translate-y-1/2"
-        style={{ width: sizeNum * 0.56, height: sizeNum * 0.56 }}
-      />
-      <div className="absolute inset-0 rounded-full bg-blue-500/15 blur-md -z-10 animate-pulse" />
+    <div className={cn("relative", className)}>
+      <svg
+        width={sizeNum}
+        height={sizeNum}
+        viewBox="0 0 50 50"
+        className="animate-spin"
+      >
+        <defs>
+          <linearGradient id="spinner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="50%" stopColor="#6366f1" />
+            <stop offset="100%" stopColor="#8b5cf6" />
+          </linearGradient>
+        </defs>
+        <circle
+          cx="25"
+          cy="25"
+          r="20"
+          fill="none"
+          stroke="url(#spinner-gradient)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray="31.416"
+          strokeDashoffset="31.416"
+        />
+      </svg>
+      <style jsx>{`
+        @keyframes dash {
+          0% {
+            stroke-dasharray: 1, 150;
+            stroke-dashoffset: 0;
+          }
+          50% {
+            stroke-dasharray: 90, 150;
+            stroke-dashoffset: -35;
+          }
+          100% {
+            stroke-dasharray: 90, 150;
+            stroke-dashoffset: -124;
+          }
+        }
+      `}</style>
     </div>
   );
 };

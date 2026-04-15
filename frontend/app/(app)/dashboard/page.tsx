@@ -278,55 +278,75 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Face Check-In Card */}
-          <div onClick={() => (location.href = "/facial-mood-detection")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-blue-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/facial-mood-detection"; } }}>
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors duration-200 group-hover:shadow">
-                <img src="/faceicon.png" alt="Face scan" className="group-hover:scale-110 transition-transform duration-200" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Face Check-In Card - UNIFIED */}
+          <div onClick={() => (location.href = "/facial-mood-detection")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-blue-50/30" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/facial-mood-detection"; } }}>
+            <div className="flex flex-col text-center items-center gap-4 h-full">
+              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-all duration-300 group-hover:shadow-lg">
+                <img src="/faceicon.png" alt="Face scan" className="group-hover:scale-110 transition-transform duration-300" />
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors duration-200 mb-1 text-sm">Start Face Check-In</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Quick facial emotion analysis to understand your current mood</p>
+                <div className="flex items-center justify-center w-full mb-2">
+                  <h3 className="font-semibold text-gray-800 group-hover:text-blue-700 transition-colors duration-300">Start Face Check-In</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Quick facial emotion analysis to understand your current mood</p>
+                <div className="flex justify-center mt-3">
+                  {/* <StatusDot status="success" /> */}
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Voice Mood Check Card */}
-          <div onClick={() => (location.href = "/voice_det")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-purple-50/40">
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors duration-200 group-hover:shadow">
-                <img src="/mic.png" alt="Voice analysis" className="group-hover:scale-110 transition-transform duration-200" />
+          {/* Voice Mood Check Card - UNIFIED */}
+          <div onClick={() => (location.href = "/voice_det")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-purple-100/50 transition-all duration-500 transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-purple-50/30" style={{ animationDelay: "100ms" }}>
+            <div className="flex flex-col text-center items-center gap-4 h-full">
+              <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-all duration-300 group-hover:shadow-lg">
+                <img src="/mic.png" alt="Voice analysis" className="group-hover:scale-110 transition-transform duration-300" />
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-purple-700 transition-colors duration-200 mb-1 text-sm">Start Voice Mood Check</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Voice tone analysis to detect emotional patterns — Coming Soon</p>
+                <div className="flex items-center justify-center w-full mb-2">
+                  <h3 className="font-semibold text-gray-800 group-hover:text-purple-700 transition-colors duration-300">Start Voice Mood Check</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Voice tone analysis to detect emotional patterns - Coming Soon</p>
+                <div className="flex justify-center mt-3">
+                  {/* <StatusDot status="pending" /> */}
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Mental Detox Card */}
-          <div onClick={() => (location.href = "/wellness")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-green-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/wellness"; } }}>
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-colors duration-200 group-hover:shadow">
-                <img src="/yoga.png" alt="Mental wellness" className="group-hover:scale-110 transition-transform duration-200" />
+          {/* Mental Detox Card - UNIFIED */}
+          <div onClick={() => (location.href = "/wellness")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-green-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-green-50/30" style={{ animationDelay: "200ms" }} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/wellness"; } }}>
+            <div className="flex flex-col text-center items-center gap-4 h-full">
+              <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-all duration-300 group-hover:shadow-lg">
+                <img src="/yoga.png" alt="Mental wellness" className="group-hover:scale-110 transition-transform duration-300" />
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-green-700 transition-colors duration-200 mb-1 text-sm">5-Minute Mental Detox</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Guided stretches and breathing exercises to refresh focus and ease stress</p>
+                <div className="flex items-center justify-center w-full mb-2">
+                  <h3 className="font-semibold text-gray-800 group-hover:text-green-700 transition-colors duration-300">5-Minute Mental Detox</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Guided stretches and breathing exercises to refresh focus and ease stress</p>
+                <div className="flex justify-center mt-3">
+                  {/* <StatusDot status="pending" /> */}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Fun Zone Card */}
-          <div onClick={() => (location.href = "/games")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-orange-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/games"; } }}>
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-orange-100 transition-colors duration-200 group-hover:shadow">
-                <div className="text-3xl group-hover:scale-110 transition-transform duration-200">🎮</div>
+          {/* Fun Zone Card - NEW */}
+          <div onClick={() => (location.href = "/games")} className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 hover:shadow-2xl hover:shadow-orange-100/50 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 group animate-slideInUp bg-gradient-to-br from-white to-orange-50/30" style={{ animationDelay: "300ms" }} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/game"; } }}>
+            <div className="flex flex-col text-center items-center gap-4 h-full">
+              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-orange-100 transition-all duration-300 group-hover:shadow-lg">
+                <div className="text-3xl group-hover:scale-110 transition-transform duration-300">🎮</div>
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-orange-700 transition-colors duration-200 mb-1 text-sm">Fun Zone</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Interactive games and activities to boost your mood and have fun</p>
+                <div className="flex items-center justify-center w-full mb-2">
+                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-700 transition-colors duration-300">Fun Zone</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Interactive games and activities to boost your mood and have fun</p>
+                <div className="flex justify-center mt-3">
+                  {/* <StatusDot status="success" /> */}
+                </div>
               </div>
             </div>
           </div>
