@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Calendar, Clock, User, MapPin, AlertTriangle, FileText, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { getAdminSessions } from "../../../actions/admin";
+import PageLoader from "@/components/ui/page-loader";
 
 // Define a type for your appointment data
 interface Appointment {
@@ -102,11 +103,7 @@ const AppointmentsPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="text-center text-slate-600 mt-20 text-lg">
-        Loading appointments...
-      </div>
-    );
+    return <PageLoader title="Loading appointments" subtitle="Syncing upcoming counseling sessions..." compact />;
   }
 
   if (error) {
