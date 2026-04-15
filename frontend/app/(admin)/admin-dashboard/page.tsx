@@ -18,6 +18,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import PageLoader from "@/components/ui/page-loader";
 
 // Assuming your actions file is at this path, relative to the page
 import {
@@ -119,11 +120,7 @@ export default function AdminDashboard() {
   }, [token]);
 
   if (loading) {
-    return (
-      <div className="text-center text-slate-600 mt-20 text-lg">
-        Loading dashboard data...
-      </div>
-    );
+    return <PageLoader title="Loading dashboard insights" subtitle="Aggregating latest platform metrics..." compact />;
   }
 
   if (error) {

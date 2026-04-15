@@ -38,9 +38,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ProtectedRoute requiredRole="student">
-      <div className="min-h-screen bg-blue-50 font-sans text-slate-800">
+      <div className="min-h-screen text-slate-800 page-fade-in">
         {/* Desktop header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+        <header className="hidden md:flex items-center justify-between px-8 py-4 mental-surface fixed top-2 left-3 right-3 z-50">
           {/* Left side: Logo */}
           <Link href="/dashboard">
             <Image
@@ -56,25 +56,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <nav className="flex items-center gap-6 text-slate-600">
               <Link
                 href="/#home"
-                className="font-medium hover:text-slate-900 transition-colors"
+                className="mental-nav-link"
               >
                 Home
               </Link>
               <Link
                 href="/#services"
-                className="font-medium hover:text-slate-900 transition-colors"
+                className="mental-nav-link"
               >
                 Services
               </Link>
               <Link
                 href="/#contact"
-                className="font-medium hover:text-slate-900 transition-colors"
+                className="mental-nav-link"
               >
                 Contact
               </Link>
               <Link
                 href="/blogs"
-                className="font-medium hover:text-slate-900 transition-colors"
+                className="mental-nav-link"
               >
                 Blogs
               </Link>
@@ -107,7 +107,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   className="fixed inset-0 z-40"
                   onClick={() => setIsProfileDropdownOpen(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[60]">
+                <div className="absolute right-0 top-full mt-2 w-48 mental-surface py-2 z-[60] animate-in fade-in zoom-in-95 duration-200">
                   <Link
                     href="/profile"
                     onClick={() => setIsProfileDropdownOpen(false)}
@@ -185,7 +185,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Mobile header */}
-        <header className="md:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-40">
+        <header className="md:hidden mental-surface fixed top-2 left-2 right-2 z-40">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
             <Link href="/dashboard">
@@ -226,7 +226,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       className="fixed inset-0 z-[100]"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[110]">
+                    <div className="absolute right-0 top-full mt-2 w-44 mental-surface py-2 z-[110] animate-in fade-in zoom-in-95 duration-200">
                       <Link
                         href="/profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
@@ -338,7 +338,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className="fixed inset-0 bg-black/20 z-30"
                 onClick={() => setIsMobileMenuOpen(false)}
               />
-              <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-40">
+               <div className="absolute top-full left-0 right-0 mental-surface z-40 animate-in slide-in-from-top-2 duration-200">
                 <nav className="px-4 py-3 space-y-1">
                   <Link
                     href="/#home"
@@ -374,10 +374,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </header>
         {/* Spacer div */}
-        <div className="h-16 md:h-20"></div>
+        <div className="h-20 md:h-24"></div>
         <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] gap-6 p-4 md:p-8">
           {/* Sidebar */}
-          <aside className="hidden md:block bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl h-screen overflow-y-auto sticky top-0">
+          <aside className="hidden md:block mental-shell p-6 h-screen overflow-y-auto sticky top-2">
             <div className="flex items-center gap-4 mb-8">
               <Avatar className="w-16 h-16 shrink-0">
                 <Link href="/profile">
@@ -445,13 +445,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </aside>
 
           {/* Main content */}
-          <main className="min-h-[80vh] bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-gray-200 shadow-xl mb-20 md:mb-0">
+          <main className="min-h-[80vh] mental-shell p-6 md:p-8 mb-20 md:mb-0 page-fade-in">
             {children}
           </main>
         </div>
 
         {/* Mobile nav bar */}
-        <footer className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/90 backdrop-blur-md border-t border-gray-200">
+        <footer className="fixed bottom-2 left-2 right-2 z-50 md:hidden mental-surface">
           <nav className="flex items-center justify-around px-2 py-3">
             <MobileLink
               href="/dashboard"
