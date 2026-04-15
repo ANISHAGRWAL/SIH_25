@@ -616,7 +616,6 @@ export default function BookSessionPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
