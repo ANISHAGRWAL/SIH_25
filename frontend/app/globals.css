@@ -207,8 +207,7 @@
 
   /* Improve focus rings globally */
   :focus-visible {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
+    @apply outline-none ring-2 ring-blue-500 ring-offset-1;
     border-radius: 6px;
   }
 
@@ -217,7 +216,7 @@
     @apply transition-shadow duration-200;
   }
   input:focus, textarea:focus, select:focus {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    @apply ring-2 ring-blue-500/20;
   }
 }
 
