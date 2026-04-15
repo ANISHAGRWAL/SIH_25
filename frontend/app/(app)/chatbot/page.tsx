@@ -371,13 +371,13 @@ async function send() {
       )}
 
       <div className="flex-1 flex flex-col min-h-0 p-0 sm:p-4 relative z-10">
-        <div className="flex-1 flex flex-col min-h-0 rounded-none sm:rounded-2xl bg-white/80 backdrop-blur-lg border-0 sm:border sm:border-gray-200/60 shadow-none sm:shadow-xl overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 rounded-none sm:rounded-2xl bg-white/90 backdrop-blur-lg border-0 sm:border sm:border-slate-200/80 shadow-none sm:shadow-xl overflow-hidden">
           {messages.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 text-center">
+            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center">
               <div className="max-w-sm sm:max-w-md">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg soft-float">
                   <svg
-                    className="w-6 h-6 sm:w-8 sm:h-8 text-white"
+                    className="w-8 h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -390,23 +390,21 @@ async function send() {
                     />
                   </svg>
                 </div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-800 mb-2">
                   Hello! I'm your mental health companion.
                 </h2>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  I'm here to listen and support you. Feel free to share what's
-                  on your mind - whether it's something that's bothering you, a
-                  win you'd like to celebrate, or just how your day is going.
+                <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+                  I'm here to listen and support you. Share what's on your mind — whether it's something that's bothering you, a win you'd like to celebrate, or just how your day is going.
                 </p>
-                <p className="text-xs sm:text-sm text-gray-700 mb-2 sm:mb-3 font-medium">
-                  Quick responses:
+                <p className="text-xs text-slate-400 mb-3 font-semibold uppercase tracking-wider">
+                  Quick responses
                 </p>
                 <div className="grid grid-cols-1 sm:flex sm:flex-wrap sm:justify-center gap-2">
                   {quickActions.map((action, index) => (
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action)}
-                      className="px-3 py-2 text-xs sm:text-sm text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-700 border border-gray-200 hover:border-blue-300 rounded-lg sm:rounded-full transition-all duration-200 text-left sm:text-center"
+                      className="px-4 py-2 text-xs sm:text-sm text-slate-600 bg-slate-50 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 hover:border-blue-200 rounded-xl transition-all duration-200 text-left sm:text-center font-medium"
                     >
                       {action}
                     </button>
@@ -415,7 +413,7 @@ async function send() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-4">
+            <div className="flex-1 p-3 sm:p-5 overflow-y-auto space-y-3 sm:space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -424,12 +422,12 @@ async function send() {
                   }`}
                 >
                   <div
-                    className={`max-w-[90%] sm:max-w-[80%] flex gap-2 sm:gap-3 ${
+                    className={`max-w-[90%] sm:max-w-[78%] flex gap-2 sm:gap-2.5 ${
                       message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
                     <div
-                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
                         message.role === "user"
                           ? "bg-gradient-to-br from-blue-500 to-indigo-600"
                           : "bg-gradient-to-br from-emerald-500 to-teal-600"
@@ -440,7 +438,7 @@ async function send() {
                           <img
                             src={user.avatarUrl}
                             alt={`${user.name}'s profile picture`}
-                            className="w-full h-full rounded-full object-cover"
+                            className="w-full h-full rounded-xl object-cover"
                           />
                         ) : (
                           userAvatar
@@ -452,37 +450,37 @@ async function send() {
 
                     <div className="flex flex-col">
                       <div
-                        className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${
+                        className={`px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl text-sm leading-relaxed ${
                           message.role === "user"
                             ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-tr-md"
-                            : "bg-gray-100 text-gray-800 rounded-tl-md"
+                            : "bg-slate-100/80 text-slate-800 rounded-tl-md"
                         }`}
                       >
                         {message.isTyping ? (
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 py-0.5">
                             <div className="flex gap-1">
-                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
                               <div
-                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{ animationDelay: "0.1s" }}
+                                className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.15s" }}
                               ></div>
                               <div
-                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{ animationDelay: "0.2s" }}
+                                className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.3s" }}
                               ></div>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-xs sm:text-sm leading-relaxed">
+                          <p className="text-[13px] sm:text-sm">
                             {message.text}
                           </p>
                         )}
                       </div>
                       {message.time && !message.isTyping && (
                         <p
-                          className={`text-xs mt-1 ${
+                          className={`text-[10px] mt-1 ${
                             message.role === "user" ? "text-right" : "text-left"
-                          } text-gray-500`}
+                          } text-slate-400`}
                         >
                           {message.time}
                         </p>
@@ -495,17 +493,17 @@ async function send() {
             </div>
           )}
 
-          <div className="p-3 sm:p-4 border-t border-gray-200/60 bg-white/90">
+          <div className="p-3 sm:p-4 border-t border-slate-200/70 bg-white/90">
             <div className="flex items-end gap-2 sm:gap-3">
               {hasRecognitionSupport ? (
                 <button
                   onClick={handleVoiceToggle}
                   disabled={loading}
-                  className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
+                  className={`p-2.5 rounded-xl transition-all duration-200 ${
                     isListening
                       ? "bg-red-500 text-white shadow-lg"
-                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                  } flex items-center justify-center h-[40px] sm:h-[52px]`}
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  } flex items-center justify-center`}
                 >
                   <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -527,16 +525,16 @@ async function send() {
                   }
                   disabled={loading}
                   rows={1}
-                  className="w-full px-3 py-2 sm:px-4 sm:py-3 pr-8 sm:pr-12 rounded-lg sm:rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200 placeholder-gray-500 text-sm resize-none bg-white"
-                  style={{ minHeight: "40px", maxHeight: "120px" }}
+                  className="w-full px-4 py-2.5 sm:py-3 pr-10 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all duration-200 placeholder-slate-400 text-sm resize-none bg-slate-50/80"
+                  style={{ minHeight: "42px", maxHeight: "120px" }}
                 />
                 {input && !isListening && (
                   <button
                     onClick={() => setInput("")}
-                    className="absolute right-2 top-2 sm:right-3 sm:top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-3 top-2.5 sm:top-3 text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4"
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

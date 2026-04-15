@@ -60,7 +60,6 @@ export default function AdminLayout({
             alt="Profile"
             className="w-full h-full object-cover"
             onError={(e) => {
-              // Hide image and show fallback if image fails to load
               e.currentTarget.style.display = 'none';
             }}
           />
@@ -74,11 +73,18 @@ export default function AdminLayout({
     );
   };
 
+  const navLinks = [
+    { href: "/admin-dashboard", label: "Dashboard" },
+    { href: "/users",           label: "Users" },
+    { href: "/volunteers",      label: "Volunteers" },
+    { href: "/appointments",    label: "Appointments" },
+  ];
+
   return (
     <ProtectedRoute requiredRole="admin">
-      <div className="min-h-screen bg-blue-50 font-sans text-slate-800 flex flex-col">
+      <div className="min-h-screen text-slate-800 flex flex-col page-fade-in">
         {/* Desktop header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+        <header className="hidden md:flex items-center justify-between px-8 py-4 mental-surface fixed top-2 left-3 right-3 z-50">
           {/* Left side: Logo */}
           <Image
             src="/logoiconfull.png"
@@ -89,38 +95,19 @@ export default function AdminLayout({
 
           {/* Center: Navigation Links */}
           <div className="flex-1 flex justify-center">
-            <nav className="flex items-center gap-6 text-slate-600">
-              <Link
-                href="/admin-dashboard"
-                className="font-medium hover:text-slate-900 transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/users"
-                className="font-medium hover:text-slate-900 transition-colors"
-              >
-                Users
-              </Link>
-              {/* ✨ NEW VOLUNTEERS LINK ADDED HERE */}
-              <Link
-                href="/volunteers"
-                className="font-medium hover:text-slate-900 transition-colors"
-              >
-                Volunteers
-              </Link>
-              <Link
-                href="/appointments"
-                className="font-medium hover:text-slate-900 transition-colors"
-              >
-                Appointments
-              </Link>
-              {/* <Link
-                href="/forums"
-                className="font-medium hover:text-slate-900 transition-colors"
-              >
-                Forums
-              </Link> */}
+            <nav className="flex items-center gap-1">
+              {navLinks.map(({ href, label }) => {
+                const active = pathname === href;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={active ? "mental-nav-link-active" : "mental-nav-link"}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 
@@ -139,7 +126,7 @@ export default function AdminLayout({
                   className="fixed inset-0 z-40"
                   onClick={() => setIsProfileDropdownOpen(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[60]">
+                 <div className="absolute right-0 top-full mt-2 w-48 mental-surface py-2 z-[60] animate-in fade-in zoom-in-95 duration-200">
                   <Link
                     href="/admin-profile"
                     onClick={() => setIsProfileDropdownOpen(false)}
@@ -186,7 +173,7 @@ export default function AdminLayout({
         </header>
 
         {/* Mobile header */}
-        <header className="md:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-40">
+        <header className="md:hidden mental-surface fixed top-2 left-2 right-2 z-40">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Left side: Logo */}
             <Image
@@ -214,7 +201,7 @@ export default function AdminLayout({
                       className="fixed inset-0 z-[100]"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[110]">
+                     <div className="absolute right-0 top-full mt-2 w-44 mental-surface py-2 z-[110] animate-in fade-in zoom-in-95 duration-200">
                       <Link
                         href="/admin-profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
@@ -309,44 +296,26 @@ export default function AdminLayout({
                 className="fixed inset-0 bg-black/20 z-30"
                 onClick={() => setIsMobileMenuOpen(false)}
               />
-              <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg z-40">
+               <div className="absolute top-full left-0 right-0 mental-surface z-40 animate-in slide-in-from-top-2 duration-200">
                 <nav className="px-4 py-3 space-y-1">
-                  <Link
-                    href="/admin-dashboard"
-                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/users"
-                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Users
-                  </Link>
-                  {/* ✨ NEW VOLUNTEERS LINK ADDED HERE */}
-                  <Link
-                    href="/volunteers"
-                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Volunteers
-                  </Link>
-                  <Link
-                    href="/appointments"
-                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Appointments
-                  </Link>
-                  {/* <Link
-                    href="/forums"
-                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Forums
-                  </Link> */}
+                  {navLinks.map(({ href, label }) => {
+                    const active = pathname === href;
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                          active
+                            ? "bg-blue-50 text-blue-700 font-semibold"
+                            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {label}
+                        {active && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                      </Link>
+                    );
+                  })}
                 </nav>
               </div>
             </>
@@ -354,21 +323,21 @@ export default function AdminLayout({
         </header>
 
         {/* Main content container with dynamic margin */}
-        <div className="flex-1 overflow-y-auto pt-16 md:pt-20">
+        <div className="flex-1 overflow-y-auto pt-20 md:pt-24">
           <main className="h-full">
-            <div className="h-full bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200 shadow-xl p-6 md:p-8 mb-20 md:mb-0">
+            <div className="h-full mental-shell p-6 md:p-8 mb-20 md:mb-0 page-fade-in">
               {children}
             </div>
           </main>
         </div>
 
         {/* Mobile nav bar */}
-        <footer className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/90 backdrop-blur-md border-t border-gray-200">
-          <nav className="flex items-center justify-around px-2 py-3">
+        <footer className="fixed bottom-2 left-2 right-2 z-50 md:hidden mental-surface">
+          <nav className="flex items-center justify-around px-2 py-2">
             <MobileLink
               href="/admin-dashboard"
               label="Dashboard"
-              isActive={pathname === "/admin-dashboard"} // Corrected path
+              isActive={pathname === "/admin-dashboard"}
               icon={LayoutDashboard}
             />
             <MobileLink
@@ -377,7 +346,6 @@ export default function AdminLayout({
               isActive={pathname === "/users"}
               icon={Users}
             />
-            {/* ✨ NEW VOLUNTEERS LINK ADDED HERE */}
             <MobileLink
               href="/volunteers"
               label="Volunteers"
@@ -390,13 +358,6 @@ export default function AdminLayout({
               isActive={pathname === "/appointments"}
               icon={Calendar}
             />
-            {/* <MobileLink
-              href="/forums"
-              label="Forums"
-              isActive={pathname === "/forums"}
-              icon={MessageSquare}
-            /> */}
-            {/* The "More" menu is removed to make space, but you can add it back if needed */}
           </nav>
         </footer>
       </div>
@@ -436,7 +397,7 @@ function SideLink({
   );
 }
 
-// MobileLink component remains unchanged
+// MobileLink component
 function MobileLink({
   href,
   label,
@@ -448,20 +409,15 @@ function MobileLink({
   isActive?: boolean;
   icon: React.ComponentType<{ className?: string }>;
 }) {
-  const activeClasses = "text-blue-600";
-  const inactiveClasses = "text-slate-500";
-
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center gap-1 text-xs transition-colors ${
-        isActive ? activeClasses : inactiveClasses
-      }`}
+      className={`mobile-nav-item ${isActive ? "mobile-nav-item-active" : ""}`}
     >
-      <div className="w-6 h-6 flex items-center justify-center">
-        <Icon className="w-5 h-5" />
+      <div className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isActive ? "bg-blue-100" : ""}`}>
+        <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-slate-500"}`} />
       </div>
-      <span className="font-medium">{label}</span>
+      <span>{label}</span>
     </Link>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getTestHistory } from "@/actions/test";
+import PageLoader from "@/components/ui/page-loader";
 
 const testsData = [
   {
@@ -81,11 +82,7 @@ export default function PsychTestsPage() {
   }, [token]);
 
   if (loading) {
-    return (
-      <div className="text-center text-slate-600 mt-20 text-lg px-4">
-        Loading tests...
-      </div>
-    );
+    return <PageLoader title="Loading assessments" subtitle="Fetching your test history and eligibility..." compact />;
   }
 
   if (error) {

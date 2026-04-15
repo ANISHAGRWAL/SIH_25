@@ -18,6 +18,7 @@ import { Camera, Save, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import { getUserDetails, updateUserDetails, becomeVolunteer, appliedForVolunteer } from "@/actions/student";
 import ChangePasswordModal from "@/components/changePassword";
+import PageLoader from "@/components/ui/page-loader";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -146,11 +147,7 @@ export default function ProfilePage() {
   };
 
   if (loading || !profileData) {
-    return (
-      <div className="text-center text-slate-600 mt-20 text-lg">
-        Loading profile...
-      </div>
-    );
+    return <PageLoader title="Loading your profile" subtitle="Preparing your personal details..." compact />;
   }
 
   return (
