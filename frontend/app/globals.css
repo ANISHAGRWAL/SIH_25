@@ -220,117 +220,130 @@
   }
 }
 
-@layer utilities {
-  /* ─── Glass shell / surfaces ────────────────────── */
-  .mental-shell {
-    @apply relative overflow-hidden rounded-3xl border border-slate-200/60 bg-white/72 backdrop-blur-xl shadow-xl;
-  }
+/* ─────────────────────────────────────────────────────────
+   Tailwind v4 custom utilities — use @utility, not @layer
+   ───────────────────────────────────────────────────────── */
 
-  .mental-surface {
-    @apply rounded-2xl border border-white/70 bg-white/82 shadow-lg backdrop-blur-md;
-  }
+/* ─── Glass shell / surfaces ────────────────────── */
+@utility mental-shell {
+  @apply relative overflow-hidden rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-xl shadow-xl;
+}
 
-  /* ─── Content cards ─────────────────────────────── */
-  .mc-card {
-    @apply rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md;
-  }
+@utility mental-surface {
+  @apply rounded-2xl border border-white/70 bg-white/80 shadow-lg backdrop-blur-md;
+}
 
-  .mc-card-inset {
-    @apply rounded-xl border border-slate-100 bg-slate-50/70;
-  }
+/* ─── Content cards ─────────────────────────────── */
+@utility mc-card {
+  @apply rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md;
+}
 
-  /* ─── Section header ────────────────────────────── */
-  .mc-section-header {
-    @apply flex items-center gap-3 pb-3 mb-5 border-b border-slate-100;
-  }
+@utility mc-card-inset {
+  @apply rounded-xl border border-slate-100 bg-slate-50/70;
+}
 
-  .mc-section-icon {
-    @apply flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow;
-  }
+/* ─── Section header ────────────────────────────── */
+@utility mc-section-header {
+  @apply flex items-center gap-3 pb-3 mb-5 border-b border-slate-100;
+}
 
-  /* ─── Stat cards ─────────────────────────────────── */
-  .mc-stat {
-    @apply mc-card p-5 flex flex-col gap-3;
-  }
+@utility mc-section-icon {
+  @apply flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow;
+}
 
-  /* ─── Badges ─────────────────────────────────────── */
-  .mc-badge {
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
-  }
-  .mc-badge-blue   { @apply mc-badge bg-blue-100   text-blue-700; }
-  .mc-badge-green  { @apply mc-badge bg-green-100  text-green-700; }
-  .mc-badge-red    { @apply mc-badge bg-red-100    text-red-700; }
-  .mc-badge-amber  { @apply mc-badge bg-amber-100  text-amber-700; }
-  .mc-badge-purple { @apply mc-badge bg-purple-100 text-purple-700; }
+/* ─── Stat card (mc-card properties inlined to avoid cross-apply) ── */
+@utility mc-stat {
+  @apply rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md p-5 flex flex-col gap-3;
+}
 
-  /* ─── Navigation ────────────────────────────────── */
-  .mental-nav-link {
-    @apply relative rounded-xl px-3 py-2 text-sm font-medium text-slate-500 transition-all duration-250 hover:bg-slate-100/70 hover:text-slate-900;
-  }
+/* ─── Badges ─────────────────────────────────────── */
+@utility mc-badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+/* badge colours — mc-badge props inlined */
+@utility mc-badge-blue {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700;
+}
+@utility mc-badge-green {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-700;
+}
+@utility mc-badge-red {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-700;
+}
+@utility mc-badge-amber {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-100 text-amber-700;
+}
+@utility mc-badge-purple {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700;
+}
 
-  .mental-nav-link-active {
-    @apply rounded-xl px-3 py-2 text-sm font-semibold text-blue-600 bg-blue-50/80;
-  }
+/* ─── Navigation ────────────────────────────────── */
+@utility mental-nav-link {
+  @apply relative rounded-xl px-3 py-2 text-sm font-medium text-slate-500 transition-all duration-200 hover:bg-slate-100/70 hover:text-slate-900;
+}
 
-  .mobile-nav-item {
-    @apply flex flex-col items-center gap-0.5 text-[11px] font-medium text-slate-500 transition-colors duration-200 px-2 py-1 rounded-xl;
-  }
+@utility mental-nav-link-active {
+  @apply rounded-xl px-3 py-2 text-sm font-semibold text-blue-600 bg-blue-50/80;
+}
 
-  .mobile-nav-item-active {
-    @apply text-blue-600 bg-blue-50/70;
-  }
+@utility mobile-nav-item {
+  @apply flex flex-col items-center gap-0.5 text-[11px] font-medium text-slate-500 transition-colors duration-200 px-2 py-1 rounded-xl;
+}
 
-  /* ─── Buttons ────────────────────────────────────── */
-  .mc-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:from-blue-600 hover:to-indigo-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
-  }
+@utility mobile-nav-item-active {
+  @apply text-blue-600 bg-blue-50/70;
+}
 
-  .mc-btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow active:scale-[0.98] disabled:opacity-50;
-  }
+/* ─── Buttons ────────────────────────────────────── */
+@utility mc-btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:from-blue-600 hover:to-indigo-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-md disabled:opacity-50 disabled:cursor-not-allowed;
+}
 
-  /* ─── Form elements ──────────────────────────────── */
-  .mc-input {
-    @apply w-full rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:outline-none;
-  }
+@utility mc-btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow active:scale-[0.98] disabled:opacity-50;
+}
 
-  .mc-label {
-    @apply block mb-1.5 text-sm font-semibold text-slate-700;
-  }
+/* ─── Form elements ──────────────────────────────── */
+@utility mc-input {
+  @apply w-full rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:outline-none;
+}
 
-  /* ─── Dividers ───────────────────────────────────── */
-  .mc-divider {
-    @apply w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-5;
-  }
+@utility mc-label {
+  @apply block mb-1.5 text-sm font-semibold text-slate-700;
+}
 
-  /* ─── Animations ─────────────────────────────────── */
-  .page-fade-in {
-    animation: fade-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
+/* ─── Dividers ───────────────────────────────────── */
+@utility mc-divider {
+  @apply w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-5;
+}
 
-  .slide-in-left {
-    animation: slide-in-left 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
+/* ─── Animations ─────────────────────────────────── */
+@utility page-fade-in {
+  animation: fade-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
-  .scale-in {
-    animation: scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
+@utility slide-in-left {
+  animation: slide-in-left 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
-  .soft-float {
-    animation: float-soft 3.2s ease-in-out infinite;
-  }
+@utility scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
-  .shimmer-text {
-    background: linear-gradient(90deg, #1e293b 0%, #2563eb 40%, #6366f1 60%, #1e293b 100%);
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    animation: shimmer 4s linear infinite;
-  }
+@utility soft-float {
+  animation: float-soft 3.2s ease-in-out infinite;
+}
 
-  /* ─── Hover card lift ────────────────────────────── */
-  .mc-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
-  }
+@utility shimmer-text {
+  background: linear-gradient(90deg, #1e293b 0%, #2563eb 40%, #6366f1 60%, #1e293b 100%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ─── Hover card lift ────────────────────────────── */
+@utility mc-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
 }
