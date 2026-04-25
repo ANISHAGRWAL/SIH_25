@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import { uploadOnCloudinary } from '../utils/cloudinary';
 import { eq } from 'drizzle-orm';
 import sgMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 
 // --- SendGrid Configuration ---
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -69,20 +70,26 @@ export const sendOtp = async (email: string) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
-    const to = email;
     const subject = 'Your OTP Code for Completing Registration at Campus Care';
-    const text = `Your OTP code is ${otp.toString()}. It is valid for 10 minutes.`;
-    const transporter = hasSendgridConfig
-      ? nodemailer.createTransport({
-          host: 'smtp.sendgrid.net',
-          port: 587,
-          secure: false,
-          auth: {
-            user: 'apikey',
-            pass: sendgridApiKey,
-          },
-        })
-      : nodemailer.createTransport({
+    const text = `Your OTP code is ${otp.toString()}. It is valid for 5 minutes.`;
+
+    if (hasSendgridConfig) {
+      const msg = {
+        to: email,
+        from: sendgridFromEmail,
+        subject,
+        text,
+        html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
+      };
+
+      const [info] = await sgMail.send(msg);
+
+      if (info.statusCode !== 202) {
+        console.error('SendGrid response:', info);
+        throw new Error('Failed to send OTP email via SendGrid. Please try again.');
+      }
+    } else {
+      const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,
           secure: false,
@@ -91,20 +98,14 @@ export const sendOtp = async (email: string) => {
             pass: gmailPassword,
           },
         });
-    const mailOptions = {
-      from: hasSendgridConfig ? sendgridFromEmail : gmailEmail,
-      to,
-      from: SENDGRID_FROM_EMAIL, // Must be a verified sender
-      subject,
-      text,
-      html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
-    };
 
-    const [info] = await sgMail.send(msg);
-
-    if (info.statusCode !== 202) {
-        console.error('SendGrid response:', info);
-        throw new Error('Failed to send OTP email via SendGrid. Please try again.');
+      await transporter.sendMail({
+        from: gmailEmail,
+        to: email,
+        subject,
+        text,
+        html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
+      });
     }
 
     // Insert new OTP record (valid for 5 minutes)
@@ -114,7 +115,7 @@ export const sendOtp = async (email: string) => {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes validity
     });
 
-    console.log('✅ OTP Email sent successfully via SendGrid.');
+    console.log('✅ OTP Email sent successfully.');
   } catch (error) {
     console.error('Error in sendOtp:', error);
     throw error;
