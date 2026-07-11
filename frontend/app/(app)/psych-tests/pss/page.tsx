@@ -255,6 +255,17 @@ export default function PSSTestPage() {
           <p className="text-slate-600">
             Answer based on your feelings over the past month.
           </p>
+          <div className="text-xs text-slate-400">
+            Reference source:{" "}
+            <a 
+              href="https://cancercontrol.cancer.gov/brp/research/group-evaluated-measures/adopt/perceived-stress-scale?utm_source=chatgpt.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-500 hover:underline font-medium"
+            >
+              National Cancer Institute (NCI)
+            </a>
+          </div>
         </div>
 
         {/* Progress Indicator */}

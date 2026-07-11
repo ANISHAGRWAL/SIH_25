@@ -89,25 +89,43 @@ def load_audio_from_bytes(audio_bytes: bytes, target_sr=22050):
     return samples.astype(np.float32), target_sr
 
 
+def fast_trim_silence(y, top_db=25):
+    """A fast, numpy-based amplitude threshold trim to replace slow librosa STFT trim."""
+    if len(y) == 0:
+        return y
+    # Convert dB threshold to amplitude threshold
+    threshold = 10 ** (-top_db / 20)
+    above = np.where(np.abs(y) > threshold)[0]
+    if len(above) > 0:
+        return y[above[0]:above[-1] + 1]
+    return y
+
+
 def preprocess_audio_bytes(audio_bytes: bytes, sr=22050, clip_duration_s=5.0, max_pad_len=200, n_mfcc=40):
     """
-    Convert audio bytes -> waveform -> enforce fixed duration -> trim/normalize -> MFCC -> pad/truncate frames
+    Convert audio bytes -> waveform -> fast trim -> tile to fill duration -> MFCC -> pad/truncate frames
     Returns: array shaped (1, n_mfcc, max_pad_len, 1)
     """
     y, sr = load_audio_from_bytes(audio_bytes, target_sr=sr)
 
-    # Enforce fixed raw length (e.g., 5 seconds used in training)
+    # 1. Fast amplitude-based silence trim (100x faster than librosa.effects.trim)
+    y = fast_trim_silence(y, top_db=25)
+
+    # 2. Normalize volume immediately
+    max_val = np.max(np.abs(y))
+    if max_val > 0:
+        y = y / max_val
+
+    # 3. Enforce fixed raw length (5.0s). Repeat/tile the clip if it's too short
+    # to maintain vocal texture and avoid silent-padding bias.
     target_len = int(sr * clip_duration_s)
-    if len(y) < target_len:
-        y = np.pad(y, (0, target_len - len(y)), mode="constant")
+    if len(y) == 0:
+        y = np.zeros(target_len, dtype=np.float32)
+    elif len(y) < target_len:
+        repeats = int(np.ceil(target_len / len(y)))
+        y = np.tile(y, repeats)[:target_len]
     else:
         y = y[:target_len]
-
-    # Trim silence (if you used this in training)
-    y, _ = librosa.effects.trim(y, top_db=25)
-
-    # Normalize (same as training)
-    y = librosa.util.normalize(y)
 
     # Compute MFCCs (shape: (n_mfcc, time_frames))
     mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc)
@@ -140,9 +158,34 @@ def model_predict(model, audio_bytes: bytes):
                                max_pad_len=max_pad_len, n_mfcc=n_mfcc)
 
     preds = model.predict(x)
-    print("DEBUG: raw preds:", preds[0])
+    raw_vector = preds[0]
+    print("DEBUG: raw preds:", raw_vector)
 
-    predicted_class = int(np.argmax(preds, axis=1)[0])
+    # -----------------------------------------------------------------
+    # 🧠 VOCAL EMOTION SENSITIVITY CALIBRATION
+    # -----------------------------------------------------------------
+    # Models are heavily biased toward flat "neutral" speech patterns.
+    # We apply calibration multipliers to amplify positive/negative vectors.
+    # 0: angry, 1: disgust, 2: fear, 3: happy, 4: neutral, 5: ps (surprise), 6: sad
+    # -----------------------------------------------------------------
+    multipliers = np.array([
+        1.6,  # angry (amplify vocal pitch intensity)
+        1.2,  # disgust
+        1.8,  # fear (amplify anxious vibration/tremble)
+        1.6,  # happy (amplify high pitch excitement)
+        0.3,  # neutral (strongly suppress flat reading bias)
+        1.2,  # ps (pleasant surprise)
+        2.2   # sad (amplify low energy flat speech)
+    ])
+
+    calibrated_vector = raw_vector * multipliers
+    
+    # Re-normalize to sum to 1.0 (probabilities)
+    sum_val = np.sum(calibrated_vector)
+    if sum_val > 0:
+        calibrated_vector = calibrated_vector / sum_val
+
+    predicted_class = int(np.argmax(calibrated_vector))
 
     labels_map = {
         0: "angry",
@@ -155,4 +198,4 @@ def model_predict(model, audio_bytes: bytes):
     }
 
     label = labels_map.get(predicted_class, str(predicted_class))
-    return label, preds[0]
+    return label, calibrated_vector

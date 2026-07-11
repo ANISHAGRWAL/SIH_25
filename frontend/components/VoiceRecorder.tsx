@@ -1,6 +1,19 @@
-"use client"
+"use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+
+const GET_SPEECH_API_URL = (): string => {
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (process.env.NEXT_PUBLIC_SPEECH_API_URL) {
+      return process.env.NEXT_PUBLIC_SPEECH_API_URL;
+    }
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:8001";
+    }
+  }
+  return "https://sih-25-5.onrender.com";
+};
 
 // --- Type Definitions for better code safety ---
 type Status = 'idle' | 'permission_denied' | 'recording' | 'analyzing' | 'success' | 'error';
@@ -143,7 +156,7 @@ const VoiceEmotionAnalyzer = () => {
     // This function sends a "ping" to the server when the page loads.
     const warmUpServer = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://sih-25-5.onrender.com";
+        const API_URL = GET_SPEECH_API_URL();
         // We use the new /wake-up endpoint
         await fetch(`${API_URL}/wake-up`);
         console.log("Server has been warmed up.");
@@ -233,7 +246,7 @@ const VoiceEmotionAnalyzer = () => {
 
     setStatus('analyzing');
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://sih-25-5.onrender.com";
+      const API_URL = GET_SPEECH_API_URL();
       const res = await fetch(`${API_URL}/transcribe`, {
         method: "POST",
         body: formData,

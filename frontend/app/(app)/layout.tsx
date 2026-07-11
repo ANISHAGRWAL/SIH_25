@@ -40,14 +40,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <ProtectedRoute requiredRole="student">
       <div className="min-h-screen text-slate-800 page-fade-in">
         {/* Desktop header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 mental-surface fixed top-2 left-3 right-3 z-50">
+        <header className="hidden md:flex items-center justify-between px-6 py-2.5 mental-surface fixed top-2 left-3 right-3 z-50">
           {/* Left side: Logo */}
           <Link href="/dashboard">
             <Image
               src="/logoiconfull.png"
               alt="CampusCare Logo"
-              width={122}
-              height={122}
+              width={90}
+              height={90}
             />
           </Link>
 
@@ -374,19 +374,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </header>
         {/* Spacer div */}
-        <div className="h-20 md:h-24"></div>
-        <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] gap-6 p-4 md:p-8">
+        <div className="h-16 md:h-20"></div>
+        <div className="grid md:grid-cols-[250px_1fr] lg:grid-cols-[270px_1fr] gap-4 p-3 md:p-5">
           {/* Sidebar */}
-          <aside className="hidden md:block mental-shell p-6 h-screen overflow-y-auto sticky top-2">
-            <div className="flex items-center gap-3 mb-8 p-3 rounded-2xl bg-gradient-to-br from-blue-50/80 to-indigo-50/60 border border-blue-100/70">
-              <Avatar className="w-12 h-12 shrink-0 ring-2 ring-blue-200 ring-offset-1">
+          <aside className="hidden md:block mental-shell p-4 h-[calc(100vh-100px)] overflow-y-auto sticky top-20">
+            <div className="flex items-center gap-2 mb-4 p-2.5 rounded-2xl bg-gradient-to-br from-blue-50/80 to-indigo-50/60 border border-blue-100/70">
+              <Avatar className="w-10 h-10 shrink-0 ring-2 ring-blue-200 ring-offset-1">
                 <Link href="/profile">
                 <AvatarImage
                   src={user?.avatarUrl ? user?.avatarUrl : undefined}
                   alt="Avatar"
                   />
                   </Link>
-                <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+                <AvatarFallback className="text-md font-bold bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
                   {user?.name
                     .split(" ")
                     .map((n) => n[0])
@@ -394,11 +394,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="font-bold text-sm text-slate-800 truncate">{user?.name}</p>
-                <p className="text-slate-400 text-xs overflow-wrap-anywhere break-words leading-tight mt-0.5">{user?.email}</p>
+                <p className="font-bold text-xs text-slate-800 truncate">{user?.name}</p>
+                <p className="text-slate-400 text-[10px] overflow-wrap-anywhere break-words leading-tight mt-0.5">{user?.email}</p>
               </div>
             </div>
-            <nav className="space-y-3">
+            <nav className="space-y-1.5">
               <SideLink
                 href="/dashboard"
                 label="Dashboard"
@@ -445,7 +445,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </aside>
 
           {/* Main content */}
-          <main className="min-h-[80vh] mental-shell p-6 md:p-8 mb-20 md:mb-0 page-fade-in">
+          <main className="min-h-[calc(100vh-100px)] mental-shell p-4 md:p-6 mb-20 md:mb-0 page-fade-in">
             {children}
           </main>
         </div>

@@ -270,6 +270,17 @@ export default function GAD7TestPage() {
             Over the last 2 weeks, how often have you been bothered by the
             following problem?
           </p>
+          <div className="text-xs text-slate-400">
+            Reference source:{" "}
+            <a 
+              href="https://adaa.org" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-500 hover:underline font-medium"
+            >
+              Anxiety & Depression Association of America (ADAA)
+            </a>
+          </div>
         </div>
 
         {/* Progress Indicator */}

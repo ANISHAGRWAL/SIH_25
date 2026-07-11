@@ -81,6 +81,17 @@ app.use(`${BASE_PATH}/admin`, adminRoutes);
 
 initializeSocketIo(io);
 
+server.on('error', (error: NodeJS.ErrnoException) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(
+      `Port ${port} is already in use. Stop the existing process or change PORT in backend/.env.`,
+    );
+    process.exit(1);
+  }
+
+  throw error;
+});
+
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

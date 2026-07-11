@@ -1,7 +1,8 @@
 import { IAuthUser } from "../../backend/src/types";
 
-const BASE_URL =
-  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api` || "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+  ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`
+  : "http://localhost:5000/api";
 
 // New function to fetch all students
 export const getAdminStudents = async (

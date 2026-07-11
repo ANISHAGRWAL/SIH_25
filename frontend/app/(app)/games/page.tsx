@@ -340,6 +340,100 @@ export default function StressReliefGamesDemo() {
             💡 Click the fullscreen button for an immersive gaming experience
           </div>
         )}
+
+        {/* Scientific References Section */}
+        {!isFullscreen && (
+          <section className="mt-8 sm:mt-12 bg-white/70 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-md text-left">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              🔬 The Science of Play: How These Games Help You De-stress
+            </h2>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+              Play is not just for distraction; it is a scientifically backed method to reset your autonomic nervous system and lower cortisol levels. Here is the clinical evidence supporting the interactive tools above:
+            </p>
+            
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-blue-700 flex items-center gap-1.5">
+                  🎮 Casual Gaming & Cognitive Diversion
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Games like <strong>Color Match</strong> and <strong>Memory Waves</strong> engage working memory, blocking stress-inducing thoughts. Clinical trials publish that casual games reduce autonomic stress responses and improve mood.
+                </p>
+                <div className="text-[11px] text-gray-400">
+                  Source:{" "}
+                  <a 
+                    href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7488056/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-500 hover:underline hover:text-blue-600 font-medium"
+                  >
+                    PMC Article (Casual Games & Stress Treatment)
+                  </a>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-purple-700 flex items-center gap-1.5">
+                  🎨 Art Therapy & Cortisol Reduction
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Repetitive drawing in <strong>Zen Patterns</strong> promotes mindfulness similar to meditation. Studies demonstrate that creative art-making significantly decreases physical stress hormones.
+                </p>
+                <div className="text-[11px] text-gray-400">
+                  Source:{" "}
+                  <a 
+                    href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6124538/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-500 hover:underline hover:text-blue-600 font-medium"
+                  >
+                    PMC Article (Art Therapy & Cortisol Levels)
+                  </a>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-green-700 flex items-center gap-1.5">
+                  🕊️ Cognitive Externalization
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Writing and releasing worries in <strong>Worry Release</strong> is an adaptation of CBT worry postponement. Putting concerns into words reduces repetitive thinking (rumination) and cognitive loading.
+                </p>
+                <div className="text-[11px] text-gray-400">
+                  Source:{" "}
+                  <a 
+                    href="https://www.apa.org/pubs/journals/ccp" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-500 hover:underline hover:text-blue-600 font-medium"
+                  >
+                    APA (Journal of Consulting and Clinical Psychology)
+                  </a>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-teal-700 flex items-center gap-1.5">
+                  💧 Sensory Biofeedback & Flow State
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Interacting with <strong>Liquid Motion</strong> or the <strong>Stress Ball</strong> triggers a psychological state called "flow," promoting calm alpha brain waves and grounding sensory stimulation.
+                </p>
+                <div className="text-[11px] text-gray-400">
+                  Source:{" "}
+                  <a 
+                    href="https://www.apa.org/monitor/2024/04/psychology-of-play" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-500 hover:underline hover:text-blue-600 font-medium"
+                  >
+                    APA Monitor (Psychology of Play & Relaxation)
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
