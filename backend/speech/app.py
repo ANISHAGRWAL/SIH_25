@@ -27,6 +27,15 @@ def startup_event():
     except Exception:
         print("Could not read MODEL.input_shape")
 
+    # 🚀 Warm up the Keras/TensorFlow model to avoid cold-start lag on first client request
+    try:
+        import numpy as np
+        dummy_input = np.zeros((1, 40, 200, 1), dtype=np.float32)
+        MODEL.predict(dummy_input)
+        print("MODEL warmed up successfully. Cold-start latency eliminated.")
+    except Exception as e_warm:
+        print("Could not warm up model:", repr(e_warm))
+
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     contents = await file.read()  # bytes
@@ -44,4 +53,4 @@ async def wake_up():
     return {"status": "awake"}
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("app:app", host="127.0.0.1", port=8001, reload=True)

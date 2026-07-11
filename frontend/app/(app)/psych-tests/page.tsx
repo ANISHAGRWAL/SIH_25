@@ -15,6 +15,10 @@ const testsData = [
     bgColor: "bg-blue-50",
     estimatedTime: "5-10 min",
     cooldownDays: 7,
+    reference: {
+      name: "PMC Article",
+      url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1495268/",
+    },
   },
   {
     key: "gad",
@@ -24,6 +28,10 @@ const testsData = [
     bgColor: "bg-purple-50",
     estimatedTime: "3-7 min",
     cooldownDays: 7,
+    reference: {
+      name: "ADAA Website",
+      url: "https://adaa.org",
+    },
   },
   {
     key: "pss",
@@ -33,6 +41,10 @@ const testsData = [
     bgColor: "bg-green-50",
     estimatedTime: "8-12 min",
     cooldownDays: 30,
+    reference: {
+      name: "NCI Website",
+      url: "https://cancercontrol.cancer.gov/brp/research/group-evaluated-measures/adopt/perceived-stress-scale?utm_source=chatgpt.com",
+    },
   },
 ];
 
@@ -155,9 +167,23 @@ export default function PsychTestsPage() {
               </div>
               
               {/* Description */}
-              <p className="text-sm text-gray-500 leading-relaxed mb-4">
+              <p className="text-sm text-gray-500 leading-relaxed mb-3">
                 {test.desc}
               </p>
+              
+              {/* Reference / Source Link */}
+              <div className="flex items-center gap-1.5 text-xs mb-4">
+                <span className="text-slate-400">🔗</span>
+                <span className="text-slate-500 font-medium">Source:</span>
+                <a 
+                  href={test.reference.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-blue-500 hover:text-blue-700 font-semibold hover:underline transition-colors"
+                >
+                  {test.reference.name}
+                </a>
+              </div>
               
               {/* Status and Time Info - Desktop version */}
               <div className="hidden sm:flex items-center gap-4 text-xs text-gray-400 mb-6">

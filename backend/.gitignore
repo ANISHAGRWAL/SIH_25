@@ -32,3 +32,13 @@ next-env.d.ts
 .vscode/*
 
 dist/
+
+# Python Virtual Environments & Caches
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/

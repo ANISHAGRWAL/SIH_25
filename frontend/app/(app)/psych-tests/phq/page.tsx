@@ -275,6 +275,17 @@ export default function PHQ9TestPage() {
             Over the last 2 weeks, how often have you been bothered by the
             following problem?
           </p>
+          <div className="text-xs text-slate-400">
+            Reference source:{" "}
+            <a 
+              href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1495268/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-500 hover:underline font-medium"
+            >
+              PubMed Central (PMC)
+            </a>
+          </div>
         </div>
 
         {/* Progress Indicator */}

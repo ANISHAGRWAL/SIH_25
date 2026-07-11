@@ -1,7 +1,8 @@
 import { ITestHistory } from "../../backend/src/types";
 
-const BASE_URL =
-  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api` || "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+  ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`
+  : "http://localhost:5000/api";
 
 export const getTestHistory = async (token: string): Promise<{ ok: boolean; status?: number; data?: ITestHistory; error?: string }> => {
   try {

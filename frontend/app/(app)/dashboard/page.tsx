@@ -103,18 +103,18 @@ function MusicPlayer() {
   };
 
   return (
-    <div className="rounded-3xl bg-white/90 p-4 md:p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05),0_0_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.08),0_0_25px_rgba(0,0,0,0.04)] backdrop-blur-sm">
-      <div className="rounded-[calc(1.5rem-4px)] bg-white/95 backdrop-blur-md p-4 md:p-6 space-y-4">
+    <div className="rounded-2xl bg-white/90 p-3 md:p-4 shadow-[0_8px_24px_rgba(0,0,0,0.04),0_0_15px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(0,0,0,0.06),0_0_20px_rgba(0,0,0,0.03)] backdrop-blur-sm">
+      <div className="rounded-[calc(1rem-2px)] bg-white/95 backdrop-blur-md p-3 md:p-4 space-y-3">
         {/* Top Row: Track Info, Main Controls, Volume */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           {/* Track Info */}
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg flex-shrink-0 transition-all duration-300 group-hover:scale-105">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow flex-shrink-0 transition-all duration-300 group-hover:scale-105">
               🎶
             </div>
             <div className="min-w-0">
-              <h4 className="font-bold text-gray-900 text-lg truncate">{currentTrack.title}</h4>
-              <p className="text-gray-500 text-sm truncate">{currentTrack.artist}</p>
+              <h4 className="font-bold text-gray-900 text-sm truncate">{currentTrack.title}</h4>
+              <p className="text-gray-400 text-xs truncate">{currentTrack.artist}</p>
             </div>
           </div>
 
@@ -240,21 +240,21 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 animate-slideInDown tracking-tight">
+    <div className="space-y-4 animate-fadeIn">
+      <h2 className="text-xl md:text-2xl font-extrabold text-slate-800 animate-slideInDown tracking-tight">
         Welcome Back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">{user?.name}</span>
       </h2>
 
-      <section className="space-y-6">
-        <div className="rounded-3xl bg-white/90 p-6 ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.05),0_0_20px_rgba(0,0,0,0.02)] transition-all duration-500 ease-out hover:shadow-[0_15px_40px_rgba(0,0,0,0.08),0_0_25px_rgba(0,0,0,0.04)] backdrop-blur-sm">
+      <section className="space-y-4">
+        <div className="rounded-2xl bg-white/90 p-4 md:p-5 ring-1 ring-slate-200 shadow-[0_8px_24px_rgba(0,0,0,0.04),0_0_15px_rgba(0,0,0,0.01)] transition-all duration-500 ease-out hover:shadow-[0_12px_32px_rgba(0,0,0,0.06),0_0_20px_rgba(0,0,0,0.02)] backdrop-blur-sm">
           {!selectedMood ? (
             <div className={`transition-all duration-500 ${isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
-              <p className="text-center font-semibold text-slate-700 mb-8 text-lg animate-fadeIn">How are you feeling right now?</p>
-              <div className="flex items-center justify-center gap-2 md:gap-3 flex-wrap md:flex-nowrap">
+              <p className="text-center font-semibold text-slate-700 mb-4 text-base animate-fadeIn">How are you feeling right now?</p>
+              <div className="flex items-center justify-center gap-1.5 md:gap-2.5 flex-wrap md:flex-nowrap">
                 {moods.map((mood, index) => (
-                  <button key={mood.key} onClick={() => handleMoodClick(mood.key)} aria-label={mood.label} className={`flex flex-col items-center gap-2 p-4 md:p-5 rounded-xl hover:bg-slate-50/80 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out border border-transparent hover:border-gray-200 group animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
+                  <button key={mood.key} onClick={() => handleMoodClick(mood.key)} aria-label={mood.label} className={`flex flex-col items-center gap-1.5 p-3 md:p-4 rounded-xl hover:bg-slate-50/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ease-out border border-transparent hover:border-gray-200 group animate-slideInUp`} style={{ animationDelay: `${index * 80}ms` }}>
                     <div className="group-hover:scale-110 transition-transform duration-300">{renderMoodButton(mood)}</div>
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-800 transition-colors duration-200">{mood.label}</span>
+                    <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors duration-200">{mood.label}</span>
                   </button>
                 ))}
               </div>
@@ -278,55 +278,55 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Face Check-In Card */}
-          <div onClick={() => (location.href = "/facial-mood-detection")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-blue-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/facial-mood-detection"; } }}>
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors duration-200 group-hover:shadow">
-                <img src="/faceicon.png" alt="Face scan" className="group-hover:scale-110 transition-transform duration-200" />
+          <div onClick={() => (location.href = "/facial-mood-detection")} className="mc-card mc-lift p-4 cursor-pointer group bg-gradient-to-br from-white to-blue-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/facial-mood-detection"; } }}>
+            <div className="flex flex-col text-center items-center gap-2.5 h-full">
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors duration-200 group-hover:shadow">
+                <img src="/faceicon.png" alt="Face scan" className="w-7 h-7 group-hover:scale-110 transition-transform duration-200" />
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors duration-200 mb-1 text-sm">Start Face Check-In</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Quick facial emotion analysis to understand your current mood</p>
+                <h3 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors duration-200 mb-0.5 text-xs">Start Face Check-In</h3>
+                <p className="text-[11px] text-slate-500 leading-normal">Quick facial emotion analysis to understand your current mood</p>
               </div>
             </div>
           </div>
-          
+
           {/* Voice Mood Check Card */}
-          <div onClick={() => (location.href = "/voice_det")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-purple-50/40">
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors duration-200 group-hover:shadow">
-                <img src="/mic.png" alt="Voice analysis" className="group-hover:scale-110 transition-transform duration-200" />
+          <div onClick={() => (location.href = "/voice_det")} className="mc-card mc-lift p-4 cursor-pointer group bg-gradient-to-br from-white to-purple-50/40">
+            <div className="flex flex-col text-center items-center gap-2.5 h-full">
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors duration-200 group-hover:shadow">
+                <img src="/mic.png" alt="Voice analysis" className="w-7 h-7 group-hover:scale-110 transition-transform duration-200" />
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-purple-700 transition-colors duration-200 mb-1 text-sm">Start Voice Mood Check</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Voice tone analysis to detect emotional patterns — Coming Soon</p>
+                <h3 className="font-semibold text-slate-800 group-hover:text-purple-700 transition-colors duration-200 mb-0.5 text-xs">Start Voice Mood Check</h3>
+                <p className="text-[11px] text-slate-500 leading-normal">Voice tone analysis to detect emotional patterns</p>
               </div>
             </div>
           </div>
-          
+
           {/* Mental Detox Card */}
-          <div onClick={() => (location.href = "/wellness")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-green-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/wellness"; } }}>
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-colors duration-200 group-hover:shadow">
-                <img src="/yoga.png" alt="Mental wellness" className="group-hover:scale-110 transition-transform duration-200" />
+          <div onClick={() => (location.href = "/wellness")} className="mc-card mc-lift p-4 cursor-pointer group bg-gradient-to-br from-white to-green-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/wellness"; } }}>
+            <div className="flex flex-col text-center items-center gap-2.5 h-full">
+              <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-colors duration-200 group-hover:shadow">
+                <img src="/yoga.png" alt="Mental wellness" className="w-7 h-7 group-hover:scale-110 transition-transform duration-200" />
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-green-700 transition-colors duration-200 mb-1 text-sm">5-Minute Mental Detox</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Guided stretches and breathing exercises to refresh focus and ease stress</p>
+                <h3 className="font-semibold text-slate-800 group-hover:text-green-700 transition-colors duration-200 mb-0.5 text-xs">5-Minute Mental Detox</h3>
+                <p className="text-[11px] text-slate-500 leading-normal">Guided stretches and breathing exercises to refresh focus and ease stress</p>
               </div>
             </div>
           </div>
 
           {/* Fun Zone Card */}
-          <div onClick={() => (location.href = "/games")} className="mc-card mc-lift p-5 cursor-pointer group bg-gradient-to-br from-white to-orange-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/games"; } }}>
-            <div className="flex flex-col text-center items-center gap-3 h-full">
-              <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-orange-100 transition-colors duration-200 group-hover:shadow">
-                <div className="text-3xl group-hover:scale-110 transition-transform duration-200">🎮</div>
+          <div onClick={() => (location.href = "/games")} className="mc-card mc-lift p-4 cursor-pointer group bg-gradient-to-br from-white to-orange-50/40" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { location.href = "/games"; } }}>
+            <div className="flex flex-col text-center items-center gap-2.5 h-full">
+              <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-orange-100 transition-colors duration-200 group-hover:shadow">
+                <div className="text-2xl group-hover:scale-110 transition-transform duration-200">🎮</div>
               </div>
               <div className="flex flex-col flex-1">
-                <h3 className="font-semibold text-slate-800 group-hover:text-orange-700 transition-colors duration-200 mb-1 text-sm">Fun Zone</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Interactive games and activities to boost your mood and have fun</p>
+                <h3 className="font-semibold text-slate-800 group-hover:text-orange-700 transition-colors duration-200 mb-0.5 text-xs">Fun Zone</h3>
+                <p className="text-[11px] text-slate-500 leading-normal">Interactive games and activities to boost your mood and have fun</p>
               </div>
             </div>
           </div>

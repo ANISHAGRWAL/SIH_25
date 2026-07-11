@@ -84,13 +84,13 @@ export default function AdminLayout({
     <ProtectedRoute requiredRole="admin">
       <div className="min-h-screen text-slate-800 flex flex-col page-fade-in">
         {/* Desktop header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 mental-surface fixed top-2 left-3 right-3 z-50">
+        <header className="hidden md:flex items-center justify-between px-6 py-2.5 mental-surface fixed top-2 left-3 right-3 z-50">
           {/* Left side: Logo */}
           <Image
             src="/logoiconfull.png"
             alt="CampusCare logo"
-            width={122}
-            height={122}
+            width={90}
+            height={90}
           />
 
           {/* Center: Navigation Links */}
@@ -323,9 +323,9 @@ export default function AdminLayout({
         </header>
 
         {/* Main content container with dynamic margin */}
-        <div className="flex-1 overflow-y-auto pt-20 md:pt-24">
+        <div className="flex-1 overflow-y-auto pt-16 md:pt-20">
           <main className="h-full">
-            <div className="h-full mental-shell p-6 md:p-8 mb-20 md:mb-0 page-fade-in">
+            <div className="h-full mental-shell p-4 md:p-6 mb-20 md:mb-0 page-fade-in">
               {children}
             </div>
           </main>

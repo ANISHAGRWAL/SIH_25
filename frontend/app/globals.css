@@ -184,6 +184,12 @@
 
   html {
     scroll-behavior: smooth;
+    font-size: 14.2px; /* Global scale factor (approx. 90% zoom-out) to prevent zoomed-in layouts and excessive scrolling */
+  }
+  @media (max-width: 640px) {
+    html {
+      font-size: 13.5px; /* Even more compact on mobile displays */
+    }
   }
 
   section {
