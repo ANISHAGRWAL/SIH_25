@@ -49,13 +49,9 @@ export const sendOtp = async (email: string) => {
     const hasGmailConfig = !!gmailEmail && !!gmailPassword;
 
     if (!hasSendgridConfig && !hasGmailConfig) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`⚠️ [DEV MODE] No email credentials found. Falling back to console logging.`);
-      } else {
-        throw new Error(
-          'Missing email credentials. Configure SENDGRID_API_KEY + SENDGRID_FROM_EMAIL or EMAIL_ID + EMAIL_PASSWORD.',
-        );
-      }
+      throw new Error(
+        'Missing email credentials. Configure SENDGRID_API_KEY + SENDGRID_FROM_EMAIL or EMAIL_ID + EMAIL_PASSWORD.',
+      );
     }
 
     const existingOtp = await db.query.otp.findFirst({
@@ -82,8 +78,10 @@ export const sendOtp = async (email: string) => {
     const subject = 'Your OTP Code for Completing Registration at Campus Care';
     const text = `Your OTP code is ${otp.toString()}. It is valid for 5 minutes.`;
 
-    // Unconditional logging to console
-    console.log(`\n🔑🔑🔑 [OTP SERVICE] Generated OTP for ${email}: ${otp} 🔑🔑🔑\n`);
+    // Logging to console only in non-production environments
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n🔑🔑🔑 [OTP SERVICE] Generated OTP for ${email}: ${otp} 🔑🔑🔑\n`);
+    }
 
     if (hasSendgridConfig) {
       const msg = {
@@ -94,48 +92,30 @@ export const sendOtp = async (email: string) => {
         html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
       };
 
-      try {
-        const [info] = await sgMail.send(msg);
+      const [info] = await sgMail.send(msg);
 
-        if (info.statusCode !== 202) {
-          console.error('SendGrid response:', info);
-          throw new Error('Failed to send OTP email via SendGrid. Please try again.');
-        }
-      } catch (error) {
-        console.error('SendGrid error:', error);
-        if (process.env.NODE_ENV !== 'production') {
-          console.log(`⚠️ [DEV MODE] SendGrid failed, but allowing registration flow to continue. Use the OTP printed above.`);
-        } else {
-          throw error;
-        }
+      if (info.statusCode !== 202) {
+        console.error('SendGrid response:', info);
+        throw new Error('Failed to send OTP email via SendGrid. Please try again.');
       }
     } else if (hasGmailConfig) {
-      try {
-        const transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
-          auth: {
-            user: gmailEmail,
-            pass: gmailPassword,
-          },
-        });
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: gmailEmail,
+          pass: gmailPassword,
+        },
+      });
 
-        await transporter.sendMail({
-          from: gmailEmail,
-          to: email,
-          subject,
-          text,
-          html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
-        });
-      } catch (error) {
-        console.error('Nodemailer error:', error);
-        if (process.env.NODE_ENV !== 'production') {
-          console.log(`⚠️ [DEV MODE] Gmail SMTP failed, but allowing registration flow to continue. Use the OTP printed above.`);
-        } else {
-          throw error;
-        }
-      }
+      await transporter.sendMail({
+        from: gmailEmail,
+        to: email,
+        subject,
+        text,
+        html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
+      });
     }
 
     // Insert new OTP record (valid for 5 minutes)
@@ -146,7 +126,7 @@ export const sendOtp = async (email: string) => {
     });
 
     console.log('✅ OTP Email process completed.');
-    return { devOtp: otp };
+    return process.env.NODE_ENV !== 'production' ? { devOtp: otp } : { message: 'OTP sent successfully' };
   } catch (error) {
     console.error('Error in sendOtp:', error);
     throw error;
