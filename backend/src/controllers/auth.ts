@@ -49,9 +49,13 @@ export const sendOtp = async (email: string) => {
     const hasGmailConfig = !!gmailEmail && !!gmailPassword;
 
     if (!hasSendgridConfig && !hasGmailConfig) {
-      throw new Error(
-        'Missing email credentials. Configure SENDGRID_API_KEY + SENDGRID_FROM_EMAIL or EMAIL_ID + EMAIL_PASSWORD.',
-      );
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`⚠️ [DEV MODE] No email credentials found. Falling back to console logging.`);
+      } else {
+        throw new Error(
+          'Missing email credentials. Configure SENDGRID_API_KEY + SENDGRID_FROM_EMAIL or EMAIL_ID + EMAIL_PASSWORD.',
+        );
+      }
     }
 
     const existingOtp = await db.query.otp.findFirst({
@@ -62,7 +66,12 @@ export const sendOtp = async (email: string) => {
     if (existingOtp) {
       const now = new Date();
       if (existingOtp.expiresAt > now) {
-        throw new Error('OTP already sent. Please check your email.');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`⚠️ [DEV MODE] OTP already exists but deleting it to allow regeneration.`);
+          await db.delete(otpSchema).where(eq(otpSchema.email, email));
+        } else {
+          throw new Error('OTP already sent. Please check your email.');
+        }
       } else {
         // Delete expired OTP
         await db.delete(otpSchema).where(eq(otpSchema.email, email));
@@ -73,6 +82,9 @@ export const sendOtp = async (email: string) => {
     const subject = 'Your OTP Code for Completing Registration at Campus Care';
     const text = `Your OTP code is ${otp.toString()}. It is valid for 5 minutes.`;
 
+    // Unconditional logging to console
+    console.log(`\n🔑🔑🔑 [OTP SERVICE] Generated OTP for ${email}: ${otp} 🔑🔑🔑\n`);
+
     if (hasSendgridConfig) {
       const msg = {
         to: email,
@@ -82,14 +94,24 @@ export const sendOtp = async (email: string) => {
         html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
       };
 
-      const [info] = await sgMail.send(msg);
+      try {
+        const [info] = await sgMail.send(msg);
 
-      if (info.statusCode !== 202) {
-        console.error('SendGrid response:', info);
-        throw new Error('Failed to send OTP email via SendGrid. Please try again.');
+        if (info.statusCode !== 202) {
+          console.error('SendGrid response:', info);
+          throw new Error('Failed to send OTP email via SendGrid. Please try again.');
+        }
+      } catch (error) {
+        console.error('SendGrid error:', error);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`⚠️ [DEV MODE] SendGrid failed, but allowing registration flow to continue. Use the OTP printed above.`);
+        } else {
+          throw error;
+        }
       }
-    } else {
-      const transporter = nodemailer.createTransport({
+    } else if (hasGmailConfig) {
+      try {
+        const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,
           secure: false,
@@ -99,13 +121,21 @@ export const sendOtp = async (email: string) => {
           },
         });
 
-      await transporter.sendMail({
-        from: gmailEmail,
-        to: email,
-        subject,
-        text,
-        html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
-      });
+        await transporter.sendMail({
+          from: gmailEmail,
+          to: email,
+          subject,
+          text,
+          html: `<strong>Your OTP code is ${otp.toString()}. It is valid for 5 minutes.</strong>`,
+        });
+      } catch (error) {
+        console.error('Nodemailer error:', error);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`⚠️ [DEV MODE] Gmail SMTP failed, but allowing registration flow to continue. Use the OTP printed above.`);
+        } else {
+          throw error;
+        }
+      }
     }
 
     // Insert new OTP record (valid for 5 minutes)
@@ -115,7 +145,8 @@ export const sendOtp = async (email: string) => {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes validity
     });
 
-    console.log('✅ OTP Email sent successfully.');
+    console.log('✅ OTP Email process completed.');
+    return { devOtp: otp };
   } catch (error) {
     console.error('Error in sendOtp:', error);
     throw error;
