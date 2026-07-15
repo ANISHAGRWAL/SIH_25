@@ -105,14 +105,14 @@ const teamMembers = [
     image: "/team/anish.jpeg", // You'll need to add team member images
     // specialty: "Full-Stack Development"
   },
-  {
-    name: "Raj De Modak",
-    // role: "Backend Engineer",
-    github: "https://github.com/rajdemodak01",
-    linkedin: "https://www.linkedin.com/in/rajdemodak01/",
-    image: "/team/raj.jpg",
-    // specialty: "System Architecture"
-  },
+  // {
+  //   name: "Raj De Modak",
+  //   // role: "Backend Engineer",
+  //   github: "https://github.com/rajdemodak01",
+  //   linkedin: "https://www.linkedin.com/in/rajdemodak01/",
+  //   image: "/team/raj.jpg",
+  //   // specialty: "System Architecture"
+  // },
   {
     name: "Amar Pal",
     // role: "Frontend Developer",
@@ -130,19 +130,19 @@ const teamMembers = [
     // specialty: "Machine Learning"
   },
   {
-    name: "Shashank Shekhar",
-    role: "DevOps Engineer",
-    github: "https://github.com/shashankkk05",
-    linkedin: "https://www.linkedin.com/in/shashank-s-1a7469251/",
-    image: "/team/shashank.jpg",
+    name: "Md Musharraf",
+    // role: "DevOps Engineer",
+    // github: "https://github.com/shashankkk05",
+    // linkedin: "https://www.linkedin.com/in/shashank-s-1a7469251/",
+    image: "/team/md.png",
     specialty: "Cloud Infrastructure"
   },
   {
-    name: "Ananya Mishra",
+    name: "Anant kr. roy",
     // role: "Product Manager",
-    github: "https://github.com/ananyamishra233",
-    linkedin: "https://www.linkedin.com/in/ananya-mishra-41b431248/",
-    image: "/team/ananya.jpg",
+    // github: "https://github.com/ananyamishra233",
+    // linkedin: "https://www.linkedin.com/in/ananya-mishra-41b431248/",
+    image: "/team/anant.png",
     // specialty: "Product Strategy"
   }
 ];
@@ -233,7 +233,7 @@ function TeamSection() {
         </div>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-10xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-10xl mx-auto">
           {teamMembers.map((member, index) => (
             <div key={index} className="group relative">
               {/* Single card container with no gaps */}
